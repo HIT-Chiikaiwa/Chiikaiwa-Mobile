@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Study Date</string>
+
+    <string name="email">Email</string>
+    <string name="email_hint">Nhập email của bạn</string>
+
+    <string name="password">Mật khẩu</string>
+    <string name="password_hint">Nhập mật khẩu</string>
+
+    <string name="forgot_password">Quên mật khẩu?</string>
+
+    <string name="login">Đăng nhập</string>
+
+    <string name="register">Đăng kí ngay</string>
+
+    <string name="no_account">Chưa có tài khoản</string>
+
+    <string name="toggle_password">Hiện hoặc ẩn mật khẩu</string>
+
 </resources>
