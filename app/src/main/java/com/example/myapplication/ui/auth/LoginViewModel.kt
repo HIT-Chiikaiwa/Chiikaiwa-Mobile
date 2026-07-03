@@ -1,40 +1,65 @@
 package com.example.myapplication.ui.auth
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.model.response.LoginResponse
-import com.example.myapplication.data.remote.RetrofitClient
+import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.repository.AuthRepository
+import com.example.myapplication.ui.base.BaseViewModel
+import com.example.myapplication.ui.base.UiEvent
+import com.example.myapplication.ui.base.UiState
+import com.example.myapplication.utils.Resource
 import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
-    private val repository = AuthRepository(RetrofitClient.apiService)
+class LoginViewModel(application: Application) : BaseViewModel<Unit>(application) {
 
-    private val _loginResult = MutableLiveData<LoginResponse?>()
+    private val repository = AuthRepository(application)
 
-    val loginResult: LiveData<LoginResponse?> = _loginResult
-
-    private val _error = MutableLiveData<String>()
-
-    val error: LiveData<String> = _error
+    private val preferenceManager = PreferenceManager(application)
 
     fun login(email: String, password: String) {
-        viewModelScope.launch {
-            try {
-                val response = repository.login(email, password)
 
-                if (response.isSuccessful) {
-                    _loginResult.value = response.body()
-                } else {
-                    _error.value = "Email hoặc mật khẩu không đúng"
-                }
-            } catch (e: Exception) {
-                _error.value = e.message?: "Không thể kết nối tới server"
-            }
+        if (email.isBlank()) {
+            _uiState.value = UiState.Error("Vui lòng nhập email")
+            return
         }
 
+        if (password.isBlank()) {
+            _uiState.value = UiState.Error("Vui lòng nhập mật khẩu")
+            return
+        }
+
+        viewModelScope.launch {
+
+            _uiState.value = UiState.Loading
+
+            when (val result = repository.login(email, password)) {
+
+                is Resource.Success -> {
+
+                    result.data?.let { data ->
+
+                        preferenceManager.saveLogin(
+                            accessToken = data.accessToken,
+                            refreshToken = data.refreshToken,
+                            userId = data.id
+                        )
+
+                        _uiState.value = UiState.Success(Unit)
+
+                        _event.value = UiEvent.ShowToast("Đăng nhập thành công")
+                        _event.value = UiEvent.NavigateHome
+                    }
+                }
+
+                is Resource.Error -> {
+                    android.util.Log.d("LOGIN", "Error message = '${result.message}'")
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
     }
 
+    fun resetState() {
+        _uiState.value = UiState.Idle
+    }
 }

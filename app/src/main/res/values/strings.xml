@@ -16,5 +16,18 @@
     <string name="no_account">Chưa có tài khoản</string>
 
     <string name="toggle_password">Hiện hoặc ẩn mật khẩu</string>
+    <string name="last_name">Họ</string>
+    <string name="first_name">Tên</string>
+    <string name="confirm_password">Nhập lại mật khẩu</string>
 
+    <string name="back">Quay lại</string>
+    <string name="gender">Giới tính</string>
+    <string name="date">Ngày sinh</string>
+    <string name="choose_date">Ngày sinh</string>
+    <string name="had_account">Đã có tài khoản?</string>
+    <string name="verify_otp">Xác thực Email</string>
+    <string name="otp_description">Chip đã gửi mã otp vào Email mà bạn đã đăng ký rồi đó!</string>
+    <string name="input_otp">Vui lòng nhập mã OTP</string>
+    <string name="verify">Xác thực</string>
+    <string name="resend_otp">Gửi lại</string>
 </resources>

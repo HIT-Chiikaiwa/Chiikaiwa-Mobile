@@ -1,6 +1,6 @@
 package com.example.myapplication.data.model.request
 
-data class LoginRequest(
+data class VerifyOtpRequest(
     val email: String,
-    val password: String
+    val otpCode: String
 )
