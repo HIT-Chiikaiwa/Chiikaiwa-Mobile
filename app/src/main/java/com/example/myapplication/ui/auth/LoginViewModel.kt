@@ -36,12 +36,13 @@ class LoginViewModel(application: Application) : BaseViewModel<Unit>(application
 
                 is Resource.Success -> {
 
-                    result.data?.let { data ->
+                    result.data?.let { loginResponse ->
+                        val loginData = loginResponse.data
 
                         preferenceManager.saveLogin(
-                            accessToken = data.accessToken,
-                            refreshToken = data.refreshToken,
-                            userId = data.id
+                            accessToken = loginData.accessToken,
+                            refreshToken = loginData.refreshToken,
+                            userId = loginData.id
                         )
 
                         _uiState.value = UiState.Success(Unit)
@@ -52,8 +53,10 @@ class LoginViewModel(application: Application) : BaseViewModel<Unit>(application
                 }
 
                 is Resource.Error -> {
-                    android.util.Log.d("LOGIN", "Error message = '${result.message}'")
-                    _uiState.value = UiState.Error(result.message)
+                    android.util.Log.d("LOGIN_ERROR", "Message: ${result.message}")
+
+                    val errorMessage = result.message ?: "Đăng nhập thất bại, vui lòng thử lại"
+                    _uiState.value = UiState.Error(errorMessage)
                 }
             }
         }

@@ -18,6 +18,7 @@ class VerifyOtpActivity : BaseActivity<VerifyOtpBinding>() {
     private val viewModel: VerifyOtpViewModel by viewModels()
 
     private var email = ""
+    private var isLoading = false
 
     override fun initView() {
 
@@ -38,6 +39,8 @@ class VerifyOtpActivity : BaseActivity<VerifyOtpBinding>() {
             binding.tvOtpError.visibility = View.GONE
             viewModel.resendOtp(email)
         }
+
+        viewModel.startResendTimer()
     }
 
     override fun observeData() {
@@ -84,15 +87,33 @@ class VerifyOtpActivity : BaseActivity<VerifyOtpBinding>() {
                 }
             }
         }
+
+        viewModel.resendCooldown.observe(this) { cooldown ->
+            updateResendButton(cooldown)
+        }
     }
 
     private fun setLoading(isLoading: Boolean) {
-
+        this.isLoading = isLoading
         binding.btnVerify.isEnabled = !isLoading
-        binding.btnResend.isEnabled = !isLoading
+        binding.btnVerify.alpha = if (isLoading) 0.5f else 1.0f
+
+        updateResendButton(viewModel.resendCooldown.value ?: 0)
 
         if (isLoading) {
             binding.tvOtpError.visibility = View.GONE
+        }
+    }
+
+    private fun updateResendButton(cooldown: Int) {
+        if (cooldown > 0) {
+            binding.btnResend.isEnabled = false
+            binding.btnResend.text = "Gửi lại (${cooldown}s)"
+            binding.btnResend.alpha = 0.5f
+        } else {
+            binding.btnResend.isEnabled = !isLoading
+            binding.btnResend.text = "Gửi lại"
+            binding.btnResend.alpha = if (isLoading) 0.5f else 1.0f
         }
     }
 
