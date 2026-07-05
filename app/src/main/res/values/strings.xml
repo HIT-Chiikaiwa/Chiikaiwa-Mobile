@@ -30,4 +30,7 @@
     <string name="input_otp">Vui lòng nhập mã OTP</string>
     <string name="verify">Xác thực</string>
     <string name="resend_otp">Gửi lại</string>
+    <string name="verify_email">Bạn cần xác thực email!</string>
+    <string name="verify_your_email">Nhấn Nhận mã OTP để nhận mã nhé!\nChíp sẽ gửi OTP tới abc123@gmail.com</string>
+    <string name="send_email">Nhận mã OTP</string>
 </resources>

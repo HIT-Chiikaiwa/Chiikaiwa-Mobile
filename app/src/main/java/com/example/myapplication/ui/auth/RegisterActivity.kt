@@ -104,7 +104,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
                     setLoading(false)
 
                     startActivity(
-                        Intent(this, VerifyOtpActivity::class.java).apply {
+                        Intent(this, VerifyEmailActivity::class.java).apply {
                             putExtra("email", registeredEmail)
                         }
                     )

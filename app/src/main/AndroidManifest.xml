@@ -25,6 +25,9 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.auth.VerifyEmailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.auth.VerifyOtpActivity"
             android:exported="false" />
     </application>

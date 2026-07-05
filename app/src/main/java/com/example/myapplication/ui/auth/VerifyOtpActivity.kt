@@ -6,14 +6,14 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import androidx.activity.viewModels
-import com.example.myapplication.databinding.VerifyOtpBinding
+import com.example.myapplication.databinding.ActivityVerifyOtpBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 
-class VerifyOtpActivity : BaseActivity<VerifyOtpBinding>() {
+class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
 
-    override fun inflateBinding() = VerifyOtpBinding.inflate(layoutInflater)
+    override fun inflateBinding() = ActivityVerifyOtpBinding.inflate(layoutInflater)
 
     private val viewModel: VerifyOtpViewModel by viewModels()
 
