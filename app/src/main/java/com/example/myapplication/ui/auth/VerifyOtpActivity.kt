@@ -18,11 +18,13 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
     private val viewModel: VerifyOtpViewModel by viewModels()
 
     private var email = ""
+    private var flow = "register"
     private var isLoading = false
 
     override fun initView() {
 
         email = intent.getStringExtra("email") ?: ""
+        flow = intent.getStringExtra("flow") ?: "register"
         binding.tvOtpDescription.text = "Mã OTP đã được gửi đến email:\n$email"
         binding.ivBack.setOnClickListener {
             finish()
@@ -32,12 +34,12 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
 
         binding.btnVerify.setOnClickListener {
             binding.tvOtpError.visibility = View.GONE
-            viewModel.verifyOtp(email, getOtpCode())
+            viewModel.verifyOtp(email, getOtpCode(), flow)
         }
 
         binding.btnResend.setOnClickListener {
             binding.tvOtpError.visibility = View.GONE
-            viewModel.resendOtp(email)
+            viewModel.resendOtp(email, flow)
         }
 
         viewModel.startResendTimer()
@@ -58,6 +60,19 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
 
                 is UiState.Success -> {
                     setLoading(false)
+                    if (flow == "forgot_password") {
+                        val intent = Intent(this, ForgotPasswordActivity::class.java).apply {
+                            putExtra("email", email)
+                        }
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        val intent = Intent(this, LoginActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        finish()
+                    }
                 }
 
                 is UiState.Error -> {

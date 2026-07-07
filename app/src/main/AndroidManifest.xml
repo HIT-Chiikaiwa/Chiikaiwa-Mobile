@@ -30,6 +30,12 @@
         <activity
             android:name=".ui.auth.VerifyOtpActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.auth.InputEmailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.ForgotPasswordActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

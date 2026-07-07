@@ -13,7 +13,7 @@ class VerifyEmailViewModel(application: Application) : BaseViewModel<String>(app
 
     private val repository = AuthRepository(application)
 
-    fun sendOtp(email: String) {
+    fun sendOtp(email: String, flow: String) {
         if (email.isBlank()) {
             _uiState.value = UiState.Error("Không tìm thấy email")
             return
@@ -22,10 +22,16 @@ class VerifyEmailViewModel(application: Application) : BaseViewModel<String>(app
         viewModelScope.launch {
             _uiState.value = UiState.Loading
 
-            when (val result = repository.sendOtp(email)) {
+            val apiCall = if (flow == "forgot_password") {
+                repository.forgotPasswordSendOtp(email)
+            } else {
+                repository.sendOtp(email)
+            }
+
+            when (val result = apiCall) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.message ?: "Gửi mã OTP thành công")
-                    _event.value = UiEvent.ShowToast(result.data?.message ?: "Gửi mã OTP thành công")
+                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Gửi mã OTP thành công")
+                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Gửi mã OTP thành công")
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)

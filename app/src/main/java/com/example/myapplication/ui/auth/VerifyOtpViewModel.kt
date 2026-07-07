@@ -32,7 +32,7 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
         }
     }
 
-    fun verifyOtp(email: String, otpCode: String) {
+    fun verifyOtp(email: String, otpCode: String, flow: String) {
         if (otpCode.isBlank()) {
             _uiState.value = UiState.Error("Vui lòng nhập mã OTP")
             return
@@ -40,11 +40,16 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
 
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            when (val result = repository.verifyRegisterOtp(email, otpCode)) {
+            val apiCall = if (flow == "forgot_password") {
+                repository.forgotPasswordVerifyOtp(email, otpCode)
+            } else {
+                repository.verifyRegisterOtp(email, otpCode)
+            }
 
+            when (val result = apiCall) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.message ?: "Xác thực OTP thành công")
-                    _event.value = UiEvent.ShowToast(result.data?.message ?: "Xác thực OTP thành công")
+                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Xác thực OTP thành công")
+                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Xác thực OTP thành công")
                 }
 
                 is Resource.Error -> {
@@ -54,27 +59,29 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
         }
     }
 
-    fun resendOtp(email: String) {
+    fun resendOtp(email: String, flow: String) {
         if (email.isBlank()) {
             _uiState.value = UiState.Error("Không tìm thấy email")
             return
         }
 
         viewModelScope.launch {
-
             _uiState.value = UiState.Loading
+            val apiCall = if (flow == "forgot_password") {
+                repository.forgotPasswordSendOtp(email)
+            } else {
+                repository.sendOtp(email)
+            }
 
-            when (val result = repository.sendOtp(email)) {
-
+            when (val result = apiCall) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.message ?: "Đã gửi lại mã OTP")
-                    _event.value = UiEvent.ShowToast(result.data?.message ?: "Đã gửi lại mã OTP")
+                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Đã gửi lại mã OTP")
+                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Đã gửi lại mã OTP")
                     startResendTimer()
                 }
 
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
-
                 }
             }
         }

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_2"
-    tools:context=".ui.auth.VerifyEmailActivity">
+    tools:context=".ui.auth.InputEmailActivity">
 
     <ImageView
         android:id="@+id/ivBack"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:gravity="center"
-        android:text="@string/verify_email"
+        android:text="@string/verify_security"
         android:textAlignment="center"
         android:textColor="@color/brown"
         android:textSize="40sp"
@@ -43,13 +43,27 @@
         android:layout_marginHorizontal="40dp"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text='@string/verify_your_email'
+        android:text="@string/input_email"
         android:textColor="@color/brown"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"/>
+
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/bg_edittext"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress"
+        android:paddingHorizontal="16dp"
+        android:textColor="@color/brown"
+        android:textColorHint="@color/hint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDescription"/>
 
     <ImageView
         android:id="@+id/imgChicken"
@@ -61,7 +75,7 @@
         android:src="@drawable/group1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDescription"/>
+        app:layout_constraintTop_toBottomOf="@id/edtEmail"/>
 
     <TextView
         android:id="@+id/tvLogin"

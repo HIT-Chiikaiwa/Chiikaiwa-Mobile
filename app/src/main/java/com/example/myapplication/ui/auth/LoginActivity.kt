@@ -33,6 +33,12 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
             togglePassword()
         }
 
+        binding.tvForgot.setOnClickListener {
+            startActivity(
+                Intent(this, InputEmailActivity::class.java)
+            )
+        }
+
         binding.tvRegister.setOnClickListener {
             startActivity(
                 Intent(this, RegisterActivity::class.java)

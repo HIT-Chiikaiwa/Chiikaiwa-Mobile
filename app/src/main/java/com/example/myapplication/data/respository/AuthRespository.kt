@@ -1,12 +1,11 @@
 package com.example.myapplication.data.repository
 
 import android.content.Context
-import com.example.myapplication.data.model.request.LoginRequest
-import com.example.myapplication.data.model.request.RegisterRequest
-import com.example.myapplication.data.model.request.SendOtpRequest
-import com.example.myapplication.data.model.request.VerifyOtpRequest
+import com.example.myapplication.data.model.request.*
+import com.example.myapplication.data.model.response.BaseResponse
 import com.example.myapplication.data.model.response.CommonResponse
 import com.example.myapplication.data.model.response.LoginResponse
+import com.example.myapplication.data.model.response.UserDto
 import com.example.myapplication.data.remote.RetrofitClient
 import com.example.myapplication.utils.Resource
 
@@ -19,17 +18,31 @@ class AuthRepository(context: Context) : BaseRepository() {
         }
     }
 
-    suspend fun getCurrentUser() = safeApiCall { api.getCurrentUser() }
+    suspend fun getCurrentUser(): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.getCurrentUser() }
+    }
 
-    suspend fun register(request: RegisterRequest): Resource<CommonResponse> {
+    suspend fun register(request: RegisterRequest): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.register(request) }
     }
 
-    suspend fun verifyRegisterOtp(email: String, otpCode: String): Resource<CommonResponse> {
+    suspend fun verifyRegisterOtp(email: String, otpCode: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.verifyRegisterOtp(VerifyOtpRequest(email, otpCode)) }
     }
 
-    suspend fun sendOtp(email: String): Resource<CommonResponse> {
+    suspend fun sendOtp(email: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.sendOtp(SendOtpRequest(email)) }
+    }
+
+    suspend fun forgotPasswordSendOtp(email: String): Resource<BaseResponse<CommonResponse>> {
+        return safeApiCall { api.forgotPasswordSendOtp(SendOtpRequest(email)) }
+    }
+
+    suspend fun forgotPasswordVerifyOtp(email: String, otpCode: String): Resource<BaseResponse<CommonResponse>> {
+        return safeApiCall { api.forgotPasswordVerifyOtp(VerifyOtpRequest(email, otpCode)) }
+    }
+
+    suspend fun resetPassword(email: String, pass: String, confirmPass: String): Resource<BaseResponse<CommonResponse>> {
+        return safeApiCall { api.resetPassword(ResetPasswordRequest(email, pass, confirmPass)) }
     }
 }

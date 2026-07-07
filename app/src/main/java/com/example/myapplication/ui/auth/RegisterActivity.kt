@@ -188,11 +188,11 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
 
         if (isPasswordVisible) {
             binding.edtPassword.transformationMethod = PasswordTransformationMethod.getInstance()
-            binding.ivTogglePassword.setImageResource(R.drawable.ic_visibility)
+            binding.ivTogglePassword.setImageResource(R.drawable.ic_visibility_off)
 
         } else {
             binding.edtPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
-            binding.ivTogglePassword.setImageResource(R.drawable.ic_visibility_off)
+            binding.ivTogglePassword.setImageResource(R.drawable.ic_visibility)
         }
 
         binding.edtPassword.setSelection(binding.edtPassword.text.length)
@@ -204,11 +204,11 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
         if (isConfirmPasswordVisible) {
 
             binding.edtConfirmPassword.transformationMethod = PasswordTransformationMethod.getInstance()
-            binding.ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility)
+            binding.ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility_off)
 
         } else {
             binding.edtConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
-            binding.ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility_off)
+            binding.ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility)
 
         }
         binding.edtConfirmPassword.setSelection(binding.edtConfirmPassword.text.length)

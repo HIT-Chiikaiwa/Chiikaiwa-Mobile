@@ -93,8 +93,8 @@ class RegisterViewModel(application: Application) : BaseViewModel<String>(applic
             when (val result = repository.register(request)) {
 
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.message ?: "Đăng ký thành công")
-                    _event.value = UiEvent.ShowToast(result.data?.message ?: "Đăng ký thành công")
+                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Đăng ký thành công")
+                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Đăng ký thành công")
                 }
 
                 is Resource.Error -> {

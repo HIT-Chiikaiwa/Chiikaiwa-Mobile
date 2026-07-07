@@ -33,4 +33,10 @@
     <string name="verify_email">Bạn cần xác thực email!</string>
     <string name="verify_your_email">Nhấn Nhận mã OTP để nhận mã nhé!\nChíp sẽ gửi OTP tới abc123@gmail.com</string>
     <string name="send_email">Nhận mã OTP</string>
+    <string name="create_new_password">Hãy tạo mật khẩu mới!</string>
+    <string name="new_password">Nhập mật khẩu mới</string>
+    <string name="confirm_new_password">Nhập lại mật khẩu mới</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="verify_security">Bạn cần xác thực bảo mật!</string>
+    <string name="input_email">Nhập email nhận mã</string>
 </resources>

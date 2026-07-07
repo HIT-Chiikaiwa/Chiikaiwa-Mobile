@@ -1,4 +1,125 @@
 package com.example.myapplication.ui.auth
 
-class ForgotPasswordActivity {
+import android.content.Intent
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
+import android.view.View
+import androidx.activity.viewModels
+import com.example.myapplication.R
+import com.example.myapplication.databinding.ActivityForgotPasswordBinding
+import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.UiEvent
+import com.example.myapplication.ui.base.UiState
+
+class ForgotPasswordActivity : BaseActivity<ActivityForgotPasswordBinding>() {
+
+    override fun inflateBinding() = ActivityForgotPasswordBinding.inflate(layoutInflater)
+
+    private val viewModel: ForgotPasswordViewModel by viewModels()
+
+    private var email = ""
+    private var isPasswordVisible = false
+    private var isConfirmPasswordVisible = false
+
+    override fun initView() {
+        email = intent.getStringExtra("email") ?: ""
+
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+
+        binding.ivTogglePassword.setOnClickListener {
+            togglePasswordVisibility()
+        }
+
+        binding.ivToggleConfirmPassword.setOnClickListener {
+            toggleConfirmPasswordVisibility()
+        }
+
+        binding.tvConfirm.setOnClickListener {
+            binding.tvPasswordError.visibility = View.GONE
+            viewModel.resetPassword(
+                email = email,
+                pass = binding.edtNewPassword.text.toString().trim(),
+                confirmPass = binding.edtConfirmPassword.text.toString().trim()
+            )
+        }
+    }
+
+    override fun observeData() {
+        viewModel.uiState.observe(this) { state ->
+            when (state) {
+                UiState.Idle -> {
+                    setLoading(false)
+                }
+                UiState.Loading -> {
+                    setLoading(true)
+                }
+                is UiState.Success -> {
+                    setLoading(false)
+                    val intent = Intent(this, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    startActivity(intent)
+                    finish()
+                }
+                is UiState.Error -> {
+                    setLoading(false)
+                    binding.tvPasswordError.visibility = View.VISIBLE
+                    binding.tvPasswordError.text = state.message
+                }
+            }
+        }
+
+        viewModel.event.observe(this) { event ->
+            when (event) {
+                is UiEvent.ShowToast -> {
+                    showToast(event.message)
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        binding.tvConfirm.isEnabled = !isLoading
+        binding.tvConfirm.alpha = if (isLoading) 0.5f else 1.0f
+        if (isLoading) {
+            binding.tvPasswordError.visibility = View.GONE
+        }
+    }
+
+    private fun togglePasswordVisibility() {
+        if (isPasswordVisible) {
+            binding.edtNewPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+            binding.ivTogglePassword.setImageResource(R.drawable.ic_visibility_off)
+        } else {
+            binding.edtNewPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            binding.ivTogglePassword.setImageResource(R.drawable.ic_visibility)
+        }
+        binding.edtNewPassword.setSelection(binding.edtNewPassword.text.length)
+        isPasswordVisible = !isPasswordVisible
+        updateAvatarState()
+    }
+
+    private fun toggleConfirmPasswordVisibility() {
+        if (isConfirmPasswordVisible) {
+            binding.edtConfirmPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+            binding.ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility_off)
+        } else {
+            binding.edtConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            binding.ivToggleConfirmPassword.setImageResource(R.drawable.ic_visibility)
+        }
+        binding.edtConfirmPassword.setSelection(binding.edtConfirmPassword.text.length)
+        isConfirmPasswordVisible = !isConfirmPasswordVisible
+        updateAvatarState()
+    }
+
+    private fun updateAvatarState() {
+        if (isPasswordVisible || isConfirmPasswordVisible) {
+            binding.ivPic.setImageResource(R.drawable.frame1)
+        } else {
+            binding.ivPic.setImageResource(R.drawable.frame3)
+        }
+    }
 }

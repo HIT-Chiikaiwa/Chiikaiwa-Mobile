@@ -15,9 +15,11 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
     private val viewModel: VerifyEmailViewModel by viewModels()
 
     private var email = ""
+    private var flow = "register"
 
     override fun initView() {
         email = intent.getStringExtra("email") ?: ""
+        flow = intent.getStringExtra("flow") ?: "register"
 
         binding.tvDescription.text = "Nhấn Nhận mã OTP để nhận mã nhé!\nChíp sẽ gửi OTP tới $email"
 
@@ -26,7 +28,7 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
         }
 
         binding.tvLogin.setOnClickListener {
-            viewModel.sendOtp(email)
+            viewModel.sendOtp(email, flow)
         }
     }
 
@@ -44,6 +46,7 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
                     startActivity(
                         Intent(this, VerifyOtpActivity::class.java).apply {
                             putExtra("email", email)
+                            putExtra("flow", flow)
                         }
                     )
                 }
