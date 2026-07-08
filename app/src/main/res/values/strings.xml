@@ -39,4 +39,20 @@
     <string name="confirm">Xác nhận</string>
     <string name="verify_security">Bạn cần xác thực bảo mật!</string>
     <string name="input_email">Nhập email nhận mã</string>
+    <string name="profile_title">Hồ sơ cá nhân</string>
+    <string name="username">Username</string>
+    <string name="id">ID:</string>
+    <string name="friends">Bạn bè:</string>
+    <string name="introduction">Dòng gới thiệu</string>
+    <string name="update_profile">Chỉnh sửa trang cá nhân</string>
+    <string name="infor">Thông tin cá nhân</string>
+    <string name="age">Tuổi:</string>
+    <string name="sex">Giới tính:</string>
+    <string name="school">Trường học:</string>
+    <string name="major">Ngành học:</string>
+    <string name="country">Quê quán:</string>
+    <string name="setting">Cài đặt tài khoản</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="appointment">Cuộc hẹn</string>
+    <string name="honor">Danh hiệu</string>
 </resources>
