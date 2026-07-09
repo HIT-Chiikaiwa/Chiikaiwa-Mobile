@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/svProfile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_profile"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/layoutHeader"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:background="@color/bg_2"
+            android:gravity="center_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/bg_2"
+                android:contentDescription="@string/back"
+                android:padding="8dp"
+                android:src="@drawable/arrow_back"
+                app:tint="@color/brown" />
+
+            <TextView
+                android:id="@+id/tvHeaderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="@string/profile_title"
+                android:textColor="@color/brown"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivTogglePassword1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/edit_profile"
+            app:layout_constraintTop_toBottomOf="@+id/layoutHeader"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageView
+            android:id="@+id/ivWoodLeft1"
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="50dp"
+            android:contentDescription="@null"
+            android:elevation="-1dp"
+            android:src="@drawable/rectangle"
+            app:layout_constraintBottom_toTopOf="@id/cvProfile"
+            app:layout_constraintStart_toStartOf="@id/cvProfile"
+            app:layout_constraintTop_toBottomOf="@id/layoutHeader" />
+
+        <ImageView
+            android:id="@+id/ivWoodRight1"
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="50dp"
+            android:contentDescription="@null"
+            android:elevation="-1dp"
+            android:src="@drawable/rectangle"
+            app:layout_constraintBottom_toTopOf="@id/cvProfile"
+            app:layout_constraintEnd_toEndOf="@id/cvProfile"
+            app:layout_constraintTop_toBottomOf="@id/layoutHeader" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="35dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="-4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutHeader">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_2"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/profile"
+                    android:gravity="center_vertical"
+                    android:padding="5dp">
+
+                    <FrameLayout
+                        android:layout_width="80dp"
+                        android:layout_height="80dp">
+
+                        <ImageView
+                            android:id="@+id/imgAvatar"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:src="@drawable/ic_launcher_foreground"/>
+
+                        <ImageView
+                            android:id="@+id/imgEditAvatar"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="end|bottom"
+                            android:src="@drawable/edit_profile"
+                            android:padding="4dp" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvUsername"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/username"
+                            android:textColor="@color/brown"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvUserId"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/id"
+                            android:textColor="@color/brown" />
+
+                        <TextView
+                            android:id="@+id/tvFriendsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/friends"
+                            android:textColor="@color/brown" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/tvIntroduction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/introduction"
+                        android:textColor="@color/brown" />
+
+                    <ImageView
+                        android:id="@+id/ivTogglePassword"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@drawable/edit_profile"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnUpdateProfile"
+                    android:layout_width="125dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_button"
+                    android:text="@string/save_changes"
+                    android:textColor="@color/brown"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/ivWoodLeft2"
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="50dp"
+            android:contentDescription="@null"
+            android:elevation="-1dp"
+            android:src="@drawable/rectangle"
+            app:layout_constraintBottom_toTopOf="@id/cvInfo"
+            app:layout_constraintStart_toStartOf="@id/cvInfo"
+            app:layout_constraintTop_toBottomOf="@id/cvProfile" />
+
+        <ImageView
+            android:id="@+id/ivWoodRight2"
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="50dp"
+            android:contentDescription="@null"
+            android:elevation="-1dp"
+            android:src="@drawable/rectangle"
+            app:layout_constraintBottom_toTopOf="@id/cvInfo"
+            app:layout_constraintEnd_toEndOf="@id/cvInfo"
+            app:layout_constraintTop_toBottomOf="@id/cvProfile" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="-4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvProfile">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/bg_2"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/infor"
+                    android:textColor="@color/brown"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/profile"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/tvAge"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/age"
+                        android:textColor="@color/brown" />
+
+                    <TextView
+                        android:id="@+id/tvGender"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sex"
+                        android:textColor="@color/brown" />
+
+                    <TextView
+                        android:id="@+id/tvSchool"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/school"
+                        android:textColor="@color/brown" />
+
+                    <TextView
+                        android:id="@+id/tvMajor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/major"
+                        android:textColor="@color/brown" />
+
+                    <TextView
+                        android:id="@+id/tvCountry"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/country"
+                        android:textColor="@color/brown" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/brown"
+                        android:layout_marginTop="10dp"/>
+
+                    <TextView
+                        android:id="@+id/tvAddInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/add_infor"
+                        android:textColor="@color/brown"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

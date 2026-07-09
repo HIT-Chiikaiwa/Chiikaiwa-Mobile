@@ -55,4 +55,6 @@
     <string name="favorite">Yêu thích</string>
     <string name="appointment">Cuộc hẹn</string>
     <string name="honor">Danh hiệu</string>
+    <string name="add_infor">+ Thêm thông tin</string>
+    <string name="save_changes">Lưu thay đổi</string>
 </resources>
