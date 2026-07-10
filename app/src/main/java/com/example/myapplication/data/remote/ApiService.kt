@@ -5,10 +5,10 @@ import com.example.myapplication.data.model.response.BaseResponse
 import com.example.myapplication.data.model.response.CommonResponse
 import com.example.myapplication.data.model.response.LoginResponse
 import com.example.myapplication.data.model.response.UserDto
+import com.example.myapplication.data.model.response.SubjectDto
+import okhttp3.MultipartBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ApiService {
     @POST("api/v1/auth/login")
@@ -34,4 +34,42 @@ interface ApiService {
 
     @POST("api/v1/auth/forgot-password/reset")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<BaseResponse<CommonResponse>>
+
+    @GET("api/v1/profile/{userId}")
+    suspend fun getProfile(@Path("userId") userId: String): Response<BaseResponse<UserDto>>
+
+    @PATCH("api/v1/profile/{userId}/status")
+    suspend fun toggleBuddyStatus(
+        @Path("userId") userId: String,
+        @Body request: ToggleBuddyStatusRequest
+    ): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/password")
+    suspend fun changePassword(
+        @Path("userId") userId: String,
+        @Body request: ChangePasswordRequest
+    ): Response<BaseResponse<CommonResponse>>
+
+    @GET("api/v1/profile/{userId}/subjects")
+    suspend fun getSubjects(
+        @Path("userId") userId: String,
+        @Query("type") type: String? = null
+    ): Response<BaseResponse<List<SubjectDto>>>
+
+    @POST("api/v1/profile/{userId}/subjects")
+    suspend fun addSubject(
+        @Path("userId") userId: String,
+        @Body request: AddSubjectRequest
+    ): Response<BaseResponse<SubjectDto>>
+
+    @DELETE("api/v1/profile/{userId}/subjects/{subjectId}")
+    suspend fun deleteSubject(
+        @Path("userId") userId: String,
+        @Path("subjectId") subjectId: String
+    ): Response<BaseResponse<CommonResponse>>
+
+    @DELETE("api/v1/profile/{userId}")
+    suspend fun deleteAccount(
+        @Path("userId") userId: String
+    ): Response<BaseResponse<CommonResponse>>
 }

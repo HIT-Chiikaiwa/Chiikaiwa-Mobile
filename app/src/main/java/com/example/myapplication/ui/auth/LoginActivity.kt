@@ -85,7 +85,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
                 UiEvent.NavigateHome -> {
                     startActivity(
-                        Intent(this, RegisterActivity::class.java)
+                        Intent(this, com.example.myapplication.ui.profile.ProfileActivity::class.java)
                     )
                     finish()
                 }
