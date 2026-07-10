@@ -57,4 +57,7 @@
     <string name="honor">Danh hiệu</string>
     <string name="add_infor">+ Thêm thông tin</string>
     <string name="save_changes">Lưu thay đổi</string>
+    <string name="register_infor">Thông tin đăng kí</string>
+    <string name="help">Trợ giúp</string>
+    <string name="log_out">Đăng xuất</string>
 </resources>
