@@ -55,4 +55,7 @@
     <string name="favorite">Yêu thích</string>
     <string name="appointment">Cuộc hẹn</string>
     <string name="honor">Danh hiệu</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="who">Bạn muốn tìm ai?</string>
 </resources>
