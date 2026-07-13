@@ -13,8 +13,16 @@ import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
-import org.maplibre.android.plugins.annotation.SymbolManager
-import org.maplibre.android.plugins.annotation.SymbolOptions
+
+import org.maplibre.android.style.layers.PropertyFactory.iconAllowOverlap
+import org.maplibre.android.style.layers.PropertyFactory.iconImage
+import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.android.style.sources.GeoJsonSource
+
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.Point
+
+import org.maplibre.geojson.FeatureCollection
 
 class MapFragment : Fragment() {
 
@@ -46,39 +54,69 @@ class MapFragment : Fragment() {
 
             map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
 
-                style.addImage(
-                    "marker",
-                    BitmapFactory.decodeResource(
-                        resources,
-                        R.drawable.ic_marker
+                val haNoi = LatLng(
+                    21.028511,
+                    105.804817
+                )
+
+                map.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        haNoi,
+                        15.0
                     )
                 )
 
-                val haNoi = LatLng(21.028511, 105.804817)
-
-                val cameraPosition = CameraPosition.Builder()
-                    .target(haNoi)
-                    .zoom(15.0)
-                    .build()
-
-                map.animateCamera(
-                    CameraUpdateFactory.newCameraPosition(cameraPosition)
+                val bitmap = BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.ic_marker
                 )
 
-                val symbolManager = SymbolManager(
-                    binding.mapView,
-                    map,
-                    style
+                style.addImage("my_marker", bitmap)
+
+                val features = listOf(
+
+                    Feature.fromGeometry(
+                        Point.fromLngLat(
+                            105.804817,
+                            21.028511
+                        )
+                    ),
+
+                    Feature.fromGeometry(
+                        Point.fromLngLat(
+                            105.808000,
+                            21.030000
+                        )
+                    ),
+
+                    Feature.fromGeometry(
+                        Point.fromLngLat(
+                            105.801500,
+                            21.025500
+                        )
+                    )
+
                 )
 
-                symbolManager.create(
-                    SymbolOptions()
-                        .withLatLng(haNoi)
-                        .withIconImage("marker")
-                        .withIconAnchor("bottom")
-                        .withIconSize(0.8f)
+                style.addSource(
+                    GeoJsonSource(
+                        "user-source",
+                        FeatureCollection.fromFeatures(features)
+                    )
                 )
 
+                style.addLayer(
+                    SymbolLayer(
+                        "user-layer",
+                        "user-source"
+                    ).withProperties(
+                        iconImage("my_marker"),
+                        iconAllowOverlap(true)
+                    )
+                )
+                Log.d("MAP_TEST", "Image = ${style.getImage("marker") != null}")
+                Log.d("MAP_TEST", "Source = ${style.getSource("user-source") != null}")
+                Log.d("MAP_TEST", "Layer = ${style.getLayer("user-layer") != null}")
             }
         }
     }
