@@ -59,5 +59,6 @@ dependencies {
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    implementation("org.maplibre.gl:android-sdk:13.3.1")
+    implementation("org.maplibre.gl:android-sdk:12.3.1")
+    implementation("org.maplibre.gl:android-plugin-annotation-v9:3.0.2")
 }
