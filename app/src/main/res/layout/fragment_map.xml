@@ -119,6 +119,17 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <ImageView
+        android:id="@+id/imgBottomRight"
+        android:layout_width="160dp"
+        android:layout_height="80dp"
+        android:src="@drawable/bt_right"
+        android:scaleType="fitXY"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
         android:id="@+id/btnNotification"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -139,17 +150,6 @@
         android:background="@android:color/transparent"
         android:src="@drawable/ic_calendar"
         android:scaleType="centerInside"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/imgBottomRight"
-        android:layout_width="160dp"
-        android:layout_height="80dp"
-        android:src="@drawable/bt_right"
-        android:scaleType="fitXY"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
