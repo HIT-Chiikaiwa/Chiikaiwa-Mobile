@@ -26,30 +26,68 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val _avatarBitmaps = MutableLiveData<Map<String, Bitmap>>(emptyMap())
     val avatarBitmaps: LiveData<Map<String, Bitmap>> get() = _avatarBitmaps
 
-    fun getNearbyUsers(lat: Double, lng: Double, radius: Double = 5.0) {
+    fun getNearbyUsers(lat: Double, lng: Double, radius: Double = 1.0) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
+            
+            val filterAndDistance = { users: List<NearbyUserResponse> ->
+                users.filter { user ->
+                    val distanceResults = FloatArray(1)
+                    try {
+                        android.location.Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
+                        val distanceKm = distanceResults[0] / 1000.0
+                        distanceKm <= radius
+                    } catch (e: Exception) {
+                        true
+                    }
+                }.map { user ->
+                    val distanceResults = FloatArray(1)
+                    try {
+                        android.location.Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
+                        user.copy(distanceKm = distanceResults[0] / 1000.0)
+                    } catch (e: Exception) {
+                        user
+                    }
+                }
+            }
+
             when (val result = repository.getNearbyUsers(lat, lng, radius)) {
                 is Resource.Success -> {
-                    val usersList = result.data?.data ?: emptyList()
-                    _nearbyUsers.value = usersList
-                    _uiState.value = UiState.Success(usersList)
-                    fetchAvatars(usersList)
+                    val remoteUsers = result.data?.data ?: emptyList()
+                    val fakeUsers = FakeData.getFakeNearbyUsers(lat, lng)
+                    val combinedList = filterAndDistance(remoteUsers) + filterAndDistance(fakeUsers)
+                    _nearbyUsers.value = combinedList
+                    _uiState.value = UiState.Success(combinedList)
+                    fetchAvatars(combinedList)
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message ?: "Không thể lấy danh sách người dùng xung quanh")
+                    val fakeUsers = FakeData.getFakeNearbyUsers(lat, lng)
+                    val filteredFake = filterAndDistance(fakeUsers)
+                    _nearbyUsers.value = filteredFake
+                    _uiState.value = UiState.Success(filteredFake)
+                    fetchAvatars(filteredFake)
                 }
             }
         }
     }
 
     private fun fetchAvatars(users: List<NearbyUserResponse>) {
+        val context = getApplication<Application>()
         users.forEach { user ->
             val avatarUrl = user.avatar
             if (!avatarUrl.isNullOrEmpty() && _avatarBitmaps.value?.containsKey(user.userId) != true) {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
-                        val bitmap = BitmapFactory.decodeStream(URL(avatarUrl).openStream())
+                        val bitmap = if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
+                            BitmapFactory.decodeStream(URL(avatarUrl).openStream())
+                        } else {
+                            val resId = context.resources.getIdentifier(avatarUrl, "drawable", context.packageName)
+                            if (resId != 0) {
+                                BitmapFactory.decodeResource(context.resources, resId)
+                            } else {
+                                null
+                            }
+                        }
                         if (bitmap != null) {
                             withContext(Dispatchers.Main) {
                                 val current = _avatarBitmaps.value?.toMutableMap() ?: mutableMapOf()

@@ -51,6 +51,7 @@ class MapFragment : Fragment() {
 
     private val defaultLatLng = LatLng(21.028511, 105.804817)
     private var currentUserLatLng: LatLng? = null
+    private val RADAR_RADIUS_KM = 1.0
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -99,25 +100,43 @@ class MapFragment : Fragment() {
         binding.btnRadar.setOnClickListener {
             checkLocationPermissionsAndScan()
         }
+        binding.imgGroupRadar.setOnClickListener {
+            if (binding.btnRadar.isEnabled) {
+                checkLocationPermissionsAndScan()
+            }
+        }
+        binding.layoutRadar.setOnClickListener {
+            if (binding.btnRadar.isEnabled) {
+                checkLocationPermissionsAndScan()
+            }
+        }
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 com.example.myapplication.ui.base.UiState.Loading -> {
                     binding.btnRadar.setImageResource(R.drawable.radaring)
                     binding.btnRadar.isEnabled = false
+                    showRadarLayers(true)
+                    startRadarBeamAnimation()
                 }
                 is com.example.myapplication.ui.base.UiState.Success -> {
                     binding.btnRadar.setImageResource(R.drawable.radar)
                     binding.btnRadar.isEnabled = true
+                    stopRadarBeamAnimation()
+                    showRadarLayers(false)
                 }
                 is com.example.myapplication.ui.base.UiState.Error -> {
                     binding.btnRadar.setImageResource(R.drawable.radar)
                     binding.btnRadar.isEnabled = true
+                    stopRadarBeamAnimation()
+                    showRadarLayers(false)
                     Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 }
                 com.example.myapplication.ui.base.UiState.Idle -> {
                     binding.btnRadar.setImageResource(R.drawable.radar)
                     binding.btnRadar.isEnabled = true
+                    stopRadarBeamAnimation()
+                    showRadarLayers(false)
                 }
             }
         }
@@ -173,6 +192,49 @@ class MapFragment : Fragment() {
                     style.addImage("my_location_marker", scaledBitmap)
                 }
 
+                val radarCircleSource = GeoJsonSource(
+                    "radar-circle-source",
+                    FeatureCollection.fromFeatures(emptyList())
+                )
+                style.addSource(radarCircleSource)
+
+                style.addLayer(
+                    org.maplibre.android.style.layers.FillLayer(
+                        "radar-circle-fill-layer",
+                        "radar-circle-source"
+                    ).withProperties(
+                        org.maplibre.android.style.layers.PropertyFactory.fillColor(android.graphics.Color.parseColor("#26000000")),
+                        org.maplibre.android.style.layers.PropertyFactory.visibility(org.maplibre.android.style.layers.Property.NONE)
+                    )
+                )
+
+                style.addLayer(
+                    org.maplibre.android.style.layers.LineLayer(
+                        "radar-circle-stroke-layer",
+                        "radar-circle-source"
+                    ).withProperties(
+                        org.maplibre.android.style.layers.PropertyFactory.lineColor(android.graphics.Color.parseColor("#4DFFFFFF")),
+                        org.maplibre.android.style.layers.PropertyFactory.lineWidth(2f),
+                        org.maplibre.android.style.layers.PropertyFactory.visibility(org.maplibre.android.style.layers.Property.NONE)
+                    )
+                )
+
+                val radarBeamSource = GeoJsonSource(
+                    "radar-beam-source",
+                    FeatureCollection.fromFeatures(emptyList())
+                )
+                style.addSource(radarBeamSource)
+
+                style.addLayer(
+                    org.maplibre.android.style.layers.FillLayer(
+                        "radar-beam-layer",
+                        "radar-beam-source"
+                    ).withProperties(
+                        org.maplibre.android.style.layers.PropertyFactory.fillColor(android.graphics.Color.parseColor("#4DFFFFFF")),
+                        org.maplibre.android.style.layers.PropertyFactory.visibility(org.maplibre.android.style.layers.Property.NONE)
+                    )
+                )
+
                 val geoJsonSource = GeoJsonSource(
                     "user-source",
                     FeatureCollection.fromFeatures(emptyList())
@@ -223,6 +285,16 @@ class MapFragment : Fragment() {
                         val pointFeature = Feature.fromGeometry(Point.fromLngLat(latLng.longitude, latLng.latitude))
                         myLocSource.setGeoJson(FeatureCollection.fromFeatures(listOf(pointFeature)))
                     }
+                    val circleSource = style.getSourceAs<GeoJsonSource>("radar-circle-source")
+                    if (circleSource != null) {
+                        val circlePoly = getCirclePolygon(latLng.latitude, latLng.longitude, RADAR_RADIUS_KM)
+                        circleSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circlePoly))))
+                    }
+                    val beamSource = style.getSourceAs<GeoJsonSource>("radar-beam-source")
+                    if (beamSource != null) {
+                        val beamPoly = getSectorPolygon(latLng.latitude, latLng.longitude, RADAR_RADIUS_KM, 0.0, 40.0)
+                        beamSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(beamPoly))))
+                    }
                 }
 
                 map.addOnMapClickListener { point ->
@@ -236,8 +308,15 @@ class MapFragment : Fragment() {
                         val major = feature.getStringProperty("major") ?: "N/A"
                         val statusTag = feature.getStringProperty("statusTag") ?: "N/A"
                         val distance = feature.getNumberProperty("distance")?.toDouble() ?: 0.0
+                        val userId = feature.getStringProperty("id")
 
-                        showUserInfoDialog(name, university, major, statusTag, distance)
+                        val avatarBitmap = if (userId != null) {
+                            viewModel.avatarBitmaps.value?.get(userId)
+                        } else {
+                            null
+                        }
+
+                        showUserInfoDialog(name, university, major, statusTag, distance, avatarBitmap)
                     }
                     true
                 }
@@ -308,6 +387,11 @@ class MapFragment : Fragment() {
                 val pointFeature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
                 source.setGeoJson(FeatureCollection.fromFeatures(listOf(pointFeature)))
             }
+            val circleSource = mapStyle.getSourceAs<GeoJsonSource>("radar-circle-source")
+            if (circleSource != null) {
+                val circlePoly = getCirclePolygon(latitude, longitude, RADAR_RADIUS_KM)
+                circleSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circlePoly))))
+            }
         }
     }
 
@@ -317,7 +401,7 @@ class MapFragment : Fragment() {
             CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 15.0)
         )
         updateMyLocationMarker(latitude, longitude)
-        viewModel.getNearbyUsers(latitude, longitude, 5.0)
+        viewModel.getNearbyUsers(latitude, longitude, RADAR_RADIUS_KM)
     }
     private fun getRoundedAvatarWithBorder(srcBitmap: Bitmap): Bitmap {
         val size = 120
@@ -383,7 +467,7 @@ class MapFragment : Fragment() {
         geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
-    private fun showUserInfoDialog(name: String, university: String, major: String, statusTag: String, distance: Double) {
+    private fun showUserInfoDialog(name: String, university: String, major: String, statusTag: String, distance: Double, avatarBitmap: Bitmap?) {
         val dialog = BottomSheetDialog(requireContext())
         val dialogBinding = DialogUserInfoBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
@@ -393,6 +477,11 @@ class MapFragment : Fragment() {
         dialogBinding.tvMajor.text = major
         dialogBinding.tvStatusTag.text = statusTag
         dialogBinding.tvDistance.text = "Cách bạn %.2f km".format(distance)
+        if (avatarBitmap != null) {
+            dialogBinding.ivAvatar.setImageBitmap(avatarBitmap)
+        } else {
+            dialogBinding.ivAvatar.setImageResource(R.drawable.ic_launcher_foreground)
+        }
 
         dialogBinding.btnSendMessage.setOnClickListener {
             dialog.dismiss()
@@ -426,7 +515,111 @@ class MapFragment : Fragment() {
         binding.mapView.onLowMemory()
     }
 
+    private var radarBeamAnimator: android.animation.ValueAnimator? = null
+    private var currentRadarAngle = 0f
+
+    private fun getSectorPolygon(centerLat: Double, centerLng: Double, radiusKm: Double, startAngleDeg: Double, sweepAngleDeg: Double): org.maplibre.geojson.Polygon {
+        val points = mutableListOf<org.maplibre.geojson.Point>()
+        points.add(org.maplibre.geojson.Point.fromLngLat(centerLng, centerLat))
+
+        val rEarth = 6371.0
+        val latRad = Math.toRadians(centerLat)
+        val lngRad = Math.toRadians(centerLng)
+        val dDivR = radiusKm / rEarth
+        val sinDDivR = Math.sin(dDivR)
+        val cosDDivR = Math.cos(dDivR)
+
+        val steps = 30
+        for (i in 0..steps) {
+            val angleDeg = startAngleDeg + (sweepAngleDeg * i / steps)
+            val bearingRad = Math.toRadians(angleDeg)
+
+            val pointLatRad = Math.asin(Math.sin(latRad) * cosDDivR + Math.cos(latRad) * sinDDivR * Math.cos(bearingRad))
+            val pointLngRad = lngRad + Math.atan2(
+                Math.sin(bearingRad) * sinDDivR * Math.cos(latRad),
+                cosDDivR - Math.sin(latRad) * Math.sin(pointLatRad)
+            )
+
+            points.add(org.maplibre.geojson.Point.fromLngLat(Math.toDegrees(pointLngRad), Math.toDegrees(pointLatRad)))
+        }
+
+        points.add(org.maplibre.geojson.Point.fromLngLat(centerLng, centerLat))
+
+        return org.maplibre.geojson.Polygon.fromLngLats(listOf(points))
+    }
+
+    private fun getCirclePolygon(centerLat: Double, centerLng: Double, radiusKm: Double): org.maplibre.geojson.Polygon {
+        val points = mutableListOf<org.maplibre.geojson.Point>()
+        val rEarth = 6371.0
+        val latRad = Math.toRadians(centerLat)
+        val lngRad = Math.toRadians(centerLng)
+        val dDivR = radiusKm / rEarth
+        val sinDDivR = Math.sin(dDivR)
+        val cosDDivR = Math.cos(dDivR)
+
+        val steps = 64
+        for (i in 0..steps) {
+            val angleDeg = 360.0 * i / steps
+            val bearingRad = Math.toRadians(angleDeg)
+
+            val pointLatRad = Math.asin(Math.sin(latRad) * cosDDivR + Math.cos(latRad) * sinDDivR * Math.cos(bearingRad))
+            val pointLngRad = lngRad + Math.atan2(
+                Math.sin(bearingRad) * sinDDivR * Math.cos(latRad),
+                cosDDivR - Math.sin(latRad) * Math.sin(pointLatRad)
+            )
+
+            points.add(org.maplibre.geojson.Point.fromLngLat(Math.toDegrees(pointLngRad), Math.toDegrees(pointLatRad)))
+        }
+
+        return org.maplibre.geojson.Polygon.fromLngLats(listOf(points))
+    }
+
+    private fun startRadarBeamAnimation() {
+        if (radarBeamAnimator == null) {
+            radarBeamAnimator = android.animation.ValueAnimator.ofFloat(0f, 360f).apply {
+                duration = 3000
+                repeatCount = android.animation.ValueAnimator.INFINITE
+                interpolator = android.view.animation.LinearInterpolator()
+                addUpdateListener { animator ->
+                    val angle = animator.animatedValue as Float
+                    currentRadarAngle = angle
+                    updateRadarBeamRotation()
+                }
+            }
+        }
+        if (radarBeamAnimator?.isRunning != true) {
+            radarBeamAnimator?.start()
+        }
+    }
+
+    private fun stopRadarBeamAnimation() {
+        radarBeamAnimator?.cancel()
+    }
+
+    private fun updateRadarBeamRotation() {
+        val mapStyle = mapLibreMap?.style ?: return
+        if (!mapStyle.isFullyLoaded) return
+        val latLng = currentUserLatLng ?: return
+        val beamSource = mapStyle.getSourceAs<GeoJsonSource>("radar-beam-source") ?: return
+        val beamPoly = getSectorPolygon(latLng.latitude, latLng.longitude, RADAR_RADIUS_KM, currentRadarAngle.toDouble(), 40.0)
+        beamSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(beamPoly))))
+    }
+
+    private fun showRadarLayers(show: Boolean) {
+        val mapStyle = mapLibreMap?.style ?: return
+        if (!mapStyle.isFullyLoaded) return
+        val visibility = if (show) {
+            org.maplibre.android.style.layers.Property.VISIBLE
+        } else {
+            org.maplibre.android.style.layers.Property.NONE
+        }
+        mapStyle.getLayer("radar-circle-fill-layer")?.setProperties(org.maplibre.android.style.layers.PropertyFactory.visibility(visibility))
+        mapStyle.getLayer("radar-circle-stroke-layer")?.setProperties(org.maplibre.android.style.layers.PropertyFactory.visibility(visibility))
+        mapStyle.getLayer("radar-beam-layer")?.setProperties(org.maplibre.android.style.layers.PropertyFactory.visibility(visibility))
+    }
+
     override fun onDestroyView() {
+        stopRadarBeamAnimation()
         binding.mapView.onDestroy()
         _binding = null
         super.onDestroyView()
