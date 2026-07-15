@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.home.map
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -17,6 +16,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentMapBinding
+import com.example.myapplication.databinding.DialogUserInfoBinding
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.BitmapShader
+import android.graphics.Shader
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URL
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -38,6 +50,7 @@ class MapFragment : Fragment() {
     private var mapLibreMap: MapLibreMap? = null
 
     private val defaultLatLng = LatLng(21.028511, 105.804817)
+    private var currentUserLatLng: LatLng? = null
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -83,6 +96,58 @@ class MapFragment : Fragment() {
         binding.btnCalendar.setOnClickListener {
             Toast.makeText(requireContext(), "Tính năng Lịch hẹn đang được phát triển", Toast.LENGTH_SHORT).show()
         }
+        binding.btnRadar.setOnClickListener {
+            checkLocationPermissionsAndScan()
+        }
+
+        viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                com.example.myapplication.ui.base.UiState.Loading -> {
+                    binding.btnRadar.setImageResource(R.drawable.radaring)
+                    binding.btnRadar.isEnabled = false
+                }
+                is com.example.myapplication.ui.base.UiState.Success -> {
+                    binding.btnRadar.setImageResource(R.drawable.radar)
+                    binding.btnRadar.isEnabled = true
+                }
+                is com.example.myapplication.ui.base.UiState.Error -> {
+                    binding.btnRadar.setImageResource(R.drawable.radar)
+                    binding.btnRadar.isEnabled = true
+                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                }
+                com.example.myapplication.ui.base.UiState.Idle -> {
+                    binding.btnRadar.setImageResource(R.drawable.radar)
+                    binding.btnRadar.isEnabled = true
+                }
+            }
+        }
+
+        viewModel.nearbyUsers.observe(viewLifecycleOwner) { users ->
+            val mapStyle = mapLibreMap?.style
+            if (mapStyle != null && mapStyle.isFullyLoaded) {
+                updateUserMarkers(users)
+            }
+        }
+
+        viewModel.avatarBitmaps.observe(viewLifecycleOwner) { bitmaps ->
+            val mapStyle = mapLibreMap?.style
+            if (mapStyle != null && mapStyle.isFullyLoaded) {
+                var needsUpdate = false
+                bitmaps.forEach { (userId, bitmap) ->
+                    val avatarImageId = "avatar_$userId"
+                    if (mapStyle.getImage(avatarImageId) == null) {
+                        val roundedBitmap = getRoundedAvatarWithBorder(bitmap)
+                        mapStyle.addImage(avatarImageId, roundedBitmap)
+                        needsUpdate = true
+                    }
+                }
+                if (needsUpdate) {
+                    viewModel.nearbyUsers.value?.let { users ->
+                        updateUserMarkers(users)
+                    }
+                }
+            }
+        }
 
         binding.mapView.onCreate(savedInstanceState)
 
@@ -99,41 +164,65 @@ class MapFragment : Fragment() {
                     android.util.Log.e("MapFragment", "Failed to decode ic_marker resource")
                 }
 
+                val myLocationBitmap = BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.frame3
+                )
+                if (myLocationBitmap != null) {
+                    val scaledBitmap = Bitmap.createScaledBitmap(myLocationBitmap, 120, 120, false)
+                    style.addImage("my_location_marker", scaledBitmap)
+                }
+
                 val geoJsonSource = GeoJsonSource(
                     "user-source",
                     FeatureCollection.fromFeatures(emptyList())
                 )
                 style.addSource(geoJsonSource)
 
+                val myLocationSource = GeoJsonSource(
+                    "my-location-source",
+                    FeatureCollection.fromFeatures(emptyList())
+                )
+                style.addSource(myLocationSource)
+
                 style.addLayer(
                     SymbolLayer(
                         "user-layer",
                         "user-source"
                     ).withProperties(
-                        iconImage("my_marker"),
+                        iconImage("{avatar_id}"),
                         iconAllowOverlap(true)
                     )
                 )
 
-                viewModel.nearbyUsers.observe(viewLifecycleOwner) { users ->
-                    val features = users.map { user ->
-                        val feature = Feature.fromGeometry(
-                            Point.fromLngLat(user.longitude, user.latitude)
-                        )
-                        feature.addStringProperty("id", user.userId)
-                        feature.addStringProperty("name", "${user.lastName} ${user.firstName}".trim())
-                        feature.addStringProperty("avatar", user.avatar)
-                        feature.addStringProperty("university", user.university)
-                        feature.addStringProperty("major", user.majorName)
-                        feature.addStringProperty("statusTag", user.statusTag)
-                        feature.addNumberProperty("distance", user.distanceKm)
-                        feature
+                style.addLayer(
+                    SymbolLayer(
+                        "my-location-layer",
+                        "my-location-source"
+                    ).withProperties(
+                        iconImage("my_location_marker"),
+                        iconAllowOverlap(true)
+                    )
+                )
+
+                viewModel.avatarBitmaps.value?.forEach { (userId, bitmap) ->
+                    val avatarImageId = "avatar_$userId"
+                    if (style.getImage(avatarImageId) == null) {
+                        val roundedBitmap = getRoundedAvatarWithBorder(bitmap)
+                        style.addImage(avatarImageId, roundedBitmap)
                     }
-                    geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
                 }
 
-                binding.btnRadar.setOnClickListener {
-                    checkLocationPermissionsAndScan()
+                viewModel.nearbyUsers.value?.let { users ->
+                    updateUserMarkers(users)
+                }
+
+                currentUserLatLng?.let { latLng ->
+                    val myLocSource = style.getSourceAs<GeoJsonSource>("my-location-source")
+                    if (myLocSource != null) {
+                        val pointFeature = Feature.fromGeometry(Point.fromLngLat(latLng.longitude, latLng.latitude))
+                        myLocSource.setGeoJson(FeatureCollection.fromFeatures(listOf(pointFeature)))
+                    }
                 }
 
                 map.addOnMapClickListener { point ->
@@ -211,20 +300,105 @@ class MapFragment : Fragment() {
         }
     }
 
+    private fun updateMyLocationMarker(latitude: Double, longitude: Double) {
+        val mapStyle = mapLibreMap?.style
+        if (mapStyle != null && mapStyle.isFullyLoaded) {
+            val source = mapStyle.getSourceAs<GeoJsonSource>("my-location-source")
+            if (source != null) {
+                val pointFeature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
+                source.setGeoJson(FeatureCollection.fromFeatures(listOf(pointFeature)))
+            }
+        }
+    }
+
     private fun scanNearby(latitude: Double, longitude: Double) {
+        currentUserLatLng = LatLng(latitude, longitude)
         mapLibreMap?.animateCamera(
             CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 15.0)
         )
+        updateMyLocationMarker(latitude, longitude)
         viewModel.getNearbyUsers(latitude, longitude, 5.0)
+    }
+    private fun getRoundedAvatarWithBorder(srcBitmap: Bitmap): Bitmap {
+        val size = 120
+        val borderSize = 10f
+        val cornerRadius = 24f
+
+        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+
+        val frameDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_avatar_marker_frame)
+        frameDrawable?.setBounds(0, 0, size, size)
+        frameDrawable?.draw(canvas)
+
+        val innerPaint = Paint().apply {
+            isAntiAlias = true
+        }
+        val innerRect = RectF(
+            borderSize,
+            borderSize,
+            size - borderSize,
+            size - borderSize
+        )
+
+        val scaledBitmap = Bitmap.createScaledBitmap(
+            srcBitmap,
+            (size - 2 * borderSize).toInt(),
+            (size - 2 * borderSize).toInt(),
+            false
+        )
+        val shader = BitmapShader(scaledBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        innerPaint.shader = shader
+
+        canvas.drawRoundRect(innerRect, cornerRadius - 4f, cornerRadius - 4f, innerPaint)
+
+        return output
+    }
+
+    private fun updateUserMarkers(users: List<com.example.myapplication.data.model.response.NearbyUserResponse>) {
+        val mapStyle = mapLibreMap?.style ?: return
+        if (!mapStyle.isFullyLoaded) return
+        val geoJsonSource = mapStyle.getSourceAs<GeoJsonSource>("user-source") ?: return
+
+        val features = users.map { user ->
+            val feature = Feature.fromGeometry(
+                Point.fromLngLat(user.longitude, user.latitude)
+            )
+            feature.addStringProperty("id", user.userId)
+            feature.addStringProperty("name", "${user.lastName} ${user.firstName}".trim())
+            feature.addStringProperty("avatar", user.avatar)
+            feature.addStringProperty("university", user.university)
+            feature.addStringProperty("major", user.majorName)
+            feature.addStringProperty("statusTag", user.statusTag)
+            feature.addNumberProperty("distance", user.distanceKm)
+
+            val avatarImageId = "avatar_${user.userId}"
+            if (mapStyle.getImage(avatarImageId) != null) {
+                feature.addStringProperty("avatar_id", avatarImageId)
+            } else {
+                feature.addStringProperty("avatar_id", "my_marker")
+            }
+            feature
+        }
+        geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
     private fun showUserInfoDialog(name: String, university: String, major: String, statusTag: String, distance: Double) {
-        val message = "Trường học: $university\nNgành học: $major\nTrạng thái: $statusTag\nKhoảng cách: %.2f km".format(distance)
-        AlertDialog.Builder(requireContext())
-            .setTitle(name)
-            .setMessage(message)
-            .setPositiveButton("Đóng", null)
-            .show()
+        val dialog = BottomSheetDialog(requireContext())
+        val dialogBinding = DialogUserInfoBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+
+        dialogBinding.tvUserName.text = name
+        dialogBinding.tvSchool.text = university
+        dialogBinding.tvMajor.text = major
+        dialogBinding.tvStatusTag.text = statusTag
+        dialogBinding.tvDistance.text = "Cách bạn %.2f km".format(distance)
+
+        dialogBinding.btnSendMessage.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     override fun onStart() {

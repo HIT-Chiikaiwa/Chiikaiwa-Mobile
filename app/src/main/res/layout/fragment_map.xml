@@ -74,7 +74,7 @@
     <ImageView
         android:id="@+id/imgBottomLeft"
         android:layout_width="160dp"
-        android:layout_height="80dp"
+        android:layout_height="75dp"
         android:src="@drawable/bt_left"
         android:scaleType="fitXY"
         android:layout_marginStart="15dp"
@@ -87,7 +87,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="35dp"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="40dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_schedule"
         android:scaleType="centerInside"
@@ -99,29 +99,43 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="90dp"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="40dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_friend"
         android:scaleType="centerInside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <ImageView
-        android:id="@+id/btnRadar"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginBottom="35dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/radar"
-        android:scaleType="fitCenter"
+    <FrameLayout
+        android:id="@+id/layoutRadar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/btnRadar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/radar"
+            android:scaleType="fitCenter"/>
+
+        <ImageView
+            android:id="@+id/imgGroupRadar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/group_rardar"
+            android:scaleType="fitCenter"/>
+
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/imgBottomRight"
         android:layout_width="160dp"
-        android:layout_height="80dp"
+        android:layout_height="75dp"
         android:src="@drawable/bt_right"
         android:scaleType="fitXY"
         android:layout_marginEnd="15dp"
@@ -134,7 +148,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginEnd="90dp"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="40dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_notification"
         android:scaleType="centerInside"
@@ -146,7 +160,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginEnd="35dp"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="40dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_calendar"
         android:scaleType="centerInside"
