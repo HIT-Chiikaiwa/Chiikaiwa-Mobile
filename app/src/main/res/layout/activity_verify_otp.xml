@@ -11,7 +11,7 @@
     <FrameLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="@dimen/_200sdp"
         android:background="@color/bg"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,13 +27,13 @@
 
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
             android:layout_gravity="top|start"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_16sdp"
             android:contentDescription="@string/back"
-            android:padding="8dp"
+            android:padding="@dimen/_8sdp"
             android:src="@drawable/arrow_back" />
     </FrameLayout>
 
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_form"
             android:orientation="vertical"
-            android:padding="30dp">
+            android:padding="@dimen/_30sdp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -58,100 +58,100 @@
                 android:layout_gravity="center"
                 android:text="@string/verify_otp"
                 android:textColor="@color/brown"
-                android:textSize="40sp"
+                android:textSize="@dimen/_40ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvOtpDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:gravity="center"
                 android:text="@string/otp_description"
                 android:textColor="@color/orange"
-                android:textSize="13sp"
+                android:textSize="@dimen/_13ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/_20sdp"
                 android:text="@string/input_otp"
                 android:textColor="@color/brown"
-                android:textSize="18sp"
+                android:textSize="@dimen/_18ssp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="@dimen/_30sdp"
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/edtOtp1"
-                    android:layout_width="50dp"
-                    android:layout_height="80dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_80sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
                     android:background="@drawable/bg_editotp"
                     android:gravity="center"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="@color/brown"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/_24ssp"
                     android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtOtp2"
-                    android:layout_width="50dp"
-                    android:layout_height="80dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_80sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
                     android:background="@drawable/bg_editotp"
                     android:gravity="center"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="@color/brown"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/_24ssp"
                     android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtOtp3"
-                    android:layout_width="50dp"
-                    android:layout_height="80dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_80sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
                     android:background="@drawable/bg_editotp"
                     android:gravity="center"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="@color/brown"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/_24ssp"
                     android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtOtp4"
-                    android:layout_width="50dp"
-                    android:layout_height="80dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_80sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
                     android:background="@drawable/bg_editotp"
                     android:gravity="center"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="@color/brown"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/_24ssp"
                     android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtOtp5"
-                    android:layout_width="50dp"
-                    android:layout_height="80dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_80sdp"
                     android:background="@drawable/bg_editotp"
                     android:gravity="center"
                     android:inputType="number"
                     android:maxLength="1"
                     android:textColor="@color/brown"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/_24ssp"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -161,35 +161,35 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:textColor="@color/error"
-                android:textSize="12sp"
+                android:textSize="@dimen/_12ssp"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/btnVerify"
-                android:layout_width="150dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/_150sdp"
+                android:layout_height="@dimen/_50sdp"
                 android:layout_gravity="center"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="@dimen/_35sdp"
                 android:background="@drawable/bg_button"
                 android:gravity="center"
                 android:text="@string/verify"
                 android:textColor="@color/brown"
-                android:textSize="16sp"
+                android:textSize="@dimen/_16ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnResend"
-                android:layout_width="170dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/_170sdp"
+                android:layout_height="@dimen/_50sdp"
                 android:layout_gravity="center"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="@dimen/_18sdp"
                 android:background="@drawable/bg_edittext"
                 android:gravity="center"
                 android:text="@string/resend_otp"
                 android:textColor="@color/brown"
-                android:textSize="16sp"
+                android:textSize="@dimen/_16ssp"
                 android:textStyle="bold" />
 
         </LinearLayout>

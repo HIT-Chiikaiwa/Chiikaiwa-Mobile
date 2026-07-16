@@ -188,7 +188,9 @@ class MapFragment : Fragment() {
                     R.drawable.frame3
                 )
                 if (myLocationBitmap != null) {
-                    val scaledBitmap = Bitmap.createScaledBitmap(myLocationBitmap, 120, 120, false)
+                    val density = resources.displayMetrics.density
+                    val myLocationSize = (48 * density).toInt()
+                    val scaledBitmap = Bitmap.createScaledBitmap(myLocationBitmap, myLocationSize, myLocationSize, false)
                     style.addImage("my_location_marker", scaledBitmap)
                 }
 
@@ -404,9 +406,10 @@ class MapFragment : Fragment() {
         viewModel.getNearbyUsers(latitude, longitude, RADAR_RADIUS_KM)
     }
     private fun getRoundedAvatarWithBorder(srcBitmap: Bitmap): Bitmap {
-        val size = 120
-        val borderSize = 10f
-        val cornerRadius = 24f
+        val density = resources.displayMetrics.density
+        val size = (48 * density).toInt()
+        val borderSize = 3.5f * density
+        val cornerRadius = 24f * density
 
         val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
@@ -434,7 +437,7 @@ class MapFragment : Fragment() {
         val shader = BitmapShader(scaledBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
         innerPaint.shader = shader
 
-        canvas.drawRoundRect(innerRect, cornerRadius - 4f, cornerRadius - 4f, innerPaint)
+        canvas.drawRoundRect(innerRect, cornerRadius - (1f * density), cornerRadius - (1f * density), innerPaint)
 
         return output
     }
@@ -476,7 +479,7 @@ class MapFragment : Fragment() {
         dialogBinding.tvSchool.text = university
         dialogBinding.tvMajor.text = major
         dialogBinding.tvStatusTag.text = statusTag
-        dialogBinding.tvDistance.text = "Cách bạn %.2f km".format(distance)
+        dialogBinding.tvDistance.text = getString(R.string.distance_format, distance)
         if (avatarBitmap != null) {
             dialogBinding.ivAvatar.setImageBitmap(avatarBitmap)
         } else {

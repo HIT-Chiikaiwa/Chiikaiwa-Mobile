@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import androidx.activity.viewModels
+import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityVerifyOtpBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
@@ -25,7 +26,7 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
 
         email = intent.getStringExtra("email") ?: ""
         flow = intent.getStringExtra("flow") ?: "register"
-        binding.tvOtpDescription.text = "Mã OTP đã được gửi đến email:\n$email"
+        binding.tvOtpDescription.text = getString(R.string.otp_sent_to_email, email)
         binding.ivBack.setOnClickListener {
             finish()
         }
@@ -123,11 +124,11 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
     private fun updateResendButton(cooldown: Int) {
         if (cooldown > 0) {
             binding.btnResend.isEnabled = false
-            binding.btnResend.text = "Gửi lại (${cooldown}s)"
+            binding.btnResend.text = getString(R.string.resend_otp_countdown, cooldown)
             binding.btnResend.alpha = 0.5f
         } else {
             binding.btnResend.isEnabled = !isLoading
-            binding.btnResend.text = "Gửi lại"
+            binding.btnResend.text = getString(R.string.resend_otp)
             binding.btnResend.alpha = if (isLoading) 0.5f else 1.0f
         }
     }
