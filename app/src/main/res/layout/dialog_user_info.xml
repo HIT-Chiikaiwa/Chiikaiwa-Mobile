@@ -1,108 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="@dimen/_24sdp"
     app:cardBackgroundColor="@color/bg_2"
-    app:cardElevation="8dp">
+    app:cardCornerRadius="@dimen/_25sdp"
+    app:cardElevation="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/_20sdp">
+        android:padding="@dimen/_15sdp">
 
-        <View
-            android:id="@+id/dragHandle"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_4sdp"
-            android:background="@color/drag_handle"
-            android:layout_marginTop="@dimen/_2sdp"
+        <LinearLayout
+            android:id="@+id/layoutUserInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/profile"
+            android:padding="@dimen/_5sdp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardAvatar"
-            android:layout_width="@dimen/_72sdp"
-            android:layout_height="@dimen/_72sdp"
-            android:layout_marginTop="@dimen/_16sdp"
-            app:cardCornerRadius="@dimen/_36sdp"
-            app:cardBackgroundColor="@color/profile"
-            app:cardElevation="2dp"
-            app:layout_constraintTop_toBottomOf="@id/dragHandle"
-            app:layout_constraintStart_toStartOf="parent">
+            <FrameLayout
+                android:id="@+id/layoutAvatarFrame"
+                android:layout_width="@dimen/_60sdp"
+                android:layout_height="@dimen/_60sdp"
+                android:background="@drawable/bg_avatar_marker_frame"
+                android:padding="@dimen/_4sdp">
 
-            <ImageView
-                android:id="@+id/ivAvatar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground" />
-        </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:cardBackgroundColor="@color/profile"
+                    app:cardElevation="0dp">
 
-        <TextView
-            android:id="@+id/tvUserName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_18sdp"
-            android:textColor="@color/brown"
-            android:textSize="@dimen/_18ssp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/dragHandle"
-            app:layout_constraintStart_toEndOf="@id/cardAvatar"
-            app:layout_constraintEnd_toStartOf="@id/tvDistance"
-            tools:text="Nguyễn Văn A" />
+                    <ImageView
+                        android:id="@+id/ivAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_launcher_foreground" />
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
-        <TextView
-            android:id="@+id/tvDistance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_18sdp"
-            android:textColor="@color/orange"
-            android:textSize="@dimen/_14ssp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/dragHandle"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:text="1.2 km" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvStatusTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_6sdp"
-            android:background="@drawable/bg_edittext"
-            android:paddingHorizontal="@dimen/_10sdp"
-            android:paddingVertical="@dimen/_4sdp"
-            android:textColor="@color/brown"
-            android:textSize="@dimen/_12ssp"
-            android:textStyle="italic"
-            app:layout_constraintTop_toBottomOf="@id/tvUserName"
-            app:layout_constraintStart_toEndOf="@id/cardAvatar"
-            tools:text="Đang rảnh học bài" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/divider"
-            android:layout_marginTop="@dimen/_16sdp"
-            app:layout_constraintTop_toBottomOf="@id/cardAvatar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_15ssp"
+                        android:textStyle="bold"
+                        tools:text="Nguyễn Đình Hoàng" />
+
+                    <TextView
+                        android:id="@+id/tvDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_5sdp"
+                        android:textColor="@color/orange"
+                        android:textSize="@dimen/_12ssp"
+                        android:textStyle="bold"
+                        tools:text="1.2 km" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvStatusTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/bg_edittext"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:paddingVertical="@dimen/_5sdp"
+                    android:textColor="@color/brown"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="italic"
+                    tools:text="Đang rảnh học bài" />
+            </LinearLayout>
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/ivSchoolIcon"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
-            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_15sdp"
             android:src="@drawable/ic_schedule"
-            app:layout_constraintTop_toBottomOf="@id/divider"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutUserInfo" />
 
         <TextView
             android:id="@+id/tvSchool"
@@ -110,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_8sdp"
             android:textColor="@color/brown"
-            android:textSize="@dimen/_14ssp"
+            android:textSize="@dimen/_12ssp"
             app:layout_constraintBottom_toBottomOf="@id/ivSchoolIcon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ivSchoolIcon"
@@ -119,12 +121,12 @@
 
         <ImageView
             android:id="@+id/ivMajorIcon"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
-            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_15sdp"
             android:src="@drawable/ic_crown"
-            app:layout_constraintTop_toBottomOf="@id/ivSchoolIcon"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivSchoolIcon" />
 
         <TextView
             android:id="@+id/tvMajor"
@@ -132,7 +134,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_8sdp"
             android:textColor="@color/brown"
-            android:textSize="@dimen/_14ssp"
+            android:textSize="@dimen/_12ssp"
             app:layout_constraintBottom_toBottomOf="@id/ivMajorIcon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ivMajorIcon"
@@ -142,18 +144,18 @@
         <TextView
             android:id="@+id/btnSendMessage"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/_48sdp"
-            android:layout_marginTop="@dimen/_20sdp"
-            android:paddingHorizontal="@dimen/_20sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/bg_button"
             android:gravity="center"
+            android:paddingHorizontal="@dimen/_30sdp"
             android:text="@string/send_message"
             android:textColor="@color/brown"
-            android:textSize="@dimen/_16ssp"
+            android:textSize="@dimen/_15ssp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/tvMajor"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tvMajor" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

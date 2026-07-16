@@ -11,7 +11,7 @@
     <FrameLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_150sdp"
+        android:layout_height="@dimen/_90sdp"
         android:background="@color/bg"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -28,11 +28,11 @@
             android:layout_width="@dimen/_40sdp"
             android:layout_height="@dimen/_40sdp"
             android:layout_gravity="top|start"
-            android:layout_marginStart="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_5sdp"
             android:contentDescription="@string/back"
-            android:padding="@dimen/_8sdp"
-            android:src="@drawable/arrow_back"/>
+            android:padding="@dimen/_12sdp"
+            android:src="@drawable/arrow_back" />
 
     </FrameLayout>
 
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_form"
             android:orientation="vertical"
-            android:padding="@dimen/_30sdp">
+            android:paddingHorizontal="@dimen/_15sdp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/_6sdp"
+                    android:layout_marginEnd="@dimen/_5sdp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -72,18 +72,18 @@
                         android:layout_marginTop="@dimen/_5sdp"
                         android:text="@string/last_name"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_16ssp"
+                        android:textSize="@dimen/_15ssp"
                         android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/edtLastName"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_50sdp"
+                        android:layout_height="@dimen/_45sdp"
                         android:layout_marginTop="@dimen/_5sdp"
                         android:background="@drawable/bg_edittext"
                         android:hint="@string/last_name"
                         android:inputType="textPersonName"
-                        android:paddingHorizontal="@dimen/_16sdp"
+                        android:paddingHorizontal="@dimen/_10sdp"
                         android:textColor="@color/brown"
                         android:textColorHint="@color/hint" />
                 </LinearLayout>
@@ -91,7 +91,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_6sdp"
+                    android:layout_marginStart="@dimen/_5sdp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -102,18 +102,18 @@
                         android:layout_marginTop="@dimen/_5sdp"
                         android:text="@string/first_name"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_16ssp"
+                        android:textSize="@dimen/_15ssp"
                         android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/edtFirstName"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_50sdp"
+                        android:layout_height="@dimen/_45sdp"
                         android:layout_marginTop="@dimen/_5sdp"
                         android:background="@drawable/bg_edittext"
                         android:hint="@string/first_name"
                         android:inputType="textPersonName"
-                        android:paddingHorizontal="@dimen/_16sdp"
+                        android:paddingHorizontal="@dimen/_10sdp"
                         android:textColor="@color/brown"
                         android:textColorHint="@color/hint" />
                 </LinearLayout>
@@ -123,13 +123,12 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/_6sdp"
+                    android:layout_marginEnd="@dimen/_5sdp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -140,12 +139,12 @@
                         android:layout_marginTop="@dimen/_5sdp"
                         android:text="@string/gender"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_16ssp"
+                        android:textSize="@dimen/_15ssp"
                         android:textStyle="bold" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_50sdp"
+                        android:layout_height="@dimen/_45sdp"
                         android:layout_marginTop="@dimen/_5sdp">
 
                         <Spinner
@@ -153,13 +152,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/bg_edittext"
-                            android:paddingHorizontal="@dimen/_12sdp"
-                            android:dropDownVerticalOffset="@dimen/_50sdp"/>
+                            android:dropDownVerticalOffset="@dimen/_50sdp"
+                            android:paddingHorizontal="@dimen/_10sdp" />
 
                         <ImageView
                             android:id="@+id/ivArrow"
-                            android:layout_width="@dimen/_48sdp"
-                            android:layout_height="@dimen/_48sdp"
+                            android:layout_width="@dimen/_40sdp"
+                            android:layout_height="@dimen/_40sdp"
                             android:layout_gravity="end|center_vertical"
                             android:src="@drawable/drop_down"
                             app:tint="@color/brown" />
@@ -169,7 +168,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_6sdp"
+                    android:layout_marginStart="@dimen/_5sdp"
                     android:layout_weight="1.5"
                     android:orientation="vertical">
 
@@ -180,7 +179,7 @@
                         android:layout_marginTop="@dimen/_5sdp"
                         android:text="@string/date"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_16ssp"
+                        android:textSize="@dimen/_15ssp"
                         android:textStyle="bold" />
 
                     <FrameLayout
@@ -191,21 +190,21 @@
                         <EditText
                             android:id="@+id/edtDate"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/_50sdp"
+                            android:layout_height="@dimen/_45sdp"
                             android:background="@drawable/bg_edittext"
                             android:hint="@string/choose_date"
-                            android:paddingStart="@dimen/_16sdp"
-                            android:paddingEnd="@dimen/_56sdp"
+                            android:paddingStart="@dimen/_10sdp"
+                            android:paddingEnd="@dimen/_50sdp"
                             android:textColor="@color/brown"
                             android:textColorHint="@color/hint" />
 
                         <ImageView
                             android:id="@+id/ivCalendar"
-                            android:layout_width="@dimen/_48sdp"
-                            android:layout_height="@dimen/_48sdp"
+                            android:layout_width="@dimen/_40sdp"
+                            android:layout_height="@dimen/_40sdp"
                             android:layout_gravity="end|center_vertical"
                             android:layout_marginEnd="@dimen/_5sdp"
-                            android:padding="@dimen/_12sdp"
+                            android:padding="@dimen/_10sdp"
                             android:src="@drawable/schedule"
                             app:tint="@color/brown" />
                     </FrameLayout>
@@ -217,21 +216,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:text="@string/email"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_16ssp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtEmail"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_50sdp"
+                android:layout_height="@dimen/_45sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/bg_edittext"
                 android:hint="@string/email_hint"
                 android:inputType="textEmailAddress"
-                android:paddingHorizontal="@dimen/_16sdp"
+                android:paddingHorizontal="@dimen/_10sdp"
                 android:textColor="@color/brown"
                 android:textColorHint="@color/hint" />
 
@@ -239,10 +238,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:text="@string/password"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_16ssp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
 
             <FrameLayout
@@ -253,19 +252,19 @@
                 <EditText
                     android:id="@+id/edtPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_50sdp"
+                    android:layout_height="@dimen/_45sdp"
                     android:background="@drawable/bg_edittext"
                     android:hint="@string/password_hint"
                     android:inputType="textPassword"
-                    android:paddingStart="@dimen/_16sdp"
-                    android:paddingEnd="@dimen/_56sdp"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:paddingEnd="@dimen/_50sdp"
                     android:textColor="@color/brown"
                     android:textColorHint="@color/hint" />
 
                 <ImageView
                     android:id="@+id/ivTogglePassword"
-                    android:layout_width="@dimen/_48sdp"
-                    android:layout_height="@dimen/_48sdp"
+                    android:layout_width="@dimen/_40sdp"
+                    android:layout_height="@dimen/_40sdp"
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginEnd="@dimen/_5sdp"
                     android:contentDescription="@string/toggle_password"
@@ -278,10 +277,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:text="@string/confirm_password"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_16ssp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
 
             <FrameLayout
@@ -292,19 +291,19 @@
                 <EditText
                     android:id="@+id/edtConfirmPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_50sdp"
+                    android:layout_height="@dimen/_45sdp"
                     android:background="@drawable/bg_edittext"
                     android:hint="@string/password_hint"
                     android:inputType="textPassword"
-                    android:paddingStart="@dimen/_16sdp"
-                    android:paddingEnd="@dimen/_56sdp"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:paddingEnd="@dimen/_50sdp"
                     android:textColor="@color/brown"
                     android:textColorHint="@color/hint" />
 
                 <ImageView
                     android:id="@+id/ivToggleConfirmPassword"
-                    android:layout_width="@dimen/_48sdp"
-                    android:layout_height="@dimen/_48sdp"
+                    android:layout_width="@dimen/_40sdp"
+                    android:layout_height="@dimen/_40sdp"
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginEnd="@dimen/_5sdp"
                     android:contentDescription="@string/toggle_password"
@@ -320,20 +319,20 @@
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:textColor="@color/error"
-                android:textSize="@dimen/_12ssp"
+                android:textSize="@dimen/_15ssp"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvRegister"
-                android:layout_width="@dimen/_140sdp"
-                android:layout_height="@dimen/_50sdp"
+                android:layout_width="@dimen/_130sdp"
+                android:layout_height="@dimen/_45sdp"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_button"
                 android:gravity="center"
                 android:text="@string/register"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_16ssp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
 
             <TextView
@@ -341,10 +340,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:text="@string/had_account"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_16ssp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
 
         </LinearLayout>

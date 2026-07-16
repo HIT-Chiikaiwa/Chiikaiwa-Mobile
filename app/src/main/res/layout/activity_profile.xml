@@ -15,7 +15,7 @@
         <LinearLayout
             android:id="@+id/layoutHeader"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_56sdp"
+            android:layout_height="@dimen/_45sdp"
             android:background="@color/bg_2"
             android:gravity="center_vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -26,10 +26,10 @@
                 android:id="@+id/ivBack"
                 android:layout_width="@dimen/_40sdp"
                 android:layout_height="@dimen/_40sdp"
-                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginStart="@dimen/_5sdp"
                 android:background="@color/bg_2"
                 android:contentDescription="@string/back"
-                android:padding="@dimen/_8sdp"
+                android:padding="@dimen/_10sdp"
                 android:src="@drawable/arrow_back"
                 app:tint="@color/brown" />
 
@@ -37,18 +37,18 @@
                 android:id="@+id/tvHeaderTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_20sdp"
+                android:layout_marginStart="@dimen/_10sdp"
                 android:text="@string/profile_title"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_20ssp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <ImageView
             android:id="@+id/ivWoodLeft1"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_marginStart="@dimen/_50sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginStart="@dimen/_60sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -58,9 +58,9 @@
 
         <ImageView
             android:id="@+id/ivWoodRight1"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_marginEnd="@dimen/_50sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginEnd="@dimen/_60sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -72,9 +72,9 @@
             android:id="@+id/cvProfile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_20sdp"
-            android:layout_marginTop="@dimen/_30sdp"
-            app:cardCornerRadius="@dimen/_18sdp"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_25sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
             app:cardElevation="-4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -96,8 +96,8 @@
 
                     <ImageView
                         android:id="@+id/ivAvatar"
-                        android:layout_width="@dimen/_72sdp"
-                        android:layout_height="@dimen/_72sdp"
+                        android:layout_width="@dimen/_65sdp"
+                        android:layout_height="@dimen/_65sdp"
                         android:contentDescription="@string/username"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_launcher_foreground" />
@@ -105,7 +105,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/_16sdp"
+                        android:layout_marginStart="@dimen/_5sdp"
                         android:orientation="vertical">
 
                         <TextView
@@ -114,7 +114,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/username"
                             android:textColor="@color/brown"
-                            android:textSize="@dimen/_18ssp"
+                            android:textSize="@dimen/_15ssp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -139,33 +139,33 @@
                     android:id="@+id/tvIntroduction"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:gravity="center"
                     android:text="@string/introduction"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_12ssp" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnUpdateProfile"
                     android:layout_width="@dimen/_200sdp"
-                    android:layout_height="@dimen/_50sdp"
+                    android:layout_height="@dimen/_45sdp"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/bg_button"
                     android:foreground="?attr/selectableItemBackground"
                     android:text="@string/update_profile"
                     android:textAllCaps="false"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_15ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <ImageView
             android:id="@+id/ivWoodLeft2"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_marginStart="@dimen/_50sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginStart="@dimen/_60sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -175,9 +175,9 @@
 
         <ImageView
             android:id="@+id/ivWoodRight2"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_marginEnd="@dimen/_50sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginEnd="@dimen/_60sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -189,9 +189,9 @@
             android:id="@+id/cvInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/_20sdp"
-            android:layout_marginTop="@dimen/_15sdp"
-            app:cardCornerRadius="@dimen/_16sdp"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
             app:cardElevation="-4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -209,56 +209,56 @@
                     android:layout_height="wrap_content"
                     android:text="@string/infor"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_18ssp"
+                    android:textSize="@dimen/_15ssp"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:background="@color/profile"
                     android:orientation="vertical"
-                    android:padding="@dimen/_10sdp">
+                    android:padding="@dimen/_5sdp">
 
                     <TextView
                         android:id="@+id/tvAge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="@string/age"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_14ssp"
-                        android:text="@string/age" />
+                        android:textSize="@dimen/_12ssp" />
 
                     <TextView
                         android:id="@+id/tvGender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="@string/sex"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_14ssp"
-                        android:text="@string/sex" />
+                        android:textSize="@dimen/_12ssp" />
 
                     <TextView
                         android:id="@+id/tvSchool"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="@string/school"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_14ssp"
-                        android:text="@string/school" />
+                        android:textSize="@dimen/_12ssp" />
 
                     <TextView
                         android:id="@+id/tvMajor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="@string/major"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_14ssp"
-                        android:text="@string/major" />
+                        android:textSize="@dimen/_12ssp" />
 
                     <TextView
                         android:id="@+id/tvCountry"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="@string/country"
                         android:textColor="@color/brown"
-                        android:textSize="@dimen/_14ssp"
-                        android:text="@string/country" />
+                        android:textSize="@dimen/_12ssp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -266,11 +266,11 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cvFavorite"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_130sdp"
-            android:layout_marginStart="@dimen/_24sdp"
+            android:layout_height="@dimen/_80sdp"
+            android:layout_marginStart="@dimen/_26sdp"
             android:layout_marginTop="@dimen/_12sdp"
             android:layout_marginEnd="@dimen/_4sdp"
-            app:cardCornerRadius="@dimen/_16sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
             app:cardElevation="-3dp"
             app:layout_constraintEnd_toStartOf="@id/cvAppointment"
             app:layout_constraintHorizontal_weight="1"
@@ -290,7 +290,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/favorite"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_12ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -298,10 +298,10 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cvAppointment"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_130sdp"
+            android:layout_height="@dimen/_80sdp"
             android:layout_marginHorizontal="@dimen/_4sdp"
             android:layout_marginTop="@dimen/_12sdp"
-            app:cardCornerRadius="@dimen/_16sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
             app:cardElevation="-3dp"
             app:layout_constraintEnd_toStartOf="@id/cvHonor"
             app:layout_constraintHorizontal_weight="1"
@@ -321,7 +321,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/appointment"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_12ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -329,11 +329,11 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cvHonor"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_130sdp"
+            android:layout_height="@dimen/_80sdp"
             android:layout_marginStart="@dimen/_4sdp"
             android:layout_marginTop="@dimen/_12sdp"
-            android:layout_marginEnd="@dimen/_24sdp"
-            app:cardCornerRadius="@dimen/_16sdp"
+            android:layout_marginEnd="@dimen/_25sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
             app:cardElevation="-3dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1"
@@ -353,15 +353,15 @@
                     android:layout_height="wrap_content"
                     android:text="@string/honor"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_12ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <ImageView
             android:id="@+id/ivWoodFavLeft"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginStart="@dimen/_15sdp"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -371,8 +371,8 @@
 
         <ImageView
             android:id="@+id/ivWoodFavRight"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginEnd="@dimen/_15sdp"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -382,8 +382,8 @@
 
         <ImageView
             android:id="@+id/ivWoodAppointLeft"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginStart="@dimen/_15sdp"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -393,8 +393,8 @@
 
         <ImageView
             android:id="@+id/ivWoodAppointRight"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginEnd="@dimen/_15sdp"
             android:elevation="1dp"
             android:src="@drawable/rectangle"
@@ -404,8 +404,8 @@
 
         <ImageView
             android:id="@+id/ivWoodHonorLeft"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginStart="@dimen/_15sdp"
             android:elevation="1dp"
             android:src="@drawable/rectangle"
@@ -415,8 +415,8 @@
 
         <ImageView
             android:id="@+id/ivWoodHonorRight"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_marginEnd="@dimen/_15sdp"
             android:elevation="1dp"
             android:src="@drawable/rectangle"
@@ -426,33 +426,33 @@
 
         <ImageView
             android:id="@+id/ivWoodBottomLeft"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_50sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:elevation="8dp"
             android:src="@drawable/rectangle"
-            app:layout_constraintStart_toStartOf="@id/cvFavorite"
+            app:layout_constraintBottom_toTopOf="@id/cvSettings"
             app:layout_constraintEnd_toEndOf="@id/cvFavorite"
-            app:layout_constraintTop_toBottomOf="@id/cvFavorite"
-            app:layout_constraintBottom_toTopOf="@id/cvSettings"/>
+            app:layout_constraintStart_toStartOf="@id/cvFavorite"
+            app:layout_constraintTop_toBottomOf="@id/cvFavorite" />
 
         <ImageView
             android:id="@+id/ivWoodBottomRight"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_50sdp"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_30sdp"
             android:elevation="8dp"
             android:src="@drawable/rectangle"
-            app:layout_constraintStart_toStartOf="@id/cvHonor"
+            app:layout_constraintBottom_toTopOf="@id/cvSettings"
             app:layout_constraintEnd_toEndOf="@id/cvHonor"
-            app:layout_constraintTop_toBottomOf="@id/cvHonor"
-            app:layout_constraintBottom_toTopOf="@id/cvSettings"/>
+            app:layout_constraintStart_toStartOf="@id/cvHonor"
+            app:layout_constraintTop_toBottomOf="@id/cvHonor" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cvSettings"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_60sdp"
-            android:layout_marginHorizontal="@dimen/_20sdp"
-            android:layout_marginTop="@dimen/_20sdp"
-            app:cardCornerRadius="@dimen/_16sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginHorizontal="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:cardCornerRadius="@dimen/_15sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cvFavorite">
@@ -462,14 +462,14 @@
                 android:layout_height="match_parent"
                 android:background="@color/bg_2"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="@dimen/_16sdp">
+                android:paddingHorizontal="@dimen/_5sdp">
 
                 <ImageView
                     android:id="@+id/ivSettingsIcon"
                     android:layout_width="@dimen/_40sdp"
                     android:layout_height="@dimen/_40sdp"
                     android:contentDescription="@string/setting"
-                    android:padding="@dimen/_8sdp"
+                    android:padding="@dimen/_12sdp"
                     android:src="@drawable/icon" />
 
                 <TextView
@@ -479,7 +479,7 @@
                     android:layout_marginStart="@dimen/_5sdp"
                     android:text="@string/setting"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_14ssp"
+                    android:textSize="@dimen/_12ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
