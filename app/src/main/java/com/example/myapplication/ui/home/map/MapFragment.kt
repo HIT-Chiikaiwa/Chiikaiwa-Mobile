@@ -185,11 +185,10 @@ class MapFragment : Fragment() {
 
                 val myLocationBitmap = BitmapFactory.decodeResource(
                     resources,
-                    R.drawable.frame3
+                    R.drawable.ic_marker
                 )
                 if (myLocationBitmap != null) {
-                    val density = resources.displayMetrics.density
-                    val myLocationSize = (48 * density).toInt()
+                    val myLocationSize = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
                     val scaledBitmap = Bitmap.createScaledBitmap(myLocationBitmap, myLocationSize, myLocationSize, false)
                     style.addImage("my_location_marker", scaledBitmap)
                 }
@@ -406,10 +405,10 @@ class MapFragment : Fragment() {
         viewModel.getNearbyUsers(latitude, longitude, RADAR_RADIUS_KM)
     }
     private fun getRoundedAvatarWithBorder(srcBitmap: Bitmap): Bitmap {
-        val density = resources.displayMetrics.density
-        val size = (48 * density).toInt()
-        val borderSize = 3.5f * density
-        val cornerRadius = 24f * density
+        val size = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
+        val borderSize = resources.getDimension(com.intuit.sdp.R.dimen._4sdp)
+        val frameCornerRadius = resources.getDimension(com.intuit.sdp.R.dimen._10sdp)
+        val innerCornerRadius = frameCornerRadius - borderSize
 
         val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
@@ -428,16 +427,20 @@ class MapFragment : Fragment() {
             size - borderSize
         )
 
-        val scaledBitmap = Bitmap.createScaledBitmap(
-            srcBitmap,
-            (size - 2 * borderSize).toInt(),
-            (size - 2 * borderSize).toInt(),
-            false
-        )
-        val shader = BitmapShader(scaledBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        val targetSize = size - 2f * borderSize
+        val scale = Math.max(targetSize / srcBitmap.width, targetSize / srcBitmap.height)
+        val dx = (targetSize - srcBitmap.width * scale) / 2f
+        val dy = (targetSize - srcBitmap.height * scale) / 2f
+
+        val matrix = android.graphics.Matrix()
+        matrix.setScale(scale, scale)
+        matrix.postTranslate(dx + borderSize, dy + borderSize)
+
+        val shader = BitmapShader(srcBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        shader.setLocalMatrix(matrix)
         innerPaint.shader = shader
 
-        canvas.drawRoundRect(innerRect, cornerRadius - (1f * density), cornerRadius - (1f * density), innerPaint)
+        canvas.drawRoundRect(innerRect, innerCornerRadius, innerCornerRadius, innerPaint)
 
         return output
     }
