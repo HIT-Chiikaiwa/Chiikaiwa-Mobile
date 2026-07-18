@@ -64,6 +64,30 @@ object FakeData {
                 latitude = lat + 0.001,
                 longitude = lng - 0.005,
                 distanceKm = 0.65
+            ),
+            NearbyUserResponse(
+                userId = "fake_6",
+                firstName = "Tuấn",
+                lastName = "Lê Anh",
+                avatar = "frame1",
+                university = "Đại học Xây dựng",
+                majorName = "Kỹ thuật Xây dựng",
+                statusTag = "Tìm bạn chạy bộ ngoài phạm vi 6km",
+                latitude = lat + 0.07,
+                longitude = lng + 0.07,
+                distanceKm = 10.9
+            ),
+            NearbyUserResponse(
+                userId = "fake_7",
+                firstName = "Vy",
+                lastName = "Nguyễn Thảo",
+                avatar = "frame4",
+                university = "Đại học Luật Hà Nội",
+                majorName = "Luật Kinh tế",
+                statusTag = "Rất xa, ở ngoài 10km",
+                latitude = lat - 0.08,
+                longitude = lng - 0.08,
+                distanceKm = 12.5
             )
         )
     }

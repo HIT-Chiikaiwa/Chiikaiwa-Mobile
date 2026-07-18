@@ -26,25 +26,23 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val _avatarBitmaps = MutableLiveData<Map<String, Bitmap>>(emptyMap())
     val avatarBitmaps: LiveData<Map<String, Bitmap>> get() = _avatarBitmaps
 
-    fun getNearbyUsers(lat: Double, lng: Double, radius: Double = 1.0) {
+    private val fetchingUserIds = mutableSetOf<String>()
+
+    fun getNearbyUsers(lat: Double, lng: Double, radius: Double = 6.0) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             
             val filterAndDistance = { users: List<NearbyUserResponse> ->
-                users.filter { user ->
+                users.mapNotNull { user ->
                     val distanceResults = FloatArray(1)
                     try {
                         android.location.Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
                         val distanceKm = distanceResults[0] / 1000.0
-                        distanceKm <= radius
-                    } catch (e: Exception) {
-                        true
-                    }
-                }.map { user ->
-                    val distanceResults = FloatArray(1)
-                    try {
-                        android.location.Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
-                        user.copy(distanceKm = distanceResults[0] / 1000.0)
+                        if (distanceKm <= radius) {
+                            user.copy(distanceKm = distanceKm)
+                        } else {
+                            null
+                        }
                     } catch (e: Exception) {
                         user
                     }
@@ -73,9 +71,15 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
 
     private fun fetchAvatars(users: List<NearbyUserResponse>) {
         val context = getApplication<Application>()
+        val currentBitmaps = _avatarBitmaps.value ?: emptyMap()
         users.forEach { user ->
             val avatarUrl = user.avatar
-            if (!avatarUrl.isNullOrEmpty() && _avatarBitmaps.value?.containsKey(user.userId) != true) {
+            val userId = user.userId
+            if (!avatarUrl.isNullOrEmpty() && !currentBitmaps.containsKey(userId)) {
+                synchronized(fetchingUserIds) {
+                    if (fetchingUserIds.contains(userId)) return@forEach
+                    fetchingUserIds.add(userId)
+                }
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
                         val bitmap = if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
@@ -91,12 +95,16 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
                         if (bitmap != null) {
                             withContext(Dispatchers.Main) {
                                 val current = _avatarBitmaps.value?.toMutableMap() ?: mutableMapOf()
-                                current[user.userId] = bitmap
+                                current[userId] = bitmap
                                 _avatarBitmaps.value = current
                             }
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
+                    } finally {
+                        synchronized(fetchingUserIds) {
+                            fetchingUserIds.remove(userId)
+                        }
                     }
                 }
             }
