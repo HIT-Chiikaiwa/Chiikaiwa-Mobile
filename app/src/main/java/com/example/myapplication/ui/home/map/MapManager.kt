@@ -33,7 +33,9 @@ class MapManager(
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { bitmap ->
-                style.addImage("my_marker", bitmap)
+                val markerSize = context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, markerSize, markerSize, false)
+                style.addImage("my_marker", scaledBitmap)
             }
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { myLocationBitmap ->
@@ -134,13 +136,14 @@ class MapManager(
         val ivAvatar = view.findViewById<android.widget.ImageView>(R.id.ivAvatar)
         ivAvatar.setImageBitmap(srcBitmap)
 
+        val size = context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
         view.measure(
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
         )
-        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        view.layout(0, 0, size, size)
 
-        val output = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(output)
         view.draw(canvas)
 
