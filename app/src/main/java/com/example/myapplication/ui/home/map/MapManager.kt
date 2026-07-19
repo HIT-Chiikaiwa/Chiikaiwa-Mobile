@@ -28,8 +28,6 @@ class MapManager(
     private val radarRenderer = RadarRenderer(map)
 
     fun setup() {
-        radarRenderer.setupRadarLayers()
-
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { bitmap ->

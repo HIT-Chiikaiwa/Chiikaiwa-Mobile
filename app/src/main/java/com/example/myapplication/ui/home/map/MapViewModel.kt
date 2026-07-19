@@ -6,8 +6,10 @@ import android.graphics.BitmapFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.model.response.NearbyUserResponse
 import com.example.myapplication.data.repository.MapRepository
+import com.example.myapplication.data.repository.ProfileRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.Resource
@@ -19,6 +21,8 @@ import java.net.URL
 class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResponse>>(application) {
 
     private val repository = MapRepository(application)
+    private val profileRepository = ProfileRepository(application)
+    private val preferenceManager = PreferenceManager(application)
 
     private val _nearbyUsers = MutableLiveData<List<NearbyUserResponse>>()
     val nearbyUsers: LiveData<List<NearbyUserResponse>> get() = _nearbyUsers
@@ -26,7 +30,22 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val _avatarBitmaps = MutableLiveData<Map<String, Bitmap>>(emptyMap())
     val avatarBitmaps: LiveData<Map<String, Bitmap>> get() = _avatarBitmaps
 
+    private val _currentUserAvatar = MutableLiveData<String?>()
+    val currentUserAvatar: LiveData<String?> get() = _currentUserAvatar
+
     private val fetchingUserIds = mutableSetOf<String>()
+
+    fun loadCurrentUserAvatar() {
+        val userId = preferenceManager.getUserId() ?: return
+        viewModelScope.launch {
+            when (val result = profileRepository.getProfile(userId)) {
+                is Resource.Success -> {
+                    _currentUserAvatar.value = result.data.data.avatar
+                }
+                else -> {}
+            }
+        }
+    }
 
     fun getNearbyUsers(lat: Double, lng: Double, radius: Double = 6.0) {
         viewModelScope.launch {
@@ -52,18 +71,15 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
             when (val result = repository.getNearbyUsers(lat, lng, radius)) {
                 is Resource.Success -> {
                     val remoteUsers = result.data?.data ?: emptyList()
-                    val fakeUsers = FakeData.getFakeNearbyUsers(lat, lng)
-                    val combinedList = filterAndDistance(remoteUsers) + filterAndDistance(fakeUsers)
-                    _nearbyUsers.value = combinedList
-                    _uiState.value = UiState.Success(combinedList)
-                    fetchAvatars(combinedList)
+                    val filteredRemote = withContext(Dispatchers.Default) {
+                        filterAndDistance(remoteUsers)
+                    }
+                    _nearbyUsers.value = filteredRemote
+                    _uiState.value = UiState.Success(filteredRemote)
+                    fetchAvatars(filteredRemote)
                 }
                 is Resource.Error -> {
-                    val fakeUsers = FakeData.getFakeNearbyUsers(lat, lng)
-                    val filteredFake = filterAndDistance(fakeUsers)
-                    _nearbyUsers.value = filteredFake
-                    _uiState.value = UiState.Success(filteredFake)
-                    fetchAvatars(filteredFake)
+                    _uiState.value = UiState.Error(result.message ?: "An error occurred")
                 }
             }
         }
@@ -83,7 +99,9 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
                         val bitmap = if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
-                            BitmapFactory.decodeStream(URL(avatarUrl).openStream())
+                            URL(avatarUrl).openStream().use { stream ->
+                                BitmapFactory.decodeStream(stream)
+                            }
                         } else {
                             val resId = context.resources.getIdentifier(avatarUrl, "drawable", context.packageName)
                             if (resId != 0) {
