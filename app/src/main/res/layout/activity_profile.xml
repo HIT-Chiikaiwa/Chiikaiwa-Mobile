@@ -145,14 +145,13 @@
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_12ssp" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <TextView
                     android:id="@+id/btnUpdateProfile"
                     android:layout_width="@dimen/_200sdp"
                     android:layout_height="@dimen/_45sdp"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/bg_button"
-                    android:foreground="?attr/selectableItemBackground"
                     android:text="@string/update_profile"
                     android:textAllCaps="false"
                     android:textColor="@color/brown"
