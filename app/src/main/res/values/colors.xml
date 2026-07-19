@@ -9,4 +9,6 @@
     <color name="orange">#F89504</color>
     <color name="bg_2">#FFFCE2</color>
     <color name="profile">#F4F0CA</color>
+    <color name="drag_handle">#D7CCC8</color>
+    <color name="divider">#E0E0E0</color>
 </resources>

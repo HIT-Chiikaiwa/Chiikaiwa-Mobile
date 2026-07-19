@@ -4,11 +4,13 @@ import com.example.myapplication.data.model.request.*
 import com.example.myapplication.data.model.response.BaseResponse
 import com.example.myapplication.data.model.response.CommonResponse
 import com.example.myapplication.data.model.response.LoginResponse
+import com.example.myapplication.data.model.response.NearbyUserResponse
 import com.example.myapplication.data.model.response.UserDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("api/v1/auth/login")
@@ -34,4 +36,11 @@ interface ApiService {
 
     @POST("api/v1/auth/forgot-password/reset")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<BaseResponse<CommonResponse>>
+
+    @GET("api/v1/location/radar")
+    suspend fun getNearbyUsers(
+        @Query("lat") lat: Double,
+        @Query("lng") lng: Double,
+        @Query("radius") radius: Double
+    ): Response<BaseResponse<List<NearbyUserResponse>>>
 }
