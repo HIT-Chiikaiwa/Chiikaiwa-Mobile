@@ -3,6 +3,7 @@ package com.example.myapplication.ui.auth
 import android.content.Intent
 import android.view.View
 import androidx.activity.viewModels
+import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityVerifyEmailBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
@@ -21,7 +22,7 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
         email = intent.getStringExtra("email") ?: ""
         flow = intent.getStringExtra("flow") ?: "register"
 
-        binding.tvDescription.text = "Nhấn Nhận mã OTP để nhận mã nhé!\nChíp sẽ gửi OTP tới $email"
+        binding.tvDescription.text = getString(R.string.verify_your_email_format, email)
 
         binding.ivBack.setOnClickListener {
             finish()

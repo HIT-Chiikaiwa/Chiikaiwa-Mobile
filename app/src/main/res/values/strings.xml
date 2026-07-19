@@ -23,8 +23,8 @@
     <string name="back">Quay lại</string>
     <string name="gender">Giới tính</string>
     <string name="date">Ngày sinh</string>
-    <string name="choose_date">Ngày sinh</string>
-    <string name="had_account">Đã có tài khoản?</string>
+    <string name="choose_date">Chọn ngày sinh</string>
+    <string name="had_account">Đã có tài khoản? Đăng nhập</string>
     <string name="verify_otp">Xác thực Email</string>
     <string name="otp_description">Chip đã gửi mã otp vào Email mà bạn đã đăng ký rồi đó!</string>
     <string name="input_otp">Vui lòng nhập mã OTP</string>
@@ -43,7 +43,7 @@
     <string name="username">Username</string>
     <string name="id">ID:</string>
     <string name="friends">Bạn bè:</string>
-    <string name="introduction">Dòng gới thiệu</string>
+    <string name="introduction">Dòng giới thiệu</string>
     <string name="update_profile">Chỉnh sửa trang cá nhân</string>
     <string name="infor">Thông tin cá nhân</string>
     <string name="age">Tuổi:</string>
@@ -61,4 +61,14 @@
     <string name="help">Trợ giúp</string>
     <string name="log_out">Đăng xuất</string>
     <string name="change_password">Đổi mật khẩu</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="who">Bạn muốn tìm ai?</string>
+
+    <string name="send_message">Nhắn tin</string>
+    <string name="distance_format">Cách bạn %.2f km</string>
+    <string name="otp_sent_to_email">Mã OTP đã được gửi đến email:\n%1$s</string>
+    <string name="resend_otp_countdown">Gửi lại (%1$ds)</string>
+    <string name="verify_your_email_format">Nhấn Nhận mã OTP để nhận mã nhé!\nChíp sẽ gửi OTP tới %1$s</string>
+    <string name="error_empty_email">Vui lòng nhập email</string>
+    <string name="error_invalid_email">Email không hợp lệ</string>
 </resources>
