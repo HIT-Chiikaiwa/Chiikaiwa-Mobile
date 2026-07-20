@@ -11,4 +11,9 @@
     <color name="profile">#F4F0CA</color>
     <color name="drag_handle">#D7CCC8</color>
     <color name="divider">#E0E0E0</color>
+    <color name="brown_stroke">#B2725D</color>
+    <color name="chat_bubble_sent">#DC6B53</color>
+    <color name="online_green">#4CAF50</color>
+    <color name="context_menu_divider">#E8D5C4</color>
+    <color name="delete_red">#D93838</color>
 </resources>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:background="@color/bg_2"
+        android:paddingHorizontal="@dimen/_5sdp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginStart="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:contentDescription="@string/back"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/brown" />
+
+        <TextView
+            android:id="@+id/tvChatTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            tools:text="Nam Phong" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/btnAddOption"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/desc_options"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_plus"
+            app:tint="@color/brown" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvChatMessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_10sdp"
+        tools:listitem="@layout/item_chat_incoming" />
+
+    <LinearLayout
+        android:id="@+id/layoutInputBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_15sdp"
+        android:background="@drawable/bg_edittext"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_10sdp">
+
+        <ImageView
+            android:id="@+id/btnSticker"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:src="@drawable/ic_sticker"
+            app:tint="@color/brown" />
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/hint_type_message"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_15ssp" />
+
+        <ImageView
+            android:id="@+id/btnMic"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:src="@drawable/ic_mic"
+            app:tint="@color/brown" />
+
+        <ImageView
+            android:id="@+id/btnFolder"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:src="@drawable/ic_camera"
+            app:tint="@color/brown" />
+
+        <ImageView
+            android:id="@+id/btnGallery"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:src="@drawable/ic_folder"
+            app:tint="@color/brown" />
+
+        <ImageView
+            android:id="@+id/btnUserAction"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:src="@drawable/ic_locate"
+            app:tint="@color/brown" />
+
+    </LinearLayout>
+
+</LinearLayout>

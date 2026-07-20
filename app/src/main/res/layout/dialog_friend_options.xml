@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/_15sdp">
+
+    <include
+        android:id="@+id/layoutFriendItemPreview"
+        layout="@layout/item_friend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="0dp"
+        android:layout_marginBottom="@dimen/_10sdp" />
+
+    <LinearLayout
+        android:layout_width="@dimen/_180sdp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_edittext"
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/_8sdp">
+
+        <TextView
+            android:id="@+id/tvOptionPin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/option_pin"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_13ssp" />
+
+        <TextView
+            android:id="@+id/tvOptionCreateGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/option_create_group"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_13ssp" />
+
+        <TextView
+            android:id="@+id/tvOptionViewProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/option_view_profile"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_13ssp" />
+
+        <TextView
+            android:id="@+id/tvOptionBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/option_block"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_13ssp" />
+
+        <TextView
+            android:id="@+id/tvOptionDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="@dimen/_15sdp"
+            android:paddingVertical="@dimen/_10sdp"
+            android:text="@string/option_delete"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_13ssp" />
+
+    </LinearLayout>
+
+</LinearLayout>

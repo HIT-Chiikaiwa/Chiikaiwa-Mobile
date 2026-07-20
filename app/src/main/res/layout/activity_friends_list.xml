@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_2"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:background="@color/bg_2"
+        android:paddingHorizontal="@dimen/_5sdp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginStart="@dimen/_1sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:contentDescription="@string/back"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/brown" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/title_friends"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutSearch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:background="@drawable/bg_edittext"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_12sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:src="@drawable/ic_search"
+            app:tint="@color/brown" />
+
+        <EditText
+            android:id="@+id/etSearchFriends"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:background="@null"
+            android:hint="@string/hint_search_friends"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_15ssp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFriendsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/_4sdp"
+        android:paddingBottom="@dimen/_15sdp"
+        tools:listitem="@layout/item_friend" />
+
+</LinearLayout>

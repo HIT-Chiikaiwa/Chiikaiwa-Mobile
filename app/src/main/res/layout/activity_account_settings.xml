@@ -23,7 +23,7 @@
             android:background="@color/bg_2"
             android:contentDescription="@string/back"
             android:padding="12dp"
-            android:src="@drawable/arrow_back"
+            android:src="@drawable/ic_arrow_back"
             app:tint="@color/brown" />
 
         <TextView
@@ -61,7 +61,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
-                android:background="@drawable/bg_button2"
+                android:background="@drawable/bg_card_retro"
                 android:text="@string/register_infor"
                 android:textColor="@color/brown"
                 android:textSize="16sp"/>
@@ -82,7 +82,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
-                android:background="@drawable/bg_button2"
+                android:background="@drawable/bg_card_retro"
                 android:text="@string/change_password"
                 android:textColor="@color/brown"
                 android:textSize="16sp"/>
@@ -103,7 +103,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
-                android:background="@drawable/bg_button2"
+                android:background="@drawable/bg_card_retro"
                 android:text="@string/help"
                 android:textColor="@color/brown"
                 android:textSize="16sp"/>
@@ -123,7 +123,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
-                android:background="@drawable/bg_button2"
+                android:background="@drawable/bg_card_retro"
                 android:text="@string/log_out"
                 android:textColor="@color/brown"
                 android:textSize="16sp"/>
