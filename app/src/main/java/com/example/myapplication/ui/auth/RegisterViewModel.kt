@@ -5,12 +5,12 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.model.request.RegisterRequest
+import com.example.myapplication.data.remote.dto.request.RegisterRequest
 import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(application: Application) : BaseViewModel<String>(application) {

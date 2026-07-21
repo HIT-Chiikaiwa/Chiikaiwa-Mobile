@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.utils.SingleLiveEvent
+import com.example.myapplication.utils.common.SingleLiveEvent
 
 open class BaseViewModel<T>(application: Application) : AndroidViewModel(application){
 

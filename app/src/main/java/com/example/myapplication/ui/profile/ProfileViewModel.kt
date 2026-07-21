@@ -5,14 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
-import com.example.myapplication.data.model.request.*
-import com.example.myapplication.data.model.response.UserDto
-import com.example.myapplication.data.model.response.SubjectDto
+import com.example.myapplication.data.remote.dto.request.*
+import com.example.myapplication.data.remote.dto.response.UserDto
+import com.example.myapplication.data.remote.dto.response.SubjectDto
 import com.example.myapplication.data.repository.ProfileRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(application) {

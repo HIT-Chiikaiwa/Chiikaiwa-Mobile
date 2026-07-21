@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import com.example.myapplication.R
-import com.example.myapplication.data.model.response.NearbyUserResponse
+import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
 import com.example.myapplication.databinding.DialogUserInfoBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -130,7 +130,7 @@ class MapManager(
     }
 
     private fun createMarkerBitmapFromLayout(srcBitmap: Bitmap): Bitmap {
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_marker_avatar, null)
+        val view = LayoutInflater.from(context).inflate(R.layout.layout_avatar, null)
         val ivAvatar = view.findViewById<android.widget.ImageView>(R.id.ivAvatar)
         ivAvatar.setImageBitmap(srcBitmap)
 

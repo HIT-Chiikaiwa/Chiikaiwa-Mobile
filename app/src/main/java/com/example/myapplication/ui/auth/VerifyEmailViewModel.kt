@@ -6,7 +6,7 @@ import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class VerifyEmailViewModel(application: Application) : BaseViewModel<String>(application) {

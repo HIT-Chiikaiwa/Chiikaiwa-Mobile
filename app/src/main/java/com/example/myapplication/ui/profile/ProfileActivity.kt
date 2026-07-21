@@ -15,8 +15,8 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
-import com.example.myapplication.data.model.request.ChangePasswordRequest
-import com.example.myapplication.data.model.response.UserDto
+import com.example.myapplication.data.remote.dto.request.ChangePasswordRequest
+import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.ActivityProfileBinding
 import com.example.myapplication.ui.auth.LoginActivity
 import com.example.myapplication.ui.base.BaseActivity

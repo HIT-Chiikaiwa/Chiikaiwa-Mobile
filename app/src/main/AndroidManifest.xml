@@ -45,6 +45,7 @@
             android:name=".ui.profile.ProfileActivity"
             android:exported="false" />
 
+
     </application>
 
 </manifest>
