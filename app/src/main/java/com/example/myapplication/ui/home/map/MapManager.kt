@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import com.example.myapplication.R
+import com.example.myapplication.utils.extension.observeState
 import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
 import com.example.myapplication.databinding.DialogUserInfoBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -60,11 +61,11 @@ class MapManager(
                 )
             )
 
-            viewModel.nearbyUsers.observe(fragment.viewLifecycleOwner) { users ->
+            fragment.observeState(viewModel.nearbyUsers) { users ->
                 updateUserMarkers(users)
             }
 
-            viewModel.avatarBitmaps.observe(fragment.viewLifecycleOwner) { bitmaps ->
+            fragment.observeState(viewModel.avatarBitmaps) { bitmaps ->
                 var needsUpdate = false
                 bitmaps.forEach { (userId, bitmap) ->
                     val avatarImageId = "avatar_$userId"

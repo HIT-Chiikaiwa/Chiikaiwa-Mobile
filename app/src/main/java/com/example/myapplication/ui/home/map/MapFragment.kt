@@ -1,6 +1,8 @@
 package com.example.myapplication.ui.home.map
 
 import android.content.Context
+import com.example.myapplication.utils.extension.observeState
+import com.example.myapplication.utils.extension.observeEvent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
@@ -72,7 +74,7 @@ class MapFragment : Fragment() {
             )
         }
 
-        viewModel.currentUserAvatar.observe(viewLifecycleOwner) { avatarUrl ->
+        observeState(viewModel.currentUserAvatar) { avatarUrl ->
             if (!avatarUrl.isNullOrEmpty()) {
                 Glide.with(this)
                     .load(avatarUrl)
@@ -111,7 +113,7 @@ class MapFragment : Fragment() {
             }
         }
 
-        viewModel.uiState.observe(viewLifecycleOwner) { state ->
+        observeState(viewModel.uiState) { state ->
             when (state) {
                 com.example.myapplication.ui.base.UiState.Loading -> {
                     binding.btnRadar.setImageResource(R.drawable.radaring)

@@ -1,10 +1,10 @@
 package com.example.myapplication.ui.home.map
 
 import android.app.Application
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
@@ -24,14 +24,14 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val profileRepository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
-    private val _nearbyUsers = MutableLiveData<List<NearbyUserResponse>>()
-    val nearbyUsers: LiveData<List<NearbyUserResponse>> get() = _nearbyUsers
+    private val _nearbyUsers = MutableStateFlow<List<NearbyUserResponse>>(emptyList())
+    val nearbyUsers: StateFlow<List<NearbyUserResponse>> get() = _nearbyUsers
 
-    private val _avatarBitmaps = MutableLiveData<Map<String, Bitmap>>(emptyMap())
-    val avatarBitmaps: LiveData<Map<String, Bitmap>> get() = _avatarBitmaps
+    private val _avatarBitmaps = MutableStateFlow<Map<String, Bitmap>>(emptyMap())
+    val avatarBitmaps: StateFlow<Map<String, Bitmap>> get() = _avatarBitmaps
 
-    private val _currentUserAvatar = MutableLiveData<String?>()
-    val currentUserAvatar: LiveData<String?> get() = _currentUserAvatar
+    private val _currentUserAvatar = MutableStateFlow<String?>(null)
+    val currentUserAvatar: StateFlow<String?> get() = _currentUserAvatar
 
     private val fetchingUserIds = mutableSetOf<String>()
 

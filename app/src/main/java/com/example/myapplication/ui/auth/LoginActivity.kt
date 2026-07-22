@@ -47,7 +47,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
     }
 
     override fun observeData() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.uiState.observeState { state ->
 
             when (state) {
 
@@ -75,7 +75,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
             }
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observeEvent { event ->
 
             when (event) {
 

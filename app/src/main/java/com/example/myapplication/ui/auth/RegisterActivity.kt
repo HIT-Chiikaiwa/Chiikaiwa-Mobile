@@ -88,7 +88,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
     }
 
     override fun observeData() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.uiState.observeState { state ->
             when (state) {
 
                 UiState.Idle -> {
@@ -119,7 +119,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
             }
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observeEvent { event ->
 
             when (event) {
 

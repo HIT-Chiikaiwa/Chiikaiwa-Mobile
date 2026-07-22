@@ -14,6 +14,9 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import com.example.myapplication.data.model.Conversation
+import com.example.myapplication.data.model.Message
+import com.example.myapplication.data.model.Reaction
 
 interface ApiService {
     @POST("api/v1/auth/login")
@@ -83,4 +86,100 @@ interface ApiService {
         @Query("lng") lng: Double,
         @Query("radius") radius: Double
     ): Response<BaseResponse<List<NearbyUserResponse>>>
+
+    @GET("chat/conversations")
+    suspend fun getConversations(): Response<BaseResponse<List<Conversation>>>
+
+    @POST("chat/conversations/direct")
+    suspend fun getOrCreateDirectConversation(
+        @Query("receiverId") receiverId: Long
+    ): Response<BaseResponse<Conversation>>
+
+    @POST("chat/conversations/group")
+    suspend fun createGroup(
+        @Body request: CreateGroupRequest
+    ): Response<BaseResponse<Conversation>>
+
+    @PUT("chat/conversations/{conversationId}")
+    suspend fun updateGroup(
+        @Path("conversationId") conversationId: Long,
+        @Body request: UpdateGroupRequest
+    ): Response<BaseResponse<Conversation>>
+
+    @GET("chat/conversations/search")
+    suspend fun searchConversations(
+        @Query("keyword") keyword: String
+    ): Response<BaseResponse<List<Conversation>>>
+
+    @POST("chat/conversations/{conversationId}/members")
+    suspend fun addMembers(
+        @Path("conversationId") conversationId: Long,
+        @Body request: AddMemberRequest
+    ): Response<BaseResponse<Conversation>>
+
+    @DELETE("chat/conversations/{conversationId}/members/{userId}")
+    suspend fun removeMember(
+        @Path("conversationId") conversationId: Long,
+        @Path("userId") userId: Long
+    ): Response<BaseResponse<CommonResponse>>
+
+    @DELETE("chat/conversations/{conversationId}/dissolve")
+    suspend fun dissolveGroup(
+        @Path("conversationId") conversationId: Long
+    ): Response<BaseResponse<CommonResponse>>
+
+    @PUT("chat/conversations/{conversationId}/transfer-ownership")
+    suspend fun transferOwnership(
+        @Path("conversationId") conversationId: Long,
+        @Query("newOwnerId") newOwnerId: Long
+    ): Response<BaseResponse<Conversation>>
+
+    @GET("chat/conversations/{conversationId}/messages")
+    suspend fun getChatHistory(
+        @Path("conversationId") conversationId: Long
+    ): Response<BaseResponse<List<Message>>>
+
+    @GET("chat/conversations/{conversationId}/messages/search")
+    suspend fun searchMessages(
+        @Path("conversationId") conversationId: Long,
+        @Query("keyword") keyword: String
+    ): Response<BaseResponse<List<Message>>>
+
+    @POST("chat/messages/{messageId}/reply")
+    suspend fun replyMessage(
+        @Path("messageId") messageId: Long,
+        @Body request: ReplyRequest
+    ): Response<BaseResponse<Message>>
+
+    @POST("chat/messages/{messageId}/forward")
+    suspend fun forwardMessage(
+        @Path("messageId") messageId: Long,
+        @Query("targetConversationId") targetConversationId: Long
+    ): Response<BaseResponse<Message>>
+
+    @PUT("chat/messages/{messageId}/pin")
+    suspend fun pinMessage(
+        @Path("messageId") messageId: Long
+    ): Response<BaseResponse<CommonResponse>>
+
+    @PUT("chat/messages/{messageId}/unpin")
+    suspend fun unpinMessage(
+        @Path("messageId") messageId: Long
+    ): Response<BaseResponse<CommonResponse>>
+
+    @GET("chat/conversations/{conversationId}/pinned")
+    suspend fun getPinnedMessages(
+        @Path("conversationId") conversationId: Long
+    ): Response<BaseResponse<List<Message>>>
+
+    @POST("chat/messages/{messageId}/reactions")
+    suspend fun addReaction(
+        @Path("messageId") messageId: Long,
+        @Query("emoji") emoji: String
+    ): Response<BaseResponse<Reaction>>
+
+    @DELETE("chat/messages/{messageId}/reactions")
+    suspend fun removeReaction(
+        @Path("messageId") messageId: Long
+    ): Response<BaseResponse<CommonResponse>>
 }

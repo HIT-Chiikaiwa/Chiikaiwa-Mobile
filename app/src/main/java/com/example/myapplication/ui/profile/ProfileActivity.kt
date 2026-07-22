@@ -55,7 +55,7 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
     }
 
     override fun observeData() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.uiState.observeState { state ->
             when (state) {
                 is UiState.Idle -> {
                     // Do nothing
@@ -75,7 +75,7 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             }
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observeEvent { event ->
             when (event) {
                 is UiEvent.ShowToast -> {
                     showToast(event.message)
@@ -357,7 +357,7 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             }
         }
 
-        viewModel.subjects.observe(this) { subjectsList ->
+        viewModel.subjects.observeState { subjectsList ->
             layoutStrengthSubjects.removeAllViews()
             layoutReviewSubjects.removeAllViews()
 

@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.auth
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
@@ -17,8 +17,8 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
 
     private val repository = AuthRepository(application)
 
-    private val _resendCooldown = MutableLiveData<Int>(0)
-    val resendCooldown: LiveData<Int> get() = _resendCooldown
+    private val _resendCooldown = MutableStateFlow<Int>(0)
+    val resendCooldown: StateFlow<Int> get() = _resendCooldown
 
     private var timerJob: Job? = null
 
@@ -49,7 +49,7 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
             when (val result = apiCall) {
                 is Resource.Success -> {
                     _uiState.value = UiState.Success(result.data?.data?.message ?: "Xác thực OTP thành công")
-                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Xác thực OTP thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Xác thực OTP thành công")) }
                 }
 
                 is Resource.Error -> {
@@ -76,7 +76,7 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
             when (val result = apiCall) {
                 is Resource.Success -> {
                     _uiState.value = UiState.Success(result.data?.data?.message ?: "Đã gửi lại mã OTP")
-                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Đã gửi lại mã OTP")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Đã gửi lại mã OTP")) }
                     startResendTimer()
                 }
 

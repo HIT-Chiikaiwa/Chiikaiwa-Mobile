@@ -4,6 +4,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
 
@@ -12,6 +18,23 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
     abstract fun inflateBinding(): VB
 
     abstract fun initView()
+
+    
+    protected inline fun <T> StateFlow<T>.observeState(crossinline action: (T) -> Unit) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                collect { action(it) }
+            }
+        }
+    }
+
+    protected inline fun <T> SharedFlow<T>.observeEvent(crossinline action: (T) -> Unit) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                collect { action(it) }
+            }
+        }
+    }
 
     abstract fun observeData()
 

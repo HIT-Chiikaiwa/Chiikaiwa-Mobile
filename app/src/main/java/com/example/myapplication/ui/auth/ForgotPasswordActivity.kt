@@ -47,7 +47,7 @@ class ForgotPasswordActivity : BaseActivity<ActivityForgotPasswordBinding>() {
     }
 
     override fun observeData() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.uiState.observeState { state ->
             when (state) {
                 UiState.Idle -> {
                     setLoading(false)
@@ -71,7 +71,7 @@ class ForgotPasswordActivity : BaseActivity<ActivityForgotPasswordBinding>() {
             }
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observeEvent { event ->
             when (event) {
                 is UiEvent.ShowToast -> {
                     showToast(event.message)

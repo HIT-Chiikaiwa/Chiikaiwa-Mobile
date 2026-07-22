@@ -47,8 +47,8 @@ class LoginViewModel(application: Application) : BaseViewModel<Unit>(application
 
                         _uiState.value = UiState.Success(Unit)
 
-                        _event.value = UiEvent.ShowToast("Đăng nhập thành công")
-                        _event.value = UiEvent.NavigateHome
+                        viewModelScope.launch { _event.emit(UiEvent.ShowToast("Đăng nhập thành công")) }
+                        viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
                     }
                 }
 

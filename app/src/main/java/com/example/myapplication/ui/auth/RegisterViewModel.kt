@@ -1,9 +1,9 @@
 package com.example.myapplication.ui.auth
 
 import android.app.Application
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import android.util.Patterns
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.remote.dto.request.RegisterRequest
 import com.example.myapplication.data.repository.AuthRepository
@@ -94,7 +94,7 @@ class RegisterViewModel(application: Application) : BaseViewModel<String>(applic
 
                 is Resource.Success -> {
                     _uiState.value = UiState.Success(result.data?.data?.message ?: "Đăng ký thành công")
-                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Đăng ký thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Đăng ký thành công")) }
                 }
 
                 is Resource.Error -> {

@@ -39,7 +39,7 @@ class ForgotPasswordViewModel(application: Application) : BaseViewModel<String>(
             when (val result = repository.resetPassword(email, pass, confirmPass)) {
                 is Resource.Success -> {
                     _uiState.value = UiState.Success(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")
-                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")) }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
