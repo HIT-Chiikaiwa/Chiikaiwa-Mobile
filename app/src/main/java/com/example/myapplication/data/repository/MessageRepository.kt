@@ -1,28 +1,53 @@
 package com.example.myapplication.data.repository
 
 import android.content.Context
-import com.example.myapplication.data.model.Message
-import com.example.myapplication.data.remote.dto.request.ReplyRequest
 import com.example.myapplication.data.remote.dto.response.BaseResponse
+import com.example.myapplication.data.remote.dto.response.MessageResponse
+import com.example.myapplication.data.remote.dto.response.PageResponse
 import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
 
 class MessageRepository(context: Context) : BaseRepository() {
     private val api = RetrofitClient.create(context)
 
-    suspend fun getChatHistory(conversationId: Long): Resource<BaseResponse<List<Message>>> {
-        return safeApiCall { api.getChatHistory(conversationId) }
+    suspend fun getMessages(
+        conversationId: String,
+        page: Int = 0,
+        size: Int = 20,
+        sort: String? = null
+    ): Resource<BaseResponse<PageResponse<MessageResponse>>> {
+        return safeApiCall { api.getMessages(conversationId, page, size, sort) }
     }
 
-    suspend fun searchMessages(conversationId: Long, keyword: String): Resource<BaseResponse<List<Message>>> {
-        return safeApiCall { api.searchMessages(conversationId, keyword) }
+    suspend fun searchMessages(
+        conversationId: String,
+        keyword: String,
+        page: Int = 0,
+        size: Int = 20,
+        sort: String? = null
+    ): Resource<BaseResponse<PageResponse<MessageResponse>>> {
+        return safeApiCall { api.searchMessages(conversationId, keyword, page, size, sort) }
     }
 
-    suspend fun replyMessage(messageId: Long, content: String): Resource<BaseResponse<Message>> {
-        return safeApiCall { api.replyMessage(messageId, ReplyRequest(content)) }
+    suspend fun replyMessage(
+        messageId: String,
+        content: String
+    ): Resource<BaseResponse<MessageResponse>> {
+        return safeApiCall { api.replyMessage(messageId, content) }
     }
 
-    suspend fun forwardMessage(messageId: Long, targetConversationId: Long): Resource<BaseResponse<Message>> {
+    suspend fun forwardMessage(
+        messageId: String,
+        targetConversationId: String
+    ): Resource<BaseResponse<MessageResponse>> {
         return safeApiCall { api.forwardMessage(messageId, targetConversationId) }
+    }
+
+    suspend fun recallMessage(messageId: String): Resource<BaseResponse<Any>> {
+        return safeApiCall { api.recallMessage(messageId) }
+    }
+
+    suspend fun deleteMessage(messageId: String): Resource<BaseResponse<Any>> {
+        return safeApiCall { api.deleteMessage(messageId) }
     }
 }

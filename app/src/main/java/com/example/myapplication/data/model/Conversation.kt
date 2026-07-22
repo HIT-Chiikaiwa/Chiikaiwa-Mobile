@@ -1,16 +1,17 @@
 package com.example.myapplication.data.model
 
 data class Conversation(
-    val id: Long,
+    val id: String,
     val type: ConversationType,
     val name: String,
-    val avatar: String?,
-    val ownerId: Long?,
-    val lastMessage: Message?,
-    val lastMessageTime: String,
-    val lastSenderId: Long?,
-    val memberCount: Int,
-    val unreadCount: Int,
-    val createdAt: String,
-    val updatedAt: String
+    val avatar: String? = null,
+    val ownerId: String? = null,
+    val lastMessage: Message? = null,
+    val lastMessageTime: String = "",
+    val lastSenderId: String? = null,
+    val memberCount: Int = 0,
+    val unreadCount: Int = 0,
+    val hasLeft: Boolean = false,
+    val createdAt: String = "",
+    val updatedAt: String = ""
 )

@@ -2,6 +2,6 @@ package com.example.myapplication.data.remote.dto.request
 
 import com.google.gson.annotations.SerializedName
 
-data class AddMemberRequest(
-    @SerializedName("memberIds") val memberIds: List<String>
+data class DirectChatRequest(
+    @SerializedName("targetUserId") val targetUserId: String
 )

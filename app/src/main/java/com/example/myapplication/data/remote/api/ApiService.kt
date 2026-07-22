@@ -1,22 +1,10 @@
 package com.example.myapplication.data.remote.api
 
 import com.example.myapplication.data.remote.dto.request.*
-import com.example.myapplication.data.remote.dto.response.BaseResponse
-import com.example.myapplication.data.remote.dto.response.CommonResponse
-import com.example.myapplication.data.remote.dto.response.LoginResponse
-import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
-import com.example.myapplication.data.remote.dto.response.UserDto
-import com.example.myapplication.data.remote.dto.response.SubjectDto
+import com.example.myapplication.data.remote.dto.response.*
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
-import com.example.myapplication.data.model.Conversation
-import com.example.myapplication.data.model.Message
-import com.example.myapplication.data.model.Reaction
 
 interface ApiService {
     @POST("api/v1/auth/login")
@@ -80,6 +68,7 @@ interface ApiService {
     suspend fun deleteAccount(
         @Path("userId") userId: String
     ): Response<BaseResponse<CommonResponse>>
+
     @GET("api/v1/location/radar")
     suspend fun getNearbyUsers(
         @Query("lat") lat: Double,
@@ -87,99 +76,135 @@ interface ApiService {
         @Query("radius") radius: Double
     ): Response<BaseResponse<List<NearbyUserResponse>>>
 
-    @GET("chat/conversations")
-    suspend fun getConversations(): Response<BaseResponse<List<Conversation>>>
+    @GET("api/v1/chat/conversations")
+    suspend fun getConversations(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<ConversationResponse>>>
 
-    @POST("chat/conversations/direct")
-    suspend fun getOrCreateDirectConversation(
-        @Query("receiverId") receiverId: Long
-    ): Response<BaseResponse<Conversation>>
+    @GET("api/v1/chat/conversations/search")
+    suspend fun searchConversations(
+        @Query("keyword") keyword: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<ConversationResponse>>>
 
-    @POST("chat/conversations/group")
+    @POST("api/v1/chat/conversations/direct")
+    suspend fun createOrGetDirectConversation(
+        @Body request: DirectChatRequest
+    ): Response<BaseResponse<ConversationResponse>>
+
+    @POST("api/v1/chat/conversations/group")
     suspend fun createGroup(
         @Body request: CreateGroupRequest
-    ): Response<BaseResponse<Conversation>>
+    ): Response<BaseResponse<ConversationResponse>>
 
-    @PUT("chat/conversations/{conversationId}")
+    @PUT("api/v1/chat/conversations/{id}")
     suspend fun updateGroup(
-        @Path("conversationId") conversationId: Long,
+        @Path("id") id: String,
         @Body request: UpdateGroupRequest
-    ): Response<BaseResponse<Conversation>>
+    ): Response<BaseResponse<ConversationResponse>>
 
-    @GET("chat/conversations/search")
-    suspend fun searchConversations(
-        @Query("keyword") keyword: String
-    ): Response<BaseResponse<List<Conversation>>>
-
-    @POST("chat/conversations/{conversationId}/members")
+    @POST("api/v1/chat/conversations/{id}/members")
     suspend fun addMembers(
-        @Path("conversationId") conversationId: Long,
+        @Path("id") id: String,
         @Body request: AddMemberRequest
-    ): Response<BaseResponse<Conversation>>
+    ): Response<BaseResponse<ActionStatusDto>>
 
-    @DELETE("chat/conversations/{conversationId}/members/{userId}")
+    @DELETE("api/v1/chat/conversations/{id}/members/{userId}")
     suspend fun removeMember(
-        @Path("conversationId") conversationId: Long,
-        @Path("userId") userId: Long
-    ): Response<BaseResponse<CommonResponse>>
+        @Path("id") id: String,
+        @Path("userId") userId: String
+    ): Response<BaseResponse<ActionStatusDto>>
 
-    @DELETE("chat/conversations/{conversationId}/dissolve")
-    suspend fun dissolveGroup(
-        @Path("conversationId") conversationId: Long
-    ): Response<BaseResponse<CommonResponse>>
-
-    @PUT("chat/conversations/{conversationId}/transfer-ownership")
+    @PUT("api/v1/chat/conversations/{id}/transfer-ownership")
     suspend fun transferOwnership(
-        @Path("conversationId") conversationId: Long,
-        @Query("newOwnerId") newOwnerId: Long
-    ): Response<BaseResponse<Conversation>>
+        @Path("id") id: String,
+        @Query("newOwnerId") newOwnerId: String
+    ): Response<BaseResponse<ActionStatusDto>>
 
-    @GET("chat/conversations/{conversationId}/messages")
-    suspend fun getChatHistory(
-        @Path("conversationId") conversationId: Long
-    ): Response<BaseResponse<List<Message>>>
+    @DELETE("api/v1/chat/conversations/{id}/dissolve")
+    suspend fun dissolveGroup(
+        @Path("id") id: String
+    ): Response<BaseResponse<ActionStatusDto>>
 
-    @GET("chat/conversations/{conversationId}/messages/search")
+    @GET("api/v1/chat/conversations/{id}/messages")
+    suspend fun getMessages(
+        @Path("id") id: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<MessageResponse>>>
+
+    @GET("api/v1/chat/conversations/{id}/messages/search")
     suspend fun searchMessages(
-        @Path("conversationId") conversationId: Long,
-        @Query("keyword") keyword: String
-    ): Response<BaseResponse<List<Message>>>
+        @Path("id") id: String,
+        @Query("keyword") keyword: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<MessageResponse>>>
 
-    @POST("chat/messages/{messageId}/reply")
-    suspend fun replyMessage(
-        @Path("messageId") messageId: Long,
-        @Body request: ReplyRequest
-    ): Response<BaseResponse<Message>>
-
-    @POST("chat/messages/{messageId}/forward")
-    suspend fun forwardMessage(
-        @Path("messageId") messageId: Long,
-        @Query("targetConversationId") targetConversationId: Long
-    ): Response<BaseResponse<Message>>
-
-    @PUT("chat/messages/{messageId}/pin")
-    suspend fun pinMessage(
-        @Path("messageId") messageId: Long
-    ): Response<BaseResponse<CommonResponse>>
-
-    @PUT("chat/messages/{messageId}/unpin")
-    suspend fun unpinMessage(
-        @Path("messageId") messageId: Long
-    ): Response<BaseResponse<CommonResponse>>
-
-    @GET("chat/conversations/{conversationId}/pinned")
+    @GET("api/v1/chat/conversations/{id}/pinned")
     suspend fun getPinnedMessages(
-        @Path("conversationId") conversationId: Long
-    ): Response<BaseResponse<List<Message>>>
+        @Path("id") id: String
+    ): Response<BaseResponse<List<MessageResponse>>>
 
-    @POST("chat/messages/{messageId}/reactions")
+    @PUT("api/v1/chat/messages/{msgId}/pin")
+    suspend fun pinMessage(
+        @Path("msgId") msgId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @PUT("api/v1/chat/messages/{msgId}/unpin")
+    suspend fun unpinMessage(
+        @Path("msgId") msgId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @PUT("api/v1/chat/messages/{msgId}/recall")
+    suspend fun recallMessage(
+        @Path("msgId") msgId: String
+    ): Response<BaseResponse<Any>>
+
+    @DELETE("api/v1/chat/messages/{msgId}")
+    suspend fun deleteMessage(
+        @Path("msgId") msgId: String
+    ): Response<BaseResponse<Any>>
+
+    @POST("api/v1/chat/messages/{msgId}/reply")
+    suspend fun replyMessage(
+        @Path("msgId") msgId: String,
+        @Query("content") content: String
+    ): Response<BaseResponse<MessageResponse>>
+
+    @POST("api/v1/chat/messages/{msgId}/forward")
+    suspend fun forwardMessage(
+        @Path("msgId") msgId: String,
+        @Query("targetConversationId") targetConversationId: String
+    ): Response<BaseResponse<MessageResponse>>
+
+    @POST("api/v1/chat/messages/{msgId}/reactions")
     suspend fun addReaction(
-        @Path("messageId") messageId: Long,
+        @Path("msgId") msgId: String,
         @Query("emoji") emoji: String
-    ): Response<BaseResponse<Reaction>>
+    ): Response<BaseResponse<ActionStatusDto>>
 
-    @DELETE("chat/messages/{messageId}/reactions")
+    @DELETE("api/v1/chat/messages/{msgId}/reactions")
     suspend fun removeReaction(
-        @Path("messageId") messageId: Long
-    ): Response<BaseResponse<CommonResponse>>
+        @Path("msgId") msgId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @Multipart
+    @POST("api/v1/chat/conversations/{id}/upload")
+    suspend fun uploadAttachment(
+        @Path("id") id: String,
+        @Part file: MultipartBody.Part
+    ): Response<BaseResponse<Any>>
+
+    @POST("api/v1/chat/conversations/{id}/schedule-invite")
+    suspend fun scheduleInvite(
+        @Path("id") id: String,
+        @Body request: ScheduleInviteRequest
+    ): Response<BaseResponse<Any>>
 }

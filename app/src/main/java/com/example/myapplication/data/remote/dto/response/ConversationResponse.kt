@@ -1,13 +1,14 @@
 package com.example.myapplication.data.remote.dto.response
 
-import com.example.myapplication.data.model.Message
+import com.google.gson.annotations.SerializedName
 
 data class ConversationResponse(
-    val conversationId: Long,
-    val conversationName: String,
-    val avatar: String?,
-    val lastMessage: Message?,
-    val lastMessageTime: String,
-    val unreadCount: Int,
-    val memberCount: Int
+    @SerializedName("id") val id: String,
+    @SerializedName("type") val type: String? = null,
+    @SerializedName("groupName") val groupName: String? = null,
+    @SerializedName("groupAvatar") val groupAvatar: String? = null,
+    @SerializedName("memberCount") val memberCount: Int = 0,
+    @SerializedName("unreadCount") val unreadCount: Int = 0,
+    @SerializedName("hasLeft") val hasLeft: Boolean = false,
+    @SerializedName("lastMessage") val lastMessage: MessageResponse? = null
 )
