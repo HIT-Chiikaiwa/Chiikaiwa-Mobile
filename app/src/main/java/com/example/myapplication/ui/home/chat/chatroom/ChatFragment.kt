@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -27,10 +28,12 @@ class ChatFragment : Fragment() {
     }
     private lateinit var adapter: MessageAdapter
     private var conversationId: String = ""
+    private var targetUserId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         conversationId = arguments?.getString(ARG_CONVERSATION_ID) ?: ""
+        targetUserId = arguments?.getString(ARG_TARGET_USER_ID) ?: ""
     }
 
     override fun onCreateView(
@@ -64,6 +67,27 @@ class ChatFragment : Fragment() {
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.btnUserAction.setOnClickListener {
+            sendMessage()
+        }
+
+        binding.etMessage.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                sendMessage()
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun sendMessage() {
+        val text = binding.etMessage.text.toString().trim()
+        if (text.isNotEmpty() && targetUserId.isNotEmpty()) {
+            viewModel.sendRealtimeMessage(targetUserId, text)
+            binding.etMessage.setText("")
         }
     }
 
@@ -107,11 +131,13 @@ class ChatFragment : Fragment() {
 
     companion object {
         private const val ARG_CONVERSATION_ID = "conversation_id"
+        private const val ARG_TARGET_USER_ID = "target_user_id"
 
-        fun newInstance(conversationId: String): ChatFragment {
+        fun newInstance(conversationId: String, targetUserId: String = ""): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CONVERSATION_ID, conversationId)
+                    putString(ARG_TARGET_USER_ID, targetUserId)
                 }
             }
         }
