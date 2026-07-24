@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -95,6 +96,12 @@ class ChatFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+        binding.btnAddOption.setOnClickListener {
+            if (conversationId.isNotEmpty()) {
+                viewModel.fetchPinnedMessages(conversationId)
+            }
+        }
+
         binding.btnUserAction.setOnClickListener {
             sendMessage()
         }
@@ -143,6 +150,14 @@ class ChatFragment : Fragment() {
                 }
 
                 launch {
+                    viewModel.pinnedMessages.collect { pinnedList ->
+                        if (pinnedList.isNotEmpty()) {
+                            showPinnedMessagesDialog(pinnedList)
+                        }
+                    }
+                }
+
+                launch {
                     viewModel.event.collect { event ->
                         when (event) {
                             is UiEvent.ShowToast -> {
@@ -154,6 +169,18 @@ class ChatFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showPinnedMessagesDialog(pinnedList: List<Message>) {
+        val items = pinnedList.map { "${it.sender.fullName}: ${it.content}" }.toTypedArray()
+        AlertDialog.Builder(requireContext())
+            .setTitle("📌 Tin nhắn đã ghim (${pinnedList.size})")
+            .setItems(items) { _, which ->
+                val selectedMsg = pinnedList[which]
+                Toast.makeText(requireContext(), "Đang xem tin nhắn: ${selectedMsg.content}", Toast.LENGTH_SHORT).show()
+            }
+            .setPositiveButton("Đóng", null)
+            .show()
     }
 
     override fun onDestroyView() {

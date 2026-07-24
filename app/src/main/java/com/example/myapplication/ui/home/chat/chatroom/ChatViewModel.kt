@@ -15,6 +15,9 @@ import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(application) {
@@ -30,6 +33,9 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     val currentUserId: String = preferenceManager.getUserId() ?: ""
 
     private val _messages = mutableListOf<Message>()
+
+    private val _pinnedMessages = MutableStateFlow<List<Message>>(emptyList())
+    val pinnedMessages: StateFlow<List<Message>> = _pinnedMessages.asStateFlow()
 
     init {
         initWebSocket()
@@ -75,6 +81,20 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
+    fun fetchPinnedMessages(conversationId: String) {
+        viewModelScope.launch {
+            when (val result = reactionRepository.getPinnedMessages(conversationId)) {
+                is Resource.Success -> {
+                    val list = result.data.data.map { ChatMapper.toDomain(it) }
+                    _pinnedMessages.value = list
+                }
+                is Resource.Error -> {
                     _event.emit(UiEvent.ShowToast(result.message))
                 }
             }
