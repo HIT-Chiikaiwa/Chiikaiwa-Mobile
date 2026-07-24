@@ -96,11 +96,95 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         }
     }
 
+    fun forwardMessage(messageId: String, targetConversationId: String) {
+        viewModelScope.launch {
+            when (val result = messageRepository.forwardMessage(messageId, targetConversationId)) {
+                is Resource.Success -> {
+                    _event.emit(UiEvent.ShowToast("Đã chuyển tiếp tin nhắn"))
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
     fun pinMessage(messageId: String) {
         viewModelScope.launch {
             when (val result = reactionRepository.pinMessage(messageId)) {
                 is Resource.Success -> {
                     _event.emit(UiEvent.ShowToast("Đã ghim tin nhắn"))
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
+    fun unpinMessage(messageId: String) {
+        viewModelScope.launch {
+            when (val result = reactionRepository.unpinMessage(messageId)) {
+                is Resource.Success -> {
+                    _event.emit(UiEvent.ShowToast("Đã bỏ ghim tin nhắn"))
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
+    fun recallMessage(messageId: String) {
+        viewModelScope.launch {
+            when (val result = messageRepository.recallMessage(messageId)) {
+                is Resource.Success -> {
+                    _messages.indexOfFirst { it.id == messageId }.takeIf { it != -1 }?.let { index ->
+                        _messages[index] = _messages[index].copy(isRecalled = true, content = "Tin nhắn đã được thu hồi")
+                        _uiState.value = UiState.Success(_messages.toList())
+                    }
+                    _event.emit(UiEvent.ShowToast("Đã thu hồi tin nhắn"))
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
+    fun deleteMessage(messageId: String) {
+        viewModelScope.launch {
+            when (val result = messageRepository.deleteMessage(messageId)) {
+                is Resource.Success -> {
+                    _messages.removeAll { it.id == messageId }
+                    _uiState.value = UiState.Success(_messages.toList())
+                    _event.emit(UiEvent.ShowToast("Đã xóa tin nhắn"))
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
+    fun addReaction(messageId: String, emoji: String) {
+        viewModelScope.launch {
+            when (val result = reactionRepository.addReaction(messageId, emoji)) {
+                is Resource.Success -> {
+                    _event.emit(UiEvent.ShowToast("Đã thêm cảm xúc"))
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast(result.message))
+                }
+            }
+        }
+    }
+
+    fun removeReaction(messageId: String) {
+        viewModelScope.launch {
+            when (val result = reactionRepository.removeReaction(messageId)) {
+                is Resource.Success -> {
+                    _event.emit(UiEvent.ShowToast("Đã xóa cảm xúc"))
                 }
                 is Resource.Error -> {
                     _event.emit(UiEvent.ShowToast(result.message))

@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.home.chat.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,7 +13,8 @@ import com.example.myapplication.ui.home.chat.adapter.viewholder.IncomingTextVie
 import com.example.myapplication.ui.home.chat.adapter.viewholder.OutgoingTextViewHolder
 
 class MessageAdapter(
-    private val currentUserId: String
+    private val currentUserId: String,
+    private val onMessageLongClick: (View, Message) -> Unit
 ) : ListAdapter<Message, RecyclerView.ViewHolder>(DiffCallback) {
 
     override fun getItemViewType(position: Int): Int {
@@ -24,10 +26,10 @@ class MessageAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == TYPE_OUTGOING) {
             val binding = ItemChatOutgoingBinding.inflate(inflater, parent, false)
-            OutgoingTextViewHolder(binding)
+            OutgoingTextViewHolder(binding, onMessageLongClick)
         } else {
             val binding = ItemChatIncomingBinding.inflate(inflater, parent, false)
-            IncomingTextViewHolder(binding)
+            IncomingTextViewHolder(binding, onMessageLongClick)
         }
     }
 
