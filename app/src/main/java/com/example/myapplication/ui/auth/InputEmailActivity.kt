@@ -32,6 +32,5 @@ class InputEmailActivity : BaseActivity<ActivityInputEmailBinding>() {
     }
 
     override fun observeData() {
-        // No data to observe currently
     }
 }

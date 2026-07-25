@@ -3,7 +3,6 @@ package com.example.myapplication.ui.home.chat
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityFriendsListBinding
@@ -25,11 +24,9 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
 
         adapter = FriendsAdapter { conversation ->
-            val targetUserId = conversation.lastMessage?.senderId ?: ""
             val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
             val intent = Intent(this, ChatActivity::class.java).apply {
                 putExtra("conversation_id", conversation.id)
-                putExtra("target_user_id", targetUserId)
                 putExtra("user_name", name)
             }
             startActivity(intent)
@@ -45,7 +42,10 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
 
+    override fun onResume() {
+        super.onResume()
         viewModel.fetchConversations()
     }
 
@@ -53,7 +53,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         viewModel.uiState.observeState { state ->
             when (state) {
                 is UiState.Success -> {
-                    adapter.submitList(state.data)
+                    adapter.submitList(ArrayList(state.data))
                 }
                 is UiState.Error -> {
                     showToast(state.message)

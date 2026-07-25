@@ -151,9 +151,12 @@ class ChatFragment : Fragment() {
                     viewModel.uiState.collect { state ->
                         when (state) {
                             is UiState.Success -> {
-                                adapter.submitList(state.data) {
-                                    if (state.data.isNotEmpty()) {
-                                        binding.rvChatMessages.scrollToPosition(state.data.size - 1)
+                                val newList = ArrayList(state.data)
+                                adapter.submitList(newList) {
+                                    if (newList.isNotEmpty()) {
+                                        binding.rvChatMessages.post {
+                                            binding.rvChatMessages.scrollToPosition(newList.size - 1)
+                                        }
                                     }
                                 }
                             }

@@ -2,7 +2,11 @@ package com.example.myapplication.ui.home.chat
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.response.ConversationResponse
+import com.example.myapplication.data.remote.network.NetworkConstants
+import com.example.myapplication.data.remote.websocket.ChatSocketService
+import com.example.myapplication.data.remote.websocket.StompManager
 import com.example.myapplication.data.repository.ConversationRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiState
@@ -12,10 +16,34 @@ import kotlinx.coroutines.launch
 class FriendsListViewModel(application: Application) : BaseViewModel<List<ConversationResponse>>(application) {
 
     private val conversationRepository = ConversationRepository(application)
+    private val preferenceManager = PreferenceManager(application)
+
+    private val stompManager = StompManager()
+    private val socketService = ChatSocketService(stompManager)
+
+    init {
+        initWebSocket()
+        fetchConversations()
+    }
+
+    private fun initWebSocket() {
+        val currentUserId = preferenceManager.getUserId() ?: ""
+        val token = preferenceManager.getAccessToken() ?: ""
+        if (currentUserId.isNotEmpty() && token.isNotEmpty()) {
+            val wsUrl = "${NetworkConstants.WS_URL}?token=$token"
+            socketService.connect(wsUrl, token)
+            socketService.subscribeToChat(currentUserId)
+
+            viewModelScope.launch {
+                socketService.messageFlow.collect {
+                    fetchConversations()
+                }
+            }
+        }
+    }
 
     fun fetchConversations() {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
             when (val result = conversationRepository.getConversations()) {
                 is Resource.Success -> {
                     val list = result.data?.data?.content ?: emptyList()
@@ -34,7 +62,6 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
             return
         }
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
             when (val result = conversationRepository.searchConversations(keyword)) {
                 is Resource.Success -> {
                     val list = result.data?.data?.content ?: emptyList()
@@ -45,5 +72,10 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stompManager.disconnect()
     }
 }

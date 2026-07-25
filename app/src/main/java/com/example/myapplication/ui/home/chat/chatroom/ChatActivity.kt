@@ -11,9 +11,20 @@ class ChatActivity : BaseActivity<ActivityMainBinding>() {
     override fun initView() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-        val conversationId = intent.getStringExtra("conversation_id") ?: ""
-        val targetUserId = intent.getStringExtra("target_user_id") ?: ""
-        val userName = intent.getStringExtra("user_name") ?: ""
+        val conversationId = intent.getStringExtra("conversation_id")
+            ?: intent.getStringExtra("conversationId")
+            ?: intent.getStringExtra("id")
+            ?: ""
+
+        val targetUserId = intent.getStringExtra("target_user_id")
+            ?: intent.getStringExtra("targetUserId")
+            ?: intent.getStringExtra("userId")
+            ?: ""
+
+        val userName = intent.getStringExtra("user_name")
+            ?: intent.getStringExtra("userName")
+            ?: intent.getStringExtra("name")
+            ?: ""
 
         val fragment = ChatFragment.newInstance(conversationId, targetUserId, userName)
         supportFragmentManager.beginTransaction()

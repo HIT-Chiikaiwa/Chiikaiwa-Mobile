@@ -8,6 +8,9 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
     private val _messageFlow = MutableSharedFlow<Pair<String, String>>(extraBufferCapacity = 64)
     val messageFlow: SharedFlow<Pair<String, String>> = _messageFlow
 
+    private var activeUserId: String = ""
+    private var activeConversationId: String = ""
+
     init {
         stompManager.listener = this
     }
@@ -17,12 +20,18 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
     }
 
     fun subscribeToChat(userId: String, conversationId: String = "") {
+        this.activeUserId = userId
+        this.activeConversationId = conversationId
+
         stompManager.subscribe("/user/queue/messages")
         if (userId.isNotEmpty()) {
             stompManager.subscribe("/user/$userId/queue/messages")
+            stompManager.subscribe("/queue/messages")
         }
         if (conversationId.isNotEmpty()) {
             stompManager.subscribe("/topic/conversations/$conversationId")
+            stompManager.subscribe("/topic/messages/$conversationId")
+            stompManager.subscribe("/topic/chat/$conversationId")
         }
     }
 
@@ -42,6 +51,9 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
     }
 
     override fun onConnected() {
+        if (activeUserId.isNotEmpty()) {
+            subscribeToChat(activeUserId, activeConversationId)
+        }
     }
 
     override fun onDisconnected() {

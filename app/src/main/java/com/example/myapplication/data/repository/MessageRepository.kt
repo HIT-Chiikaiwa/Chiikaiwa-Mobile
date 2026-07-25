@@ -14,9 +14,9 @@ class MessageRepository(context: Context) : BaseRepository() {
         conversationId: String,
         page: Int = 0,
         size: Int = 20,
-        sort: String? = null
-    ): Resource<BaseResponse<PageResponse<MessageResponse>>> {
-        return safeApiCall { api.getMessages(conversationId, page, size, sort) }
+        sort: String? = "createdDate,desc"
+    ): Resource<BaseResponse<PageResponse<MessageResponse>>> = safeApiCall {
+        api.getMessages(conversationId, page, size, sort)
     }
 
     suspend fun searchMessages(
@@ -24,16 +24,16 @@ class MessageRepository(context: Context) : BaseRepository() {
         keyword: String,
         page: Int = 0,
         size: Int = 20,
-        sort: String? = null
-    ): Resource<BaseResponse<PageResponse<MessageResponse>>> {
-        return safeApiCall { api.searchMessages(conversationId, keyword, page, size, sort) }
+        sort: String? = "createdDate,desc"
+    ): Resource<BaseResponse<PageResponse<MessageResponse>>> = safeApiCall {
+        api.searchMessages(conversationId, keyword, page, size, sort)
     }
 
-    suspend fun recallMessage(messageId: String): Resource<BaseResponse<Any>> {
-        return safeApiCall { api.recallMessage(messageId) }
+    suspend fun recallMessage(messageId: String): Resource<BaseResponse<Any>> = safeApiCall {
+        api.recallMessage(messageId)
     }
 
-    suspend fun deleteMessage(messageId: String): Resource<BaseResponse<Any>> {
-        return safeApiCall { api.deleteMessage(messageId) }
+    suspend fun deleteMessage(messageId: String): Resource<BaseResponse<Any>> = safeApiCall {
+        api.deleteMessage(messageId)
     }
 }
