@@ -42,9 +42,9 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private fun initWebSocket() {
         val token = preferenceManager.getAccessToken() ?: ""
         if (currentUserId.isNotEmpty() && token.isNotEmpty()) {
-            val wsUrl = "ws://54.255.60.109:8080/ws/chat"
+            val wsUrl = "ws://54.255.60.109:8080/ws?token=$token"
             socketService.connect(wsUrl, token)
-            socketService.subscribeToChat(currentUserId)
+            socketService.subscribeToChat(currentUserId, activeConversationId)
 
             viewModelScope.launch {
                 socketService.messageFlow.collect { (_, body) ->
@@ -66,6 +66,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     fun initChatSession(convId: String, targetId: String) {
         if (convId.isNotEmpty()) {
             activeConversationId = convId
+            socketService.subscribeToChat(currentUserId, activeConversationId)
             fetchMessages(convId)
         } else if (targetId.isNotEmpty()) {
             viewModelScope.launch {
@@ -73,6 +74,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 when (val result = conversationRepository.createOrGetDirectConversation(targetId)) {
                     is Resource.Success -> {
                         activeConversationId = result.data.data.id
+                        socketService.subscribeToChat(currentUserId, activeConversationId)
                         fetchMessages(activeConversationId)
                     }
                     is Resource.Error -> {
@@ -101,8 +103,12 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         _messages.add(localMsg)
         _uiState.value = UiState.Success(_messages.toList())
 
-        if (targetId.isNotEmpty()) {
-            socketService.sendPrivateMessage(currentUserId, targetId, msgText)
+        socketService.sendMessage(currentUserId, targetId, msgText, activeConversationId)
+    }
+
+    fun sendTypingSignal(isTyping: Boolean) {
+        if (activeConversationId.isNotEmpty()) {
+            socketService.sendTypingSignal(activeConversationId, isTyping)
         }
     }
 
@@ -116,6 +122,9 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                     _messages.clear()
                     _messages.addAll(list)
                     _uiState.value = UiState.Success(_messages.toList())
+                    if (conversationId.isNotEmpty()) {
+                        socketService.sendReadReceipt(conversationId)
+                    }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
