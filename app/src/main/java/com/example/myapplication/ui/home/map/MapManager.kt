@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
 import com.example.myapplication.databinding.DialogUserInfoBinding
@@ -183,13 +184,18 @@ class MapManager(
             binding.ivAvatar.setImageResource(R.drawable.ic_launcher_foreground)
         }
 
-        binding.btnSendMessage.setOnClickListener {
-            dialog.dismiss()
-            val intent = Intent(context, ChatActivity::class.java).apply {
-                putExtra("target_user_id", userId)
-                putExtra("user_name", name)
+        if (userId == viewModel.currentUserId) {
+            binding.btnSendMessage.visibility = View.GONE
+        } else {
+            binding.btnSendMessage.visibility = View.VISIBLE
+            binding.btnSendMessage.setOnClickListener {
+                dialog.dismiss()
+                val intent = Intent(context, ChatActivity::class.java).apply {
+                    putExtra("target_user_id", userId)
+                    putExtra("user_name", name)
+                }
+                context.startActivity(intent)
             }
-            context.startActivity(intent)
         }
 
         dialog.show()

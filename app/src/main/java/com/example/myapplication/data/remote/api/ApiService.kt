@@ -6,7 +6,6 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
-    // Auth & Profile Endpoints
     @POST("api/v1/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
@@ -75,10 +74,6 @@ interface ApiService {
         @Query("lng") lng: Double,
         @Query("radius") radius: Double
     ): Response<BaseResponse<List<NearbyUserResponse>>>
-
-    // ==========================================
-    // CHAT MODULE ENDPOINTS (Pure Messaging)
-    // ==========================================
 
     @GET("api/v1/chat/conversations")
     suspend fun getConversations(

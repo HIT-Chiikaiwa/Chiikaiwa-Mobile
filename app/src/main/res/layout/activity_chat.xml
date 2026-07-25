@@ -126,6 +126,15 @@
             android:src="@drawable/ic_locate"
             app:tint="@color/brown" />
 
+        <ImageView
+            android:id="@+id/btnSend"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:contentDescription="@string/send"
+            android:src="@drawable/ic_send"
+            android:visibility="gone"
+            app:tint="@color/brown" />
+
     </LinearLayout>
 
 </LinearLayout>

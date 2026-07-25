@@ -1,11 +1,15 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -53,12 +57,27 @@ class ChatFragment : Fragment() {
         if (userName.isNotEmpty()) {
             binding.tvChatTitle.text = userName
         }
+        setupWindowInsets()
         setupRecyclerView()
         setupListeners()
         observeViewModel()
 
-        if (conversationId.isNotEmpty()) {
-            viewModel.fetchMessages(conversationId)
+        viewModel.initChatSession(conversationId, targetUserId)
+    }
+
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val navigationBarsHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val bottomPadding = if (imeHeight > 0) imeHeight else navigationBarsHeight
+            binding.root.setPadding(0, 0, 0, bottomPadding)
+            
+            if (imeHeight > 0 && ::adapter.isInitialized && adapter.itemCount > 0) {
+                binding.rvChatMessages.post {
+                    binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
+                }
+            }
+            insets
         }
     }
 
@@ -87,9 +106,24 @@ class ChatFragment : Fragment() {
             requireActivity().finish()
         }
 
-        binding.btnUserAction.setOnClickListener {
+        binding.btnSend.setOnClickListener {
             sendMessage()
         }
+
+        binding.etMessage.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val hasContent = !s.isNullOrBlank()
+                binding.btnSend.visibility = if (hasContent) View.VISIBLE else View.GONE
+                binding.btnMic.visibility = if (hasContent) View.GONE else View.VISIBLE
+                binding.btnFolder.visibility = if (hasContent) View.GONE else View.VISIBLE
+                binding.btnGallery.visibility = if (hasContent) View.GONE else View.VISIBLE
+                binding.btnUserAction.visibility = if (hasContent) View.GONE else View.VISIBLE
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         binding.etMessage.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -103,8 +137,9 @@ class ChatFragment : Fragment() {
 
     private fun sendMessage() {
         val text = binding.etMessage.text.toString().trim()
-        if (text.isNotEmpty() && targetUserId.isNotEmpty()) {
-            viewModel.sendRealtimeMessage(targetUserId, text)
+        if (text.isNotEmpty()) {
+            val destinationId = if (targetUserId.isNotEmpty()) targetUserId else conversationId
+            viewModel.sendRealtimeMessage(destinationId, text)
             binding.etMessage.setText("")
         }
     }

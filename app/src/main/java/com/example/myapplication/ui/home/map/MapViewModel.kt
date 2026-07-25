@@ -25,6 +25,8 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val profileRepository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
+    val currentUserId: String get() = preferenceManager.getUserId() ?: ""
+
     private val _nearbyUsers = MutableStateFlow<List<NearbyUserResponse>>(emptyList())
     val nearbyUsers: StateFlow<List<NearbyUserResponse>> get() = _nearbyUsers
 

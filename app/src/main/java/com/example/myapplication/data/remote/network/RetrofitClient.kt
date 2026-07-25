@@ -2,13 +2,13 @@ package com.example.myapplication.data.remote.network
 
 import android.content.Context
 import com.example.myapplication.data.local.PreferenceManager
+import com.example.myapplication.data.remote.api.ApiService
 import com.example.myapplication.data.remote.interceptor.AuthInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import com.example.myapplication.data.remote.api.ApiService
 
 object RetrofitClient {
     private const val BASE_URL = "http://54.255.60.109:8080/"
@@ -23,7 +23,7 @@ object RetrofitClient {
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(logging)
-            .addInterceptor(AuthInterceptor(PreferenceManager(context)))
+            .addInterceptor(AuthInterceptor(PreferenceManager(context), context))
             .build()
 
         return Retrofit.Builder()

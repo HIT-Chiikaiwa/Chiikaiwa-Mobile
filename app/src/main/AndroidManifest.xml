@@ -18,6 +18,7 @@
         android:theme="@style/Theme.MyApplication">
         <activity
             android:name=".ui.home.MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,9 +28,11 @@
         </activity>
         <activity
             android:name=".ui.auth.LoginActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.auth.RegisterActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.auth.VerifyEmailActivity"
@@ -39,24 +42,31 @@
             android:exported="false" />
         <activity
             android:name=".ui.auth.InputEmailActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.auth.ForgotPasswordActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.profile.ProfileActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.profile.EditProfileActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.profile.AccountSettingsActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.home.chat.FriendsListActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.home.chat.chatroom.ChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
     </application>
