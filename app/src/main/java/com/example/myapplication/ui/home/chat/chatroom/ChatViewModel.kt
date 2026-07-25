@@ -20,6 +20,7 @@ import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(application) {
@@ -73,6 +74,10 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
             val senderName = data.get("senderName")?.asString
                 ?: data.getAsJsonObject("sender")?.get("fullName")?.asString ?: "Người dùng"
             val convId = data.get("conversationId")?.asString ?: activeConversationId
+
+            if (senderId.isNotEmpty() && senderId != currentUserId) {
+                activeTargetUserId = senderId
+            }
 
             val incomingMsg = Message(
                 id = msgId,
@@ -136,8 +141,8 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         }
 
         val receiverId = when {
-            targetId.isNotEmpty() && targetId != currentUserId && targetId != activeConversationId -> targetId
             activeTargetUserId.isNotEmpty() && activeTargetUserId != currentUserId -> activeTargetUserId
+            targetId.isNotEmpty() && targetId != currentUserId && targetId != activeConversationId -> targetId
             else -> targetId
         }
 
@@ -157,6 +162,13 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         updateState()
 
         socketService.sendMessage(currentUserId, receiverId, msgText, activeConversationId)
+
+        if (activeConversationId.isNotEmpty()) {
+            viewModelScope.launch {
+                delay(600)
+                fetchMessages(activeConversationId)
+            }
+        }
     }
 
     fun fetchMessages(conversationId: String, page: Int = 0, size: Int = 20) {
@@ -165,6 +177,12 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 is Resource.Success -> {
                     try {
                         val rawList = result.data.data.content.map { ChatMapper.toDomain(it) }
+
+                        val otherMsg = rawList.firstOrNull { it.sender.id.isNotEmpty() && it.sender.id != currentUserId }
+                        if (otherMsg != null) {
+                            activeTargetUserId = otherMsg.sender.id
+                        }
+
                         val localTemps = _messages.filter { it.id.startsWith("temp_") }
 
                         _messages.clear()

@@ -48,7 +48,11 @@ class MessageAdapter(
 
         private val DiffCallback = object : DiffUtil.ItemCallback<Message>() {
             override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
-                return oldItem.id == newItem.id
+                if (oldItem.id == newItem.id) return true
+                if (oldItem.id.startsWith("temp_") && oldItem.content == newItem.content && oldItem.sender.id == newItem.sender.id) {
+                    return true
+                }
+                return false
             }
 
             override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {

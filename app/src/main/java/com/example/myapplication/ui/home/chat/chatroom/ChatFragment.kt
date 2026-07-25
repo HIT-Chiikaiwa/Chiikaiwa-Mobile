@@ -153,10 +153,17 @@ class ChatFragment : Fragment() {
                             is UiState.Success -> {
                                 val newList = ArrayList(state.data)
                                 adapter.submitList(newList) {
-                                    if (newList.isNotEmpty()) {
-                                        binding.rvChatMessages.post {
+                                    binding.rvChatMessages.post {
+                                        adapter.notifyDataSetChanged()
+                                        if (newList.isNotEmpty()) {
                                             binding.rvChatMessages.scrollToPosition(newList.size - 1)
                                         }
+                                    }
+                                }
+                                binding.rvChatMessages.post {
+                                    adapter.notifyDataSetChanged()
+                                    if (newList.isNotEmpty()) {
+                                        binding.rvChatMessages.scrollToPosition(newList.size - 1)
                                     }
                                 }
                             }
