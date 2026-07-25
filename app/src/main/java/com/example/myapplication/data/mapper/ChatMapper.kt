@@ -34,16 +34,6 @@ object ChatMapper {
             avatar = dto.senderAvatar
         )
 
-        val replyMsg = dto.replyToMessage?.let { ref ->
-            Message(
-                id = ref.id,
-                conversationId = dto.conversationId ?: "",
-                sender = User(id = "", fullName = ref.senderName ?: ""),
-                content = ref.content ?: "",
-                type = try { MessageType.valueOf(ref.messageType ?: "TEXT") } catch (e: Exception) { MessageType.TEXT }
-            )
-        }
-
         return Message(
             id = dto.id,
             conversationId = dto.conversationId ?: "",
@@ -51,31 +41,9 @@ object ChatMapper {
             content = dto.content ?: "",
             type = msgType,
             status = MessageStatus.SENT,
-            replyMessage = replyMsg,
             createdAt = dto.createdDate ?: "",
             updatedAt = dto.createdDate ?: "",
-            isPinned = dto.isPinned,
-            isRecalled = dto.isRecalled,
-            attachments = dto.attachments.map { toDomain(it) },
-            reactions = dto.reactions.map { toDomain(it) }
-        )
-    }
-
-    fun toDomain(dto: AttachmentDto): Attachment {
-        return Attachment(
-            id = dto.id,
-            url = dto.fileUrl,
-            fileName = dto.fileName,
-            fileSize = dto.fileSize,
-            mimeType = dto.fileType
-        )
-    }
-
-    fun toDomain(dto: ReactionDto): Reaction {
-        return Reaction(
-            emoji = dto.emoji,
-            count = dto.count,
-            userIds = dto.userIds
+            isRecalled = dto.isRecalled
         )
     }
 }

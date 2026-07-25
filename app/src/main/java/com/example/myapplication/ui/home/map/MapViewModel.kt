@@ -1,10 +1,9 @@
 package com.example.myapplication.ui.home.map
 
 import android.app.Application
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Location
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
@@ -14,13 +13,15 @@ import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URL
 
 class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResponse>>(application) {
 
-    private val repository = MapRepository(application)
+    private val mapRepository = MapRepository(application)
     private val profileRepository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
@@ -33,7 +34,7 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val _currentUserAvatar = MutableStateFlow<String?>(null)
     val currentUserAvatar: StateFlow<String?> get() = _currentUserAvatar
 
-    private val fetchingUserIds = mutableSetOf<String>()
+    private val fetchingUserIds = HashSet<String>()
 
     fun loadCurrentUserAvatar() {
         val userId = preferenceManager.getUserId() ?: return
@@ -47,39 +48,31 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
         }
     }
 
-    fun getNearbyUsers(lat: Double, lng: Double, radius: Double = 6.0) {
+    fun getNearbyUsers(lat: Double, lng: Double, radiusKm: Double = 6.0) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            
-            val filterAndDistance = { users: List<NearbyUserResponse> ->
-                users.mapNotNull { user ->
-                    val distanceResults = FloatArray(1)
-                    try {
-                        android.location.Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
-                        val distanceKm = distanceResults[0] / 1000.0
-                        if (distanceKm <= radius) {
-                            user.copy(distanceKm = distanceKm)
-                        } else {
-                            null
-                        }
-                    } catch (e: Exception) {
-                        user
-                    }
-                }
-            }
 
-            when (val result = repository.getNearbyUsers(lat, lng, radius)) {
+            when (val result = mapRepository.getNearbyUsers(lat, lng, radiusKm)) {
                 is Resource.Success -> {
                     val remoteUsers = result.data?.data ?: emptyList()
-                    val filteredRemote = withContext(Dispatchers.Default) {
-                        filterAndDistance(remoteUsers)
+                    val filtered = withContext(Dispatchers.Default) {
+                        val distanceResults = FloatArray(1)
+                        remoteUsers.mapNotNull { user ->
+                            try {
+                                Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
+                                val dist = distanceResults[0] / 1000.0
+                                if (dist <= radiusKm) user.copy(distanceKm = dist) else null
+                            } catch (e: Exception) {
+                                user
+                            }
+                        }
                     }
-                    _nearbyUsers.value = filteredRemote
-                    _uiState.value = UiState.Success(filteredRemote)
-                    fetchAvatars(filteredRemote)
+                    _nearbyUsers.value = filtered
+                    _uiState.value = UiState.Success(filtered)
+                    fetchAvatars(filtered)
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message ?: "An error occurred")
+                    _uiState.value = UiState.Error(result.message ?: "Lỗi tải dữ liệu vị trí")
                 }
             }
         }
@@ -87,43 +80,40 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
 
     private fun fetchAvatars(users: List<NearbyUserResponse>) {
         val context = getApplication<Application>()
-        val currentBitmaps = _avatarBitmaps.value ?: emptyMap()
-        users.forEach { user ->
-            val avatarUrl = user.avatar
-            val userId = user.userId
-            if (!avatarUrl.isNullOrEmpty() && !currentBitmaps.containsKey(userId)) {
-                synchronized(fetchingUserIds) {
-                    if (fetchingUserIds.contains(userId)) return@forEach
-                    fetchingUserIds.add(userId)
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        val bitmap = if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
-                            URL(avatarUrl).openStream().use { stream ->
-                                BitmapFactory.decodeStream(stream)
-                            }
-                        } else {
-                            val resId = context.resources.getIdentifier(avatarUrl, "drawable", context.packageName)
-                            if (resId != 0) {
-                                BitmapFactory.decodeResource(context.resources, resId)
-                            } else {
-                                null
-                            }
-                        }
-                        if (bitmap != null) {
-                            withContext(Dispatchers.Main) {
-                                val current = _avatarBitmaps.value?.toMutableMap() ?: mutableMapOf()
-                                current[userId] = bitmap
-                                _avatarBitmaps.value = current
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    } finally {
-                        synchronized(fetchingUserIds) {
-                            fetchingUserIds.remove(userId)
-                        }
+        val currentMap = _avatarBitmaps.value
+
+        val newUsersToFetch = users.filter { user ->
+            !user.avatar.isNullOrEmpty() &&
+            !currentMap.containsKey(user.userId) &&
+            synchronized(fetchingUserIds) { fetchingUserIds.add(user.userId) }
+        }
+
+        if (newUsersToFetch.isEmpty()) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val newlyLoaded = mutableMapOf<String, Bitmap>()
+            for (user in newUsersToFetch) {
+                try {
+                    val url = user.avatar!!
+                    val bitmap = if (url.startsWith("http://") || url.startsWith("https://")) {
+                        URL(url).openStream().use { BitmapFactory.decodeStream(it) }
+                    } else {
+                        val resId = context.resources.getIdentifier(url, "drawable", context.packageName)
+                        if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
                     }
+                    if (bitmap != null) {
+                        newlyLoaded[user.userId] = bitmap
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    synchronized(fetchingUserIds) { fetchingUserIds.remove(user.userId) }
+                }
+            }
+
+            if (newlyLoaded.isNotEmpty()) {
+                withContext(Dispatchers.Main) {
+                    _avatarBitmaps.value = _avatarBitmaps.value + newlyLoaded
                 }
             }
         }

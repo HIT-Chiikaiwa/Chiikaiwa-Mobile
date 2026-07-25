@@ -61,6 +61,8 @@
     <string name="help">Trợ giúp</string>
     <string name="log_out">Đăng xuất</string>
     <string name="change_password">Đổi mật khẩu</string>
+    <string name="enable_radar">Cho phép quét rada</string>
+    <string name="notification_settings">Cài đặt thông báo</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="who">Bạn muốn tìm ai?</string>
 
@@ -71,9 +73,9 @@
     <string name="verify_your_email_format">Nhấn Nhận mã OTP để nhận mã nhé!\nChíp sẽ gửi OTP tới %1$s</string>
     <string name="error_empty_email">Vui lòng nhập email</string>
     <string name="error_invalid_email">Email không hợp lệ</string>
-    <string name="title_friends">Bạn bè</string>
-    <string name="hint_search_friends">Tìm kiếm bạn bè</string>
-    <string name="hint_type_message">Nhập tin nhắn</string>
+    <string name="title_friends">Bạn bè &amp; Tin nhắn</string>
+    <string name="hint_search_friends">Tìm kiếm bạn bè, cuộc trò chuyện...</string>
+    <string name="hint_type_message">Nhập tin nhắn...</string>
     <string name="desc_options">Tùy chọn</string>
     <string name="option_pin">Ghim</string>
     <string name="option_create_group">Tạo nhóm</string>

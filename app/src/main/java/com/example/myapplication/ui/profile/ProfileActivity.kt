@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
-import com.example.myapplication.data.remote.dto.request.ChangePasswordRequest
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.ActivityProfileBinding
 import com.example.myapplication.ui.auth.LoginActivity
@@ -38,10 +37,13 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             finish()
         }
 
-        binding.btnUpdateProfile.visibility = View.GONE
+        binding.btnUpdateProfile.visibility = View.VISIBLE
+        binding.btnUpdateProfile.setOnClickListener {
+            startActivity(Intent(this, EditProfileActivity::class.java))
+        }
 
         binding.cvSettings.setOnClickListener {
-            showSettingsDialog()
+            startActivity(Intent(this, AccountSettingsActivity::class.java))
         }
 
         binding.cvFavorite.setOnClickListener {
@@ -135,140 +137,6 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
         } catch (e: Exception) {
             "Chưa cập nhật"
         }
-    }
-
-    private fun showSettingsDialog() {
-        val user = currentProfile ?: return
-        val options = arrayOf(
-            "Thay đổi mật khẩu",
-            "Bật/Tắt tìm kiếm Buddy (Hiện tại: ${if (user.buddyActive == true) "BẬT" else "TẮT"})",
-            "Đăng xuất",
-            "Xóa tài khoản"
-        )
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Cài đặt tài khoản")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showChangePasswordDialog()
-                    1 -> {
-                        val newStatus = !(user.buddyActive ?: false)
-                        viewModel.toggleBuddyStatus(newStatus)
-                    }
-                    2 -> {
-                        viewModel.logout()
-                    }
-                    3 -> {
-                        showConfirmDeleteAccountDialog()
-                    }
-                }
-            }
-            .show()
-    }
-
-    private fun showChangePasswordDialog() {
-        val context = this
-        val layout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 48, 48, 48)
-            setBackgroundColor(android.graphics.Color.parseColor("#FFFCE2"))
-        }
-
-        val titleTextView = TextView(context).apply {
-            text = "Đổi Mật Khẩu"
-            textSize = 18f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            gravity = android.view.Gravity.CENTER
-            setPadding(0, 0, 0, 24)
-        }
-        layout.addView(titleTextView)
-
-        val edtOldPassword = EditText(context).apply {
-            hint = "Mật khẩu cũ"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setHintTextColor(ContextCompat.getColor(context, R.color.hint))
-            setBackgroundResource(R.drawable.bg_edittext)
-            setPadding(24, 24, 24, 24)
-        }
-        layout.addView(edtOldPassword, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 16 })
-
-        val edtNewPassword = EditText(context).apply {
-            hint = "Mật khẩu mới"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setHintTextColor(ContextCompat.getColor(context, R.color.hint))
-            setBackgroundResource(R.drawable.bg_edittext)
-            setPadding(24, 24, 24, 24)
-        }
-        layout.addView(edtNewPassword, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 16 })
-
-        val edtConfirmNewPassword = EditText(context).apply {
-            hint = "Xác nhận mật khẩu mới"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setHintTextColor(ContextCompat.getColor(context, R.color.hint))
-            setBackgroundResource(R.drawable.bg_edittext)
-            setPadding(24, 24, 24, 24)
-        }
-        layout.addView(edtConfirmNewPassword, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 24 })
-
-        val buttonsLayout = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.END
-        }
-
-        val btnCancelPass = Button(context).apply {
-            text = "Hủy"
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#F4F0CA"))
-        }
-        buttonsLayout.addView(btnCancelPass, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { rightMargin = 16 })
-
-        val btnConfirmPass = Button(context).apply {
-            text = "Xác nhận"
-            setTextColor(android.graphics.Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(context, R.color.brown))
-        }
-        buttonsLayout.addView(btnConfirmPass)
-
-        layout.addView(buttonsLayout)
-
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(context)
-            .setView(layout)
-            .create()
-
-        btnCancelPass.setOnClickListener { dialog.dismiss() }
-        btnConfirmPass.setOnClickListener {
-            val oldPass = edtOldPassword.text.toString().trim()
-            val newPass = edtNewPassword.text.toString().trim()
-            val confirmPass = edtConfirmNewPassword.text.toString().trim()
-
-            if (oldPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
-                showToast("Vui lòng nhập đầy đủ thông tin")
-                return@setOnClickListener
-            }
-
-            if (newPass != confirmPass) {
-                showToast("Mật khẩu mới không trùng khớp")
-                return@setOnClickListener
-            }
-
-            viewModel.changePassword(ChangePasswordRequest(oldPass, newPass, confirmPass))
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
-    private fun showConfirmDeleteAccountDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Xác nhận xóa tài khoản")
-            .setMessage("Bạn có chắc chắn muốn xóa tài khoản này? Hành động này không thể hoàn tác.")
-            .setPositiveButton("Xóa") { _, _ ->
-                viewModel.deleteAccount()
-            }
-            .setNegativeButton("Hủy", null)
-            .show()
     }
 
     private fun showSubjectManagementDialog() {

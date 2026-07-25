@@ -10,7 +10,9 @@ import java.util.concurrent.TimeUnit
 class StompManager {
     private var webSocket: WebSocket? = null
     private val client = OkHttpClient.Builder()
+        .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(0, TimeUnit.MILLISECONDS)
+        .pingInterval(15, TimeUnit.SECONDS)
         .build()
 
     var listener: SocketListener? = null

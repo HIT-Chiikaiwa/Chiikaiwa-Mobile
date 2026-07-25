@@ -9,21 +9,16 @@ import com.example.myapplication.data.remote.dto.response.MessageResponse
 import com.example.myapplication.data.remote.websocket.ChatSocketService
 import com.example.myapplication.data.remote.websocket.StompManager
 import com.example.myapplication.data.repository.MessageRepository
-import com.example.myapplication.data.repository.ReactionRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(application) {
 
     private val messageRepository = MessageRepository(application)
-    private val reactionRepository = ReactionRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
     private val stompManager = StompManager()
@@ -33,9 +28,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     val currentUserId: String = preferenceManager.getUserId() ?: ""
 
     private val _messages = mutableListOf<Message>()
-
-    private val _pinnedMessages = MutableStateFlow<List<Message>>(emptyList())
-    val pinnedMessages: StateFlow<List<Message>> = _pinnedMessages.asStateFlow()
 
     init {
         initWebSocket()
@@ -87,74 +79,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         }
     }
 
-    fun fetchPinnedMessages(conversationId: String) {
-        viewModelScope.launch {
-            when (val result = reactionRepository.getPinnedMessages(conversationId)) {
-                is Resource.Success -> {
-                    val list = result.data.data.map { ChatMapper.toDomain(it) }
-                    _pinnedMessages.value = list
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
-    fun replyMessage(messageId: String, content: String) {
-        viewModelScope.launch {
-            when (val result = messageRepository.replyMessage(messageId, content)) {
-                is Resource.Success -> {
-                    val newMsg = ChatMapper.toDomain(result.data.data)
-                    _messages.add(newMsg)
-                    _uiState.value = UiState.Success(_messages.toList())
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
-    fun forwardMessage(messageId: String, targetConversationId: String) {
-        viewModelScope.launch {
-            when (val result = messageRepository.forwardMessage(messageId, targetConversationId)) {
-                is Resource.Success -> {
-                    _event.emit(UiEvent.ShowToast("Đã chuyển tiếp tin nhắn"))
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
-    fun pinMessage(messageId: String) {
-        viewModelScope.launch {
-            when (val result = reactionRepository.pinMessage(messageId)) {
-                is Resource.Success -> {
-                    _event.emit(UiEvent.ShowToast("Đã ghim tin nhắn"))
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
-    fun unpinMessage(messageId: String) {
-        viewModelScope.launch {
-            when (val result = reactionRepository.unpinMessage(messageId)) {
-                is Resource.Success -> {
-                    _event.emit(UiEvent.ShowToast("Đã bỏ ghim tin nhắn"))
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
     fun recallMessage(messageId: String) {
         viewModelScope.launch {
             when (val result = messageRepository.recallMessage(messageId)) {
@@ -179,32 +103,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                     _messages.removeAll { it.id == messageId }
                     _uiState.value = UiState.Success(_messages.toList())
                     _event.emit(UiEvent.ShowToast("Đã xóa tin nhắn"))
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
-    fun addReaction(messageId: String, emoji: String) {
-        viewModelScope.launch {
-            when (val result = reactionRepository.addReaction(messageId, emoji)) {
-                is Resource.Success -> {
-                    _event.emit(UiEvent.ShowToast("Đã thêm cảm xúc"))
-                }
-                is Resource.Error -> {
-                    _event.emit(UiEvent.ShowToast(result.message))
-                }
-            }
-        }
-    }
-
-    fun removeReaction(messageId: String) {
-        viewModelScope.launch {
-            when (val result = reactionRepository.removeReaction(messageId)) {
-                is Resource.Success -> {
-                    _event.emit(UiEvent.ShowToast("Đã xóa cảm xúc"))
                 }
                 is Resource.Error -> {
                     _event.emit(UiEvent.ShowToast(result.message))

@@ -6,14 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myapplication.data.model.Message
 import com.example.myapplication.databinding.ActivityChatBinding
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
@@ -32,12 +30,13 @@ class ChatFragment : Fragment() {
     private lateinit var adapter: MessageAdapter
     private var conversationId: String = ""
     private var targetUserId: String = ""
-    private var replyToMessage: Message? = null
+    private var userName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         conversationId = arguments?.getString(ARG_CONVERSATION_ID) ?: ""
         targetUserId = arguments?.getString(ARG_TARGET_USER_ID) ?: ""
+        userName = arguments?.getString(ARG_USER_NAME) ?: ""
     }
 
     override fun onCreateView(
@@ -51,6 +50,9 @@ class ChatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (userName.isNotEmpty()) {
+            binding.tvChatTitle.text = userName
+        }
         setupRecyclerView()
         setupListeners()
         observeViewModel()
@@ -62,7 +64,7 @@ class ChatFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = MessageAdapter(viewModel.currentUserId) { anchorView, message ->
-            showReactionPopup(anchorView, message)
+            showActionPopup(anchorView, message)
         }
         binding.rvChatMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
@@ -70,22 +72,11 @@ class ChatFragment : Fragment() {
         binding.rvChatMessages.adapter = adapter
     }
 
-    private fun showReactionPopup(anchorView: View, message: Message) {
+    private fun showActionPopup(anchorView: View, message: com.example.myapplication.data.model.Message) {
         val popup = ReactionPopup(
             context = requireContext(),
             currentUserId = viewModel.currentUserId,
-            onEmojiSelect = { msg, emoji -> viewModel.addReaction(msg.id, emoji) },
-            onReplyClick = { msg ->
-                replyToMessage = msg
-                binding.etMessage.hint = "Trả lời ${msg.sender.fullName}: ${msg.content}"
-                binding.etMessage.requestFocus()
-            },
-            onPinClick = { msg -> viewModel.pinMessage(msg.id) },
-            onUnpinClick = { msg -> viewModel.unpinMessage(msg.id) },
             onRecallClick = { msg -> viewModel.recallMessage(msg.id) },
-            onForwardClick = { msg ->
-                Toast.makeText(requireContext(), "Chọn cuộc trò chuyện để chuyển tiếp", Toast.LENGTH_SHORT).show()
-            },
             onDeleteClick = { msg -> viewModel.deleteMessage(msg.id) }
         )
         popup.show(anchorView, message)
@@ -93,13 +84,7 @@ class ChatFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
-
-        binding.btnAddOption.setOnClickListener {
-            if (conversationId.isNotEmpty()) {
-                viewModel.fetchPinnedMessages(conversationId)
-            }
+            requireActivity().finish()
         }
 
         binding.btnUserAction.setOnClickListener {
@@ -118,14 +103,8 @@ class ChatFragment : Fragment() {
 
     private fun sendMessage() {
         val text = binding.etMessage.text.toString().trim()
-        if (text.isNotEmpty()) {
-            if (replyToMessage != null) {
-                viewModel.replyMessage(replyToMessage!!.id, text)
-                replyToMessage = null
-                binding.etMessage.hint = "Nhập tin nhắn..."
-            } else if (targetUserId.isNotEmpty()) {
-                viewModel.sendRealtimeMessage(targetUserId, text)
-            }
+        if (text.isNotEmpty() && targetUserId.isNotEmpty()) {
+            viewModel.sendRealtimeMessage(targetUserId, text)
             binding.etMessage.setText("")
         }
     }
@@ -150,14 +129,6 @@ class ChatFragment : Fragment() {
                 }
 
                 launch {
-                    viewModel.pinnedMessages.collect { pinnedList ->
-                        if (pinnedList.isNotEmpty()) {
-                            showPinnedMessagesDialog(pinnedList)
-                        }
-                    }
-                }
-
-                launch {
                     viewModel.event.collect { event ->
                         when (event) {
                             is UiEvent.ShowToast -> {
@@ -171,18 +142,6 @@ class ChatFragment : Fragment() {
         }
     }
 
-    private fun showPinnedMessagesDialog(pinnedList: List<Message>) {
-        val items = pinnedList.map { "${it.sender.fullName}: ${it.content}" }.toTypedArray()
-        AlertDialog.Builder(requireContext())
-            .setTitle("📌 Tin nhắn đã ghim (${pinnedList.size})")
-            .setItems(items) { _, which ->
-                val selectedMsg = pinnedList[which]
-                Toast.makeText(requireContext(), "Đang xem tin nhắn: ${selectedMsg.content}", Toast.LENGTH_SHORT).show()
-            }
-            .setPositiveButton("Đóng", null)
-            .show()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -191,12 +150,14 @@ class ChatFragment : Fragment() {
     companion object {
         private const val ARG_CONVERSATION_ID = "conversation_id"
         private const val ARG_TARGET_USER_ID = "target_user_id"
+        private const val ARG_USER_NAME = "user_name"
 
-        fun newInstance(conversationId: String, targetUserId: String = ""): ChatFragment {
+        fun newInstance(conversationId: String, targetUserId: String = "", userName: String = ""): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CONVERSATION_ID, conversationId)
                     putString(ARG_TARGET_USER_ID, targetUserId)
+                    putString(ARG_USER_NAME, userName)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.home.map
 
 import android.animation.ValueAnimator
+import android.graphics.Color
 import android.view.animation.LinearInterpolator
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -16,9 +17,15 @@ import org.maplibre.geojson.Polygon
 
 class RadarRenderer(private val mapLibreMap: MapLibreMap) {
 
-    private val RADAR_RADIUS_KM = 6.0
+    companion object {
+        private const val RADAR_RADIUS_KM = 6.0
+        private const val R_EARTH_KM = 6371.0
+        private const val CIRCLE_STEPS = 48
+        private const val SECTOR_STEPS = 20
+        private const val SWEEP_ANGLE = 40.0
+    }
+
     private var radarBeamAnimator: ValueAnimator? = null
-    private var currentRadarAngle = 0f
     private var centerLatLng: LatLng? = null
 
     fun setupRadarLayers() {
@@ -26,19 +33,19 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         if (!style.isFullyLoaded) return
 
         if (style.getSource("radar-circle-source") == null) {
-            val radarCircleSource = GeoJsonSource("radar-circle-source", FeatureCollection.fromFeatures(emptyList()))
-            style.addSource(radarCircleSource)
+            val circleSource = GeoJsonSource("radar-circle-source", FeatureCollection.fromFeatures(emptyList()))
+            style.addSource(circleSource)
 
             style.addLayer(
                 FillLayer("radar-circle-fill-layer", "radar-circle-source").withProperties(
-                    PropertyFactory.fillColor(android.graphics.Color.parseColor("#26000000")),
+                    PropertyFactory.fillColor(Color.parseColor("#26000000")),
                     PropertyFactory.visibility(Property.NONE)
                 )
             )
 
             style.addLayer(
                 LineLayer("radar-circle-stroke-layer", "radar-circle-source").withProperties(
-                    PropertyFactory.lineColor(android.graphics.Color.parseColor("#4DFFFFFF")),
+                    PropertyFactory.lineColor(Color.parseColor("#4DFFFFFF")),
                     PropertyFactory.lineWidth(2f),
                     PropertyFactory.visibility(Property.NONE)
                 )
@@ -46,12 +53,12 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         }
 
         if (style.getSource("radar-beam-source") == null) {
-            val radarBeamSource = GeoJsonSource("radar-beam-source", FeatureCollection.fromFeatures(emptyList()))
-            style.addSource(radarBeamSource)
+            val beamSource = GeoJsonSource("radar-beam-source", FeatureCollection.fromFeatures(emptyList()))
+            style.addSource(beamSource)
 
             style.addLayer(
                 FillLayer("radar-beam-layer", "radar-beam-source").withProperties(
-                    PropertyFactory.fillColor(android.graphics.Color.parseColor("#4DFFFFFF")),
+                    PropertyFactory.fillColor(Color.parseColor("#4DFFFFFF")),
                     PropertyFactory.visibility(Property.NONE)
                 )
             )
@@ -65,13 +72,12 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
 
         if (radarBeamAnimator == null) {
             radarBeamAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-                duration = 3000
+                duration = 2500
                 repeatCount = ValueAnimator.INFINITE
                 interpolator = LinearInterpolator()
                 addUpdateListener { animator ->
                     val angle = animator.animatedValue as Float
-                    currentRadarAngle = angle
-                    updateRadarBeamRotation()
+                    updateRadarBeamRotation(angle.toDouble())
                 }
             }
         }
@@ -86,51 +92,51 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
     }
 
     private fun showRadarLayers(show: Boolean) {
-        val mapStyle = mapLibreMap.style ?: return
-        if (!mapStyle.isFullyLoaded) return
+        val style = mapLibreMap.style ?: return
+        if (!style.isFullyLoaded) return
         val visibility = if (show) Property.VISIBLE else Property.NONE
-        mapStyle.getLayer("radar-circle-fill-layer")?.setProperties(PropertyFactory.visibility(visibility))
-        mapStyle.getLayer("radar-circle-stroke-layer")?.setProperties(PropertyFactory.visibility(visibility))
-        mapStyle.getLayer("radar-beam-layer")?.setProperties(PropertyFactory.visibility(visibility))
+        style.getLayer("radar-circle-fill-layer")?.setProperties(PropertyFactory.visibility(visibility))
+        style.getLayer("radar-circle-stroke-layer")?.setProperties(PropertyFactory.visibility(visibility))
+        style.getLayer("radar-beam-layer")?.setProperties(PropertyFactory.visibility(visibility))
     }
 
     private fun updateRadarCircle(center: LatLng) {
-        val mapStyle = mapLibreMap.style ?: return
-        if (!mapStyle.isFullyLoaded) return
-        val circleSource = mapStyle.getSourceAs<GeoJsonSource>("radar-circle-source") ?: return
-        val circlePoly = getCirclePolygon(center.latitude, center.longitude, RADAR_RADIUS_KM)
-        circleSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circlePoly))))
+        val style = mapLibreMap.style ?: return
+        if (!style.isFullyLoaded) return
+        val source = style.getSourceAs<GeoJsonSource>("radar-circle-source") ?: return
+        val circlePoly = getCirclePolygon(center.latitude, center.longitude)
+        source.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circlePoly))))
     }
 
-    private fun updateRadarBeamRotation() {
-        val mapStyle = mapLibreMap.style ?: return
-        if (!mapStyle.isFullyLoaded) return
+    private fun updateRadarBeamRotation(startAngleDeg: Double) {
+        val style = mapLibreMap.style ?: return
+        if (!style.isFullyLoaded) return
         val center = centerLatLng ?: return
-        val beamSource = mapStyle.getSourceAs<GeoJsonSource>("radar-beam-source") ?: return
-        val beamPoly = getSectorPolygon(center.latitude, center.longitude, RADAR_RADIUS_KM, currentRadarAngle.toDouble(), 40.0)
-        beamSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(beamPoly))))
+        val source = style.getSourceAs<GeoJsonSource>("radar-beam-source") ?: return
+        val beamPoly = getSectorPolygon(center.latitude, center.longitude, startAngleDeg)
+        source.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(beamPoly))))
     }
 
-    private fun getSectorPolygon(centerLat: Double, centerLng: Double, radiusKm: Double, startAngleDeg: Double, sweepAngleDeg: Double): Polygon {
-        val points = mutableListOf<Point>()
+    private fun getSectorPolygon(centerLat: Double, centerLng: Double, startAngleDeg: Double): Polygon {
+        val points = ArrayList<Point>(SECTOR_STEPS + 2)
         points.add(Point.fromLngLat(centerLng, centerLat))
 
-        val rEarth = 6371.0
         val latRad = Math.toRadians(centerLat)
         val lngRad = Math.toRadians(centerLng)
-        val dDivR = radiusKm / rEarth
-        val sinDDivR = Math.sin(dDivR)
-        val cosDDivR = Math.cos(dDivR)
+        val dDivR = RADAR_RADIUS_KM / R_EARTH_KM
+        val sinD = Math.sin(dDivR)
+        val cosD = Math.cos(dDivR)
+        val cosLat = Math.cos(latRad)
+        val sinLat = Math.sin(latRad)
 
-        val steps = 30
-        for (i in 0..steps) {
-            val angleDeg = startAngleDeg + (sweepAngleDeg * i / steps)
+        for (i in 0..SECTOR_STEPS) {
+            val angleDeg = startAngleDeg + (SWEEP_ANGLE * i / SECTOR_STEPS)
             val bearingRad = Math.toRadians(angleDeg)
 
-            val pointLatRad = Math.asin(Math.sin(latRad) * cosDDivR + Math.cos(latRad) * sinDDivR * Math.cos(bearingRad))
+            val pointLatRad = Math.asin(sinLat * cosD + cosLat * sinD * Math.cos(bearingRad))
             val pointLngRad = lngRad + Math.atan2(
-                Math.sin(bearingRad) * sinDDivR * Math.cos(latRad),
-                cosDDivR - Math.sin(latRad) * Math.sin(pointLatRad)
+                Math.sin(bearingRad) * sinD * cosLat,
+                cosD - sinLat * Math.sin(pointLatRad)
             )
 
             points.add(Point.fromLngLat(Math.toDegrees(pointLngRad), Math.toDegrees(pointLatRad)))
@@ -140,24 +146,24 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         return Polygon.fromLngLats(listOf(points))
     }
 
-    private fun getCirclePolygon(centerLat: Double, centerLng: Double, radiusKm: Double): Polygon {
-        val points = mutableListOf<Point>()
-        val rEarth = 6371.0
+    private fun getCirclePolygon(centerLat: Double, centerLng: Double): Polygon {
+        val points = ArrayList<Point>(CIRCLE_STEPS + 1)
         val latRad = Math.toRadians(centerLat)
         val lngRad = Math.toRadians(centerLng)
-        val dDivR = radiusKm / rEarth
-        val sinDDivR = Math.sin(dDivR)
-        val cosDDivR = Math.cos(dDivR)
+        val dDivR = RADAR_RADIUS_KM / R_EARTH_KM
+        val sinD = Math.sin(dDivR)
+        val cosD = Math.cos(dDivR)
+        val cosLat = Math.cos(latRad)
+        val sinLat = Math.sin(latRad)
 
-        val steps = 64
-        for (i in 0..steps) {
-            val angleDeg = 360.0 * i / steps
+        for (i in 0..CIRCLE_STEPS) {
+            val angleDeg = 360.0 * i / CIRCLE_STEPS
             val bearingRad = Math.toRadians(angleDeg)
 
-            val pointLatRad = Math.asin(Math.sin(latRad) * cosDDivR + Math.cos(latRad) * sinDDivR * Math.cos(bearingRad))
+            val pointLatRad = Math.asin(sinLat * cosD + cosLat * sinD * Math.cos(bearingRad))
             val pointLngRad = lngRad + Math.atan2(
-                Math.sin(bearingRad) * sinDDivR * Math.cos(latRad),
-                cosDDivR - Math.sin(latRad) * Math.sin(pointLatRad)
+                Math.sin(bearingRad) * sinD * cosLat,
+                cosD - sinLat * Math.sin(pointLatRad)
             )
 
             points.add(Point.fromLngLat(Math.toDegrees(pointLngRad), Math.toDegrees(pointLatRad)))

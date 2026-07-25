@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 import com.example.myapplication.data.remote.api.ApiService
 
 object RetrofitClient {
-    private const val BASE_URL = "https://chiikaiwa-be.onrender.com/"
+    private const val BASE_URL = "http://54.255.60.109:8080/"
 
     fun create(context: Context): ApiService {
         val logging = HttpLoggingInterceptor().apply {

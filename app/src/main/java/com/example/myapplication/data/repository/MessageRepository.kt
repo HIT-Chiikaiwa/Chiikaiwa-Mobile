@@ -29,20 +29,6 @@ class MessageRepository(context: Context) : BaseRepository() {
         return safeApiCall { api.searchMessages(conversationId, keyword, page, size, sort) }
     }
 
-    suspend fun replyMessage(
-        messageId: String,
-        content: String
-    ): Resource<BaseResponse<MessageResponse>> {
-        return safeApiCall { api.replyMessage(messageId, content) }
-    }
-
-    suspend fun forwardMessage(
-        messageId: String,
-        targetConversationId: String
-    ): Resource<BaseResponse<MessageResponse>> {
-        return safeApiCall { api.forwardMessage(messageId, targetConversationId) }
-    }
-
     suspend fun recallMessage(messageId: String): Resource<BaseResponse<Any>> {
         return safeApiCall { api.recallMessage(messageId) }
     }

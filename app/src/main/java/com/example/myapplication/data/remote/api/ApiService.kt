@@ -2,11 +2,11 @@ package com.example.myapplication.data.remote.api
 
 import com.example.myapplication.data.remote.dto.request.*
 import com.example.myapplication.data.remote.dto.response.*
-import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
+    // Auth & Profile Endpoints
     @POST("api/v1/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
@@ -75,6 +75,10 @@ interface ApiService {
         @Query("lng") lng: Double,
         @Query("radius") radius: Double
     ): Response<BaseResponse<List<NearbyUserResponse>>>
+
+    // ==========================================
+    // CHAT MODULE ENDPOINTS (Pure Messaging)
+    // ==========================================
 
     @GET("api/v1/chat/conversations")
     suspend fun getConversations(
@@ -147,21 +151,6 @@ interface ApiService {
         @Query("sort") sort: String? = null
     ): Response<BaseResponse<PageResponse<MessageResponse>>>
 
-    @GET("api/v1/chat/conversations/{id}/pinned")
-    suspend fun getPinnedMessages(
-        @Path("id") id: String
-    ): Response<BaseResponse<List<MessageResponse>>>
-
-    @PUT("api/v1/chat/messages/{msgId}/pin")
-    suspend fun pinMessage(
-        @Path("msgId") msgId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @PUT("api/v1/chat/messages/{msgId}/unpin")
-    suspend fun unpinMessage(
-        @Path("msgId") msgId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
     @PUT("api/v1/chat/messages/{msgId}/recall")
     suspend fun recallMessage(
         @Path("msgId") msgId: String
@@ -170,41 +159,5 @@ interface ApiService {
     @DELETE("api/v1/chat/messages/{msgId}")
     suspend fun deleteMessage(
         @Path("msgId") msgId: String
-    ): Response<BaseResponse<Any>>
-
-    @POST("api/v1/chat/messages/{msgId}/reply")
-    suspend fun replyMessage(
-        @Path("msgId") msgId: String,
-        @Query("content") content: String
-    ): Response<BaseResponse<MessageResponse>>
-
-    @POST("api/v1/chat/messages/{msgId}/forward")
-    suspend fun forwardMessage(
-        @Path("msgId") msgId: String,
-        @Query("targetConversationId") targetConversationId: String
-    ): Response<BaseResponse<MessageResponse>>
-
-    @POST("api/v1/chat/messages/{msgId}/reactions")
-    suspend fun addReaction(
-        @Path("msgId") msgId: String,
-        @Query("emoji") emoji: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @DELETE("api/v1/chat/messages/{msgId}/reactions")
-    suspend fun removeReaction(
-        @Path("msgId") msgId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @Multipart
-    @POST("api/v1/chat/conversations/{id}/upload")
-    suspend fun uploadAttachment(
-        @Path("id") id: String,
-        @Part file: MultipartBody.Part
-    ): Response<BaseResponse<Any>>
-
-    @POST("api/v1/chat/conversations/{id}/schedule-invite")
-    suspend fun scheduleInvite(
-        @Path("id") id: String,
-        @Body request: ScheduleInviteRequest
     ): Response<BaseResponse<Any>>
 }
