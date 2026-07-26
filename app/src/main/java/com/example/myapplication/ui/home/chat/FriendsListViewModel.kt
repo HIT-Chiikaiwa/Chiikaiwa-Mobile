@@ -56,6 +56,26 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
+    fun startDirectChat(targetUserId: String, onResult: (convId: String, userName: String) -> Unit) {
+        viewModelScope.launch {
+            when (val result = conversationRepository.createOrGetDirectConversation(targetUserId)) {
+                is Resource.Success -> {
+                    val conv = result.data?.data
+                    val convId = conv?.id ?: ""
+                    val userName = conv?.groupName ?: conv?.lastMessage?.senderName ?: "Người dùng"
+                    if (convId.isNotEmpty()) {
+                        onResult(convId, userName)
+                    } else {
+                        _uiState.value = UiState.Error("Không thể tạo cuộc hội thoại")
+                    }
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
     fun searchConversations(keyword: String) {
         if (keyword.isBlank()) {
             fetchConversations()

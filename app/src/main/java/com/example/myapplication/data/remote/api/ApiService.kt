@@ -2,6 +2,7 @@ package com.example.myapplication.data.remote.api
 
 import com.example.myapplication.data.remote.dto.request.*
 import com.example.myapplication.data.remote.dto.response.*
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -155,4 +156,11 @@ interface ApiService {
     suspend fun deleteMessage(
         @Path("msgId") msgId: String
     ): Response<BaseResponse<Any>>
+
+    @Multipart
+    @POST("api/v1/chat/conversations/{id}/upload")
+    suspend fun uploadImage(
+        @Path("id") conversationId: String,
+        @Part file: MultipartBody.Part
+    ): Response<BaseResponse<String>>
 }

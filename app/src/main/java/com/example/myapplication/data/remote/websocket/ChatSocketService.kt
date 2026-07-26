@@ -23,25 +23,18 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
         this.activeUserId = userId
         this.activeConversationId = conversationId
 
-        stompManager.subscribe("/user/queue/messages")
-        if (userId.isNotEmpty()) {
-            stompManager.subscribe("/user/$userId/queue/messages")
-            stompManager.subscribe("/queue/messages")
-        }
         if (conversationId.isNotEmpty()) {
-            stompManager.subscribe("/topic/conversations/$conversationId")
-            stompManager.subscribe("/topic/messages/$conversationId")
-            stompManager.subscribe("/topic/chat/$conversationId")
+            stompManager.subscribe("/topic/conversation.$conversationId")
         }
     }
 
-    fun sendMessage(senderId: String, receiverId: String, text: String, conversationId: String = "") {
-        val jsonPayload = """{"senderId":"$senderId","receiverId":"$receiverId","recipientId":"$receiverId","text":"$text","content":"$text","conversationId":"$conversationId"}"""
+    fun sendMessage(conversationId: String, content: String, type: String = "TEXT") {
+        val jsonPayload = """{"conversationId":"$conversationId","content":"$content","type":"$type"}"""
         stompManager.send("/app/chat.send", jsonPayload)
     }
 
-    fun sendReadReceipt(conversationId: String, messageId: String = "") {
-        val jsonPayload = """{"conversationId":"$conversationId","messageId":"$messageId"}"""
+    fun sendReadReceipt(conversationId: String) {
+        val jsonPayload = """{"conversationId":"$conversationId"}"""
         stompManager.send("/app/chat.read", jsonPayload)
     }
 
@@ -56,8 +49,7 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
         }
     }
 
-    override fun onDisconnected() {
-    }
+    override fun onDisconnected() {}
 
     override fun onMessageReceived(destination: String, body: String) {
         _messageFlow.tryEmit(Pair(destination, body))

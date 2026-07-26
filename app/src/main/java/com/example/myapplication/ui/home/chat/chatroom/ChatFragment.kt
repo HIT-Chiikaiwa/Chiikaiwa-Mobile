@@ -1,5 +1,9 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -22,6 +28,9 @@ import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.MessageAdapter
 import com.example.myapplication.ui.home.chat.component.ReactionPopup
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class ChatFragment : Fragment() {
 
@@ -35,6 +44,15 @@ class ChatFragment : Fragment() {
     private var conversationId: String = ""
     private var targetUserId: String = ""
     private var userName: String = ""
+
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { handleImageSelected(it) }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) pickImageLauncher.launch("image/*")
+        else Toast.makeText(requireContext(), "Cần cấp quyền truy cập ảnh", Toast.LENGTH_SHORT).show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +89,7 @@ class ChatFragment : Fragment() {
             val navigationBarsHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             val bottomPadding = if (imeHeight > 0) imeHeight else navigationBarsHeight
             binding.root.setPadding(0, 0, 0, bottomPadding)
-            
+
             if (imeHeight > 0 && ::adapter.isInitialized && adapter.itemCount > 0) {
                 binding.rvChatMessages.post {
                     binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
@@ -85,9 +103,10 @@ class ChatFragment : Fragment() {
         adapter = MessageAdapter(viewModel.currentUserId) { anchorView, message ->
             showActionPopup(anchorView, message)
         }
-        binding.rvChatMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
+        val layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
         }
+        binding.rvChatMessages.layoutManager = layoutManager
         binding.rvChatMessages.adapter = adapter
     }
 
@@ -108,6 +127,10 @@ class ChatFragment : Fragment() {
 
         binding.btnSend.setOnClickListener {
             sendMessage()
+        }
+
+        binding.btnGallery.setOnClickListener {
+            openImagePicker()
         }
 
         binding.etMessage.addTextChangedListener(object : TextWatcher {
@@ -135,12 +158,50 @@ class ChatFragment : Fragment() {
         }
     }
 
+    private fun openImagePicker() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            Manifest.permission.READ_MEDIA_IMAGES
+        else
+            Manifest.permission.READ_EXTERNAL_STORAGE
+
+        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            pickImageLauncher.launch("image/*")
+        } else {
+            requestPermissionLauncher.launch(permission)
+        }
+    }
+
+    private fun handleImageSelected(uri: Uri) {
+        val context = requireContext()
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return
+        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+        val bytes = inputStream.readBytes()
+        inputStream.close()
+
+        val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+        val part = MultipartBody.Part.createFormData("file", "image.jpg", requestBody)
+
+        viewModel.sendImageMessage(part)
+
+        binding.rvChatMessages.postDelayed({
+            if (::adapter.isInitialized && adapter.itemCount > 0) {
+                binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
+            }
+        }, 100)
+    }
+
     private fun sendMessage() {
         val text = binding.etMessage.text.toString().trim()
         if (text.isNotEmpty()) {
             val destinationId = if (targetUserId.isNotEmpty()) targetUserId else conversationId
             viewModel.sendRealtimeMessage(destinationId, text)
             binding.etMessage.setText("")
+
+            binding.rvChatMessages.postDelayed({
+                if (::adapter.isInitialized && adapter.itemCount > 0) {
+                    binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
+                }
+            }, 50)
         }
     }
 
@@ -151,19 +212,12 @@ class ChatFragment : Fragment() {
                     viewModel.uiState.collect { state ->
                         when (state) {
                             is UiState.Success -> {
-                                val newList = ArrayList(state.data)
-                                adapter.submitList(newList) {
+                                val list = state.data
+                                adapter.submitList(list) {
                                     binding.rvChatMessages.post {
-                                        adapter.notifyDataSetChanged()
-                                        if (newList.isNotEmpty()) {
-                                            binding.rvChatMessages.scrollToPosition(newList.size - 1)
+                                        if (adapter.itemCount > 0) {
+                                            binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
                                         }
-                                    }
-                                }
-                                binding.rvChatMessages.post {
-                                    adapter.notifyDataSetChanged()
-                                    if (newList.isNotEmpty()) {
-                                        binding.rvChatMessages.scrollToPosition(newList.size - 1)
                                     }
                                 }
                             }

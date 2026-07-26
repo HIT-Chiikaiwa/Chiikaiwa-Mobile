@@ -6,6 +6,7 @@ import com.example.myapplication.data.remote.dto.response.MessageResponse
 import com.example.myapplication.data.remote.dto.response.PageResponse
 import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
+import okhttp3.MultipartBody
 
 class MessageRepository(context: Context) : BaseRepository() {
     private val api = RetrofitClient.create(context)
@@ -27,6 +28,13 @@ class MessageRepository(context: Context) : BaseRepository() {
         sort: String? = "createdDate,desc"
     ): Resource<BaseResponse<PageResponse<MessageResponse>>> = safeApiCall {
         api.searchMessages(conversationId, keyword, page, size, sort)
+    }
+
+    suspend fun uploadImage(
+        conversationId: String,
+        file: MultipartBody.Part
+    ): Resource<BaseResponse<String>> = safeApiCall {
+        api.uploadImage(conversationId, file)
     }
 
     suspend fun recallMessage(messageId: String): Resource<BaseResponse<Any>> = safeApiCall {

@@ -20,8 +20,8 @@ import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(application) {
 
@@ -33,7 +33,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
 
     val currentUserId: String = preferenceManager.getUserId() ?: ""
     private var activeConversationId: String = ""
-    private var activeTargetUserId: String = ""
     private val _messages = mutableListOf<Message>()
 
     init {
@@ -75,10 +74,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 ?: data.getAsJsonObject("sender")?.get("fullName")?.asString ?: "Người dùng"
             val convId = data.get("conversationId")?.asString ?: activeConversationId
 
-            if (senderId.isNotEmpty() && senderId != currentUserId) {
-                activeTargetUserId = senderId
-            }
-
             val incomingMsg = Message(
                 id = msgId,
                 conversationId = convId,
@@ -91,7 +86,9 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 isRecalled = false
             )
 
-            _messages.removeAll { it.id == msgId || (it.content == content && (it.sender.id == senderId || it.sender.id == currentUserId)) }
+            _messages.removeAll { 
+                it.id == msgId || (it.id.startsWith("temp_") && it.content == content)
+            }
             _messages.add(incomingMsg)
             updateState()
         } catch (e: Exception) {
@@ -100,9 +97,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     }
 
     fun initChatSession(convId: String, targetId: String) {
-        if (targetId.isNotEmpty() && targetId != currentUserId) {
-            activeTargetUserId = targetId
-        }
         if (convId.isNotEmpty()) {
             activeConversationId = convId
             socketService.subscribeToChat(currentUserId, activeConversationId)
@@ -114,7 +108,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
 
     private fun reInitWithTargetId(targetId: String, pendingMessage: String? = null) {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
             when (val result = conversationRepository.createOrGetDirectConversation(targetId)) {
                 is Resource.Success -> {
                     activeConversationId = result.data.data.id
@@ -135,17 +128,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         if (text.isBlank()) return
         val msgText = text.trim()
 
-        if (activeConversationId.isEmpty() && targetId.isNotEmpty() && targetId != currentUserId) {
-            reInitWithTargetId(targetId, pendingMessage = msgText)
-            return
-        }
-
-        val receiverId = when {
-            activeTargetUserId.isNotEmpty() && activeTargetUserId != currentUserId -> activeTargetUserId
-            targetId.isNotEmpty() && targetId != currentUserId && targetId != activeConversationId -> targetId
-            else -> targetId
-        }
-
         val tempMsg = Message(
             id = "temp_${System.currentTimeMillis()}",
             conversationId = activeConversationId,
@@ -161,12 +143,47 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         _messages.add(tempMsg)
         updateState()
 
-        socketService.sendMessage(currentUserId, receiverId, msgText, activeConversationId)
+        if (activeConversationId.isEmpty() && targetId.isNotEmpty() && targetId != currentUserId) {
+            reInitWithTargetId(targetId, pendingMessage = null)
+            return
+        }
 
-        if (activeConversationId.isNotEmpty()) {
-            viewModelScope.launch {
-                delay(600)
-                fetchMessages(activeConversationId)
+        socketService.sendMessage(activeConversationId, msgText)
+    }
+
+    fun sendImageMessage(file: MultipartBody.Part) {
+        if (activeConversationId.isEmpty()) return
+
+        val tempMsg = Message(
+            id = "temp_${System.currentTimeMillis()}",
+            conversationId = activeConversationId,
+            sender = User(id = currentUserId, fullName = "Tôi", avatar = null),
+            content = "",
+            type = MessageType.IMAGE,
+            status = MessageStatus.SENT,
+            createdAt = "Vừa xong",
+            updatedAt = "",
+            isRecalled = false
+        )
+        _messages.add(tempMsg)
+        updateState()
+
+        viewModelScope.launch {
+            when (val result = messageRepository.uploadImage(activeConversationId, file)) {
+                is Resource.Success -> {
+                    val imageUrl = result.data.data ?: ""
+                    val idx = _messages.indexOfFirst { it.id == tempMsg.id }
+                    if (idx != -1 && imageUrl.isNotEmpty()) {
+                        _messages[idx] = tempMsg.copy(content = imageUrl)
+                        updateState()
+                        socketService.sendMessage(activeConversationId, imageUrl, type = "IMAGE")
+                    }
+                }
+                is Resource.Error -> {
+                    _messages.removeAll { it.id == tempMsg.id }
+                    updateState()
+                    _event.emit(UiEvent.ShowToast("Gửi ảnh thất bại: ${result.message}"))
+                }
             }
         }
     }
@@ -178,18 +195,18 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                     try {
                         val rawList = result.data.data.content.map { ChatMapper.toDomain(it) }
 
-                        val otherMsg = rawList.firstOrNull { it.sender.id.isNotEmpty() && it.sender.id != currentUserId }
-                        if (otherMsg != null) {
-                            activeTargetUserId = otherMsg.sender.id
+                        val now = System.currentTimeMillis()
+                        val recentTemps = _messages.filter { temp ->
+                            if (!temp.id.startsWith("temp_")) return@filter false
+                            val tempTime = temp.id.substringAfter("temp_").toLongOrNull() ?: 0L
+                            (now - tempTime) < 15000
                         }
-
-                        val localTemps = _messages.filter { it.id.startsWith("temp_") }
 
                         _messages.clear()
                         _messages.addAll(rawList.reversed())
 
-                        localTemps.forEach { temp ->
-                            if (_messages.none { it.content == temp.content && it.sender.id == temp.sender.id }) {
+                        recentTemps.forEach { temp ->
+                            if (_messages.none { it.content == temp.content && (it.sender.id == currentUserId || it.sender.id == temp.sender.id) }) {
                                 _messages.add(temp)
                             }
                         }

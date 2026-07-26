@@ -14,12 +14,13 @@ import java.util.concurrent.TimeUnit
 class StompManager {
     private var webSocket: WebSocket? = null
     private val client = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(0, TimeUnit.MILLISECONDS)
         .pingInterval(15, TimeUnit.SECONDS)
         .build()
 
     var listener: SocketListener? = null
+    @Volatile
     private var isConnected = false
 
     private var savedUrl: String = ""
@@ -37,9 +38,17 @@ class StompManager {
         }
     }
 
+    @Synchronized
     fun connect(url: String, accessToken: String) {
         if (url.isNotEmpty()) savedUrl = url
         if (accessToken.isNotEmpty()) savedToken = accessToken
+
+        if (savedUrl.isEmpty() || savedToken.isEmpty()) return
+
+        webSocket?.cancel()
+        webSocket = null
+        isConnected = false
+        stopHeartbeat()
 
         val request = Request.Builder()
             .url(savedUrl)
@@ -68,7 +77,6 @@ class StompManager {
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 stopHeartbeat()
                 isConnected = false
-                Log.e("StompManager", "WebSocket connection failure: ${t.message}. Reconnecting in 3s...")
                 listener?.onDisconnected()
                 scheduleReconnect()
             }
@@ -76,6 +84,7 @@ class StompManager {
     }
 
     private fun scheduleReconnect() {
+        handler.removeCallbacksAndMessages(null)
         if (savedUrl.isNotEmpty() && savedToken.isNotEmpty()) {
             handler.postDelayed({
                 if (!isConnected) {
@@ -104,7 +113,6 @@ class StompManager {
 
         val sentSuccessfully = isConnected && webSocket?.send(sendFrame) == true
         if (!sentSuccessfully) {
-            Log.w("StompManager", "Failed to send STOMP frame to $destination. Reconnecting...")
             connect(savedUrl, savedToken)
             handler.postDelayed({
                 webSocket?.send(sendFrame)
@@ -114,10 +122,12 @@ class StompManager {
 
     fun disconnect() {
         stopHeartbeat()
+        handler.removeCallbacksAndMessages(null)
         pendingSubscriptions.clear()
         val disconnectFrame = "DISCONNECT\n\n\u0000"
         webSocket?.send(disconnectFrame)
-        webSocket?.close(1000, "Normal Closure")
+        webSocket?.cancel()
+        webSocket = null
         isConnected = false
     }
 

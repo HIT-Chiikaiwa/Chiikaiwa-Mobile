@@ -3,7 +3,9 @@ package com.example.myapplication.ui.home.chat
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.EditText
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityFriendsListBinding
 import com.example.myapplication.ui.base.BaseActivity
@@ -21,6 +23,10 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
     override fun initView() {
         binding.btnBack.setOnClickListener {
             finish()
+        }
+
+        binding.btnNewChat.setOnClickListener {
+            showNewChatDialog()
         }
 
         adapter = FriendsAdapter { conversation ->
@@ -42,6 +48,33 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    private fun showNewChatDialog() {
+        val input = EditText(this).apply {
+            hint = "Nhập User ID"
+            setPadding(48, 32, 48, 32)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Chat mới")
+            .setMessage("Nhập User ID của người bạn muốn nhắn tin:")
+            .setView(input)
+            .setPositiveButton("Chat") { _, _ ->
+                val userId = input.text.toString().trim()
+                if (userId.isNotEmpty()) {
+                    viewModel.startDirectChat(userId) { convId, userName ->
+                        val intent = Intent(this, ChatActivity::class.java).apply {
+                            putExtra("conversation_id", convId)
+                            putExtra("target_user_id", userId)
+                            putExtra("user_name", userName)
+                        }
+                        startActivity(intent)
+                    }
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
     }
 
     override fun onResume() {

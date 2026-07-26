@@ -34,6 +34,17 @@
             android:textColor="@color/brown"
             android:textSize="@dimen/_20ssp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnNewChat"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_1sdp"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_plus"
+            app:tint="@color/brown" />
     </RelativeLayout>
 
     <LinearLayout
