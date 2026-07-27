@@ -19,10 +19,6 @@ class AuthRepository(context: Context) : BaseRepository() {
         }
     }
 
-    suspend fun getCurrentUser(): Resource<BaseResponse<UserDto>> {
-        return safeApiCall { api.getCurrentUser() }
-    }
-
     suspend fun register(request: RegisterRequest): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.register(request) }
     }

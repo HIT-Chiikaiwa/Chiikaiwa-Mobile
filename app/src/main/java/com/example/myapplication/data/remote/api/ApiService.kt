@@ -10,9 +10,6 @@ interface ApiService {
     @POST("api/v1/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-    @GET("api/v1/user/current")
-    suspend fun getCurrentUser(): Response<BaseResponse<UserDto>>
-
     @POST("api/v1/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<BaseResponse<CommonResponse>>
 

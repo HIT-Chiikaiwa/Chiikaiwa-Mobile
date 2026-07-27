@@ -26,7 +26,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private val messageRepository = MessageRepository(application)
     private val conversationRepository = ConversationRepository(application)
     private val preferenceManager = PreferenceManager(application)
-    private val socketService = ChatSocketService(StompManager())
+    private val socketService = com.example.myapplication.data.remote.websocket.WebSocketManager
     private val messageParser = ChatMessageParser()
 
     val currentUserId: String = preferenceManager.getUserId() ?: ""
@@ -45,6 +45,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         val token = preferenceManager.getAccessToken() ?: ""
         if (currentUserId.isEmpty() || token.isEmpty()) return
 
+        // Đảm bảo đã connect WebSocket toàn ứng dụng
         socketService.connect("${NetworkConstants.WS_URL}?token=$token", token)
         socketService.subscribeToChat(currentUserId, activeConversationId)
 
@@ -57,7 +58,10 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
 
     private fun parseIncomingWebSocketMessage(body: String) {
         try {
+            Log.d("CHAT_REALTIME_LOG", "[UI_RECEIVED_WS_RAW] $body")
             val incomingMsg = messageParser.parseWsMessage(body, activeConversationId) ?: return
+
+            Log.d("CHAT_REALTIME_LOG", "[UI_RENDER_MSG] Sender: ${incomingMsg.sender.fullName} (${incomingMsg.sender.id}) | Content: ${incomingMsg.content}")
 
             _messages.removeAll { 
                 it.id == incomingMsg.id || (it.id.startsWith("temp_") && it.content == incomingMsg.content)
@@ -65,7 +69,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
             _messages.add(incomingMsg)
             updateState()
         } catch (e: Exception) {
-            Log.e("ChatViewModel", "Error parsing WS message", e)
+            Log.e("CHAT_REALTIME_LOG", "[UI_PARSE_ERROR] Error parsing WS message", e)
         }
     }
 
@@ -221,6 +225,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
 
     override fun onCleared() {
         super.onCleared()
-        socketService.disconnect()
+        // Không ngắt kết nối WebSocket toàn ứng dụng khi thoát chatroom
     }
 }
