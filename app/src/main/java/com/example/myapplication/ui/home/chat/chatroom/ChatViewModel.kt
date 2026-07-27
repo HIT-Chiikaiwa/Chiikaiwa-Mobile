@@ -18,8 +18,6 @@ import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 
@@ -29,7 +27,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private val conversationRepository = ConversationRepository(application)
     private val preferenceManager = PreferenceManager(application)
     private val socketService = ChatSocketService(StompManager())
-    private val gson = Gson()
+    private val messageParser = ChatMessageParser()
 
     val currentUserId: String = preferenceManager.getUserId() ?: ""
     private var activeConversationId: String = ""
@@ -59,35 +57,10 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
 
     private fun parseIncomingWebSocketMessage(body: String) {
         try {
-            val jsonObj = gson.fromJson(body, JsonObject::class.java) ?: return
-            val data = if (jsonObj.has("data") && jsonObj.get("data").isJsonObject) {
-                jsonObj.getAsJsonObject("data")
-            } else jsonObj
-
-            val content = data.get("content")?.asString ?: data.get("text")?.asString ?: ""
-            if (content.isEmpty()) return
-
-            val msgId = data.get("id")?.asString ?: data.get("messageId")?.asString ?: System.currentTimeMillis().toString()
-            val senderId = data.get("senderId")?.asString
-                ?: data.getAsJsonObject("sender")?.get("id")?.asString ?: ""
-            val senderName = data.get("senderName")?.asString
-                ?: data.getAsJsonObject("sender")?.get("fullName")?.asString ?: "Người dùng"
-            val convId = data.get("conversationId")?.asString ?: activeConversationId
-
-            val incomingMsg = Message(
-                id = msgId,
-                conversationId = convId,
-                sender = User(id = senderId, fullName = senderName, avatar = null),
-                content = content,
-                type = MessageType.TEXT,
-                status = MessageStatus.SENT,
-                createdAt = "Vừa xong",
-                updatedAt = "",
-                isRecalled = false
-            )
+            val incomingMsg = messageParser.parseWsMessage(body, activeConversationId) ?: return
 
             _messages.removeAll { 
-                it.id == msgId || (it.id.startsWith("temp_") && it.content == content)
+                it.id == incomingMsg.id || (it.id.startsWith("temp_") && it.content == incomingMsg.content)
             }
             _messages.add(incomingMsg)
             updateState()
@@ -171,7 +144,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         viewModelScope.launch {
             when (val result = messageRepository.uploadImage(activeConversationId, file)) {
                 is Resource.Success -> {
-                    val imageUrl = result.data.data ?: ""
+                    val imageUrl = messageParser.extractImageUrl(result.data.data)
                     val idx = _messages.indexOfFirst { it.id == tempMsg.id }
                     if (idx != -1 && imageUrl.isNotEmpty()) {
                         _messages[idx] = tempMsg.copy(content = imageUrl)
@@ -206,7 +179,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                         _messages.addAll(rawList.reversed())
 
                         recentTemps.forEach { temp ->
-                            if (_messages.none { it.content == temp.content && (it.sender.id == currentUserId || it.sender.id == temp.sender.id) }) {
+                            if (_messages.none { it.id == temp.id }) {
                                 _messages.add(temp)
                             }
                         }
@@ -248,6 +221,6 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
 
     override fun onCleared() {
         super.onCleared()
-        socketService.connect("", "")
+        socketService.disconnect()
     }
 }

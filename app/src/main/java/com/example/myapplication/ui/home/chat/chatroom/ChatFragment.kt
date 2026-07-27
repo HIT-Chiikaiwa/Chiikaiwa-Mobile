@@ -5,12 +5,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -41,6 +38,9 @@ class ChatFragment : Fragment() {
         ViewModelProvider(this)[ChatViewModel::class.java]
     }
     private lateinit var adapter: MessageAdapter
+    private lateinit var inputHelper: ChatInputHelper
+    private lateinit var scrollHelper: ChatScrollHelper
+
     private var conversationId: String = ""
     private var targetUserId: String = ""
     private var userName: String = ""
@@ -75,12 +75,19 @@ class ChatFragment : Fragment() {
         if (userName.isNotEmpty()) {
             binding.tvChatTitle.text = userName
         }
+        setupHelpers()
         setupWindowInsets()
         setupRecyclerView()
         setupListeners()
         observeViewModel()
 
         viewModel.initChatSession(conversationId, targetUserId)
+    }
+
+    private fun setupHelpers() {
+        scrollHelper = ChatScrollHelper(binding.rvChatMessages) { adapter }
+        inputHelper = ChatInputHelper(binding) { sendMessage() }
+        inputHelper.setup()
     }
 
     private fun setupWindowInsets() {
@@ -90,10 +97,8 @@ class ChatFragment : Fragment() {
             val bottomPadding = if (imeHeight > 0) imeHeight else navigationBarsHeight
             binding.root.setPadding(0, 0, 0, bottomPadding)
 
-            if (imeHeight > 0 && ::adapter.isInitialized && adapter.itemCount > 0) {
-                binding.rvChatMessages.post {
-                    binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
-                }
+            if (imeHeight > 0 && ::adapter.isInitialized) {
+                scrollHelper.scrollToBottom()
             }
             insets
         }
@@ -132,30 +137,6 @@ class ChatFragment : Fragment() {
         binding.btnGallery.setOnClickListener {
             openImagePicker()
         }
-
-        binding.etMessage.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val hasContent = !s.isNullOrBlank()
-                binding.btnSend.visibility = if (hasContent) View.VISIBLE else View.GONE
-                binding.btnMic.visibility = if (hasContent) View.GONE else View.VISIBLE
-                binding.btnFolder.visibility = if (hasContent) View.GONE else View.VISIBLE
-                binding.btnGallery.visibility = if (hasContent) View.GONE else View.VISIBLE
-                binding.btnUserAction.visibility = if (hasContent) View.GONE else View.VISIBLE
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.etMessage.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                sendMessage()
-                true
-            } else {
-                false
-            }
-        }
     }
 
     private fun openImagePicker() {
@@ -182,12 +163,7 @@ class ChatFragment : Fragment() {
         val part = MultipartBody.Part.createFormData("file", "image.jpg", requestBody)
 
         viewModel.sendImageMessage(part)
-
-        binding.rvChatMessages.postDelayed({
-            if (::adapter.isInitialized && adapter.itemCount > 0) {
-                binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
-            }
-        }, 100)
+        scrollHelper.scrollToBottom(delayMs = 100)
     }
 
     private fun sendMessage() {
@@ -196,12 +172,7 @@ class ChatFragment : Fragment() {
             val destinationId = if (targetUserId.isNotEmpty()) targetUserId else conversationId
             viewModel.sendRealtimeMessage(destinationId, text)
             binding.etMessage.setText("")
-
-            binding.rvChatMessages.postDelayed({
-                if (::adapter.isInitialized && adapter.itemCount > 0) {
-                    binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
-                }
-            }, 50)
+            scrollHelper.scrollToBottom(delayMs = 50)
         }
     }
 
@@ -212,13 +183,8 @@ class ChatFragment : Fragment() {
                     viewModel.uiState.collect { state ->
                         when (state) {
                             is UiState.Success -> {
-                                val list = state.data
-                                adapter.submitList(list) {
-                                    binding.rvChatMessages.post {
-                                        if (adapter.itemCount > 0) {
-                                            binding.rvChatMessages.scrollToPosition(adapter.itemCount - 1)
-                                        }
-                                    }
+                                adapter.submitList(state.data) {
+                                    scrollHelper.scrollToBottom()
                                 }
                             }
                             is UiState.Error -> {}

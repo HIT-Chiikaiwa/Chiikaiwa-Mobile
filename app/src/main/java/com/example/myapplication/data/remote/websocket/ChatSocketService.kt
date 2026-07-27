@@ -19,6 +19,11 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
         stompManager.connect(url, token)
     }
 
+    fun disconnect() {
+        stompManager.disconnect()
+    }
+
+
     fun subscribeToChat(userId: String, conversationId: String = "") {
         this.activeUserId = userId
         this.activeConversationId = conversationId
