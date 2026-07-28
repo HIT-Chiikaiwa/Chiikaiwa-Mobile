@@ -22,12 +22,22 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
             ?: data.getAsJsonObject("sender")?.get("fullName")?.asString ?: "Người dùng"
         val convId = data.get("conversationId")?.asString ?: activeConversationId
 
+        val rawType = data.get("messageType")?.asString 
+            ?: data.get("type")?.asString 
+            ?: "TEXT"
+
+        val messageType = try {
+            com.example.myapplication.data.model.MessageType.valueOf(rawType.uppercase())
+        } catch (e: Exception) {
+            com.example.myapplication.data.model.MessageType.TEXT
+        }
+
         return Message(
             id = msgId,
             conversationId = convId,
             sender = com.example.myapplication.data.model.User(id = senderId, fullName = senderName, avatar = null),
             content = content,
-            type = com.example.myapplication.data.model.MessageType.TEXT,
+            type = messageType,
             status = com.example.myapplication.data.model.MessageStatus.SENT,
             createdAt = "Vừa xong",
             updatedAt = "",
