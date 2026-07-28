@@ -46,9 +46,23 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         binding = inflateBinding()
         setContentView(binding.root)
 
+        initSystemBarsPadding()
         initView()
         observeData()
         observeEvent()
+    }
+
+    protected open fun initSystemBarsPadding() {
+        androidx.core.view .ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val statusBarTop = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars()).top
+            view.setPadding(
+                view.paddingLeft,
+                statusBarTop,
+                view.paddingRight,
+                view.paddingBottom
+            )
+            insets
+        }
     }
     protected fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
