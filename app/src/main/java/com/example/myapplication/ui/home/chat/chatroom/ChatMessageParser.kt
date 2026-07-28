@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
+import android.util.Log
 import com.example.myapplication.data.model.Message
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -22,6 +23,12 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
             ?: data.getAsJsonObject("sender")?.get("fullName")?.asString ?: "Người dùng"
         val convId = data.get("conversationId")?.asString ?: activeConversationId
 
+        val rawCreatedDate = data.get("createdDate")?.asString 
+            ?: data.get("createdAt")?.asString 
+            ?: data.get("timestamp")?.asString 
+            ?: ""
+        Log.d("CHAT_REALTIME_LOG", "[SERVER_TIME_LOG] Raw createdDate from server: '$rawCreatedDate' | Full JSON: $data")
+
         val rawType = data.get("messageType")?.asString 
             ?: data.get("type")?.asString 
             ?: "TEXT"
@@ -39,7 +46,9 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
             content = content,
             type = messageType,
             status = com.example.myapplication.data.model.MessageStatus.SENT,
-            createdAt = "Vừa xong",
+            createdAt = if (rawCreatedDate.isNotEmpty()) {
+                com.example.myapplication.utils.TimeUtils.formatChatTime(rawCreatedDate)
+            } else "Vừa xong",
             updatedAt = "",
             isRecalled = false
         )

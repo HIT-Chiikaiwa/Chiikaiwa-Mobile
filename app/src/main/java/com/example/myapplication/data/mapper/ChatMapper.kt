@@ -22,6 +22,7 @@ object ChatMapper {
     }
 
     fun toDomain(dto: MessageResponse): Message {
+        android.util.Log.d("CHAT_REALTIME_LOG", "[REST_SERVER_TIME_LOG] Message ID: ${dto.id} | createdDate: '${dto.createdDate}'")
         val msgType = try {
             MessageType.valueOf(dto.messageType ?: "TEXT")
         } catch (e: Exception) {
@@ -41,8 +42,8 @@ object ChatMapper {
             content = dto.content ?: "",
             type = msgType,
             status = MessageStatus.SENT,
-            createdAt = dto.createdDate ?: "",
-            updatedAt = dto.createdDate ?: "",
+            createdAt = com.example.myapplication.utils.TimeUtils.formatChatTime(dto.createdDate),
+            updatedAt = com.example.myapplication.utils.TimeUtils.formatChatTime(dto.createdDate),
             isRecalled = dto.isRecalled
         )
     }
