@@ -22,6 +22,7 @@ export default function App() {
   const [toast, setToast] = useState<ToastState | undefined>();
   const [chatTarget, setChatTarget] = useState<ChatTarget | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chatBackRoute = useRef<Route>('home');
 
   useEffect(() => {
     const storage = getStorage();
@@ -59,6 +60,7 @@ export default function App() {
   };
 
   const openChat = (target: ChatTarget) => {
+    chatBackRoute.current = route === 'chat' ? 'home' : route;
     setChatTarget(target);
     setRoute('chat');
   };
@@ -205,8 +207,9 @@ export default function App() {
         {route === 'chat' && chatTarget ? (
           <ChatScreen
             session={session}
+            currentUser={currentUser}
             target={chatTarget}
-            onBack={() => setRoute('friends')}
+            onBack={() => setRoute(chatBackRoute.current)}
             showToast={showToast}
           />
         ) : null}

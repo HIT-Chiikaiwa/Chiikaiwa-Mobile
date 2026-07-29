@@ -13,6 +13,44 @@ import { colors } from '../theme/colors';
 import type { BaseResponse, ChatTarget, ConversationResponse, MapCoordinate, NearbyUser, Session, ToastState, UserDto } from '../types';
 import { distanceKm, fullName, remoteImageSource } from '../utils/formatters';
 
+const RADAR_RADIUS_METERS = RADAR_RADIUS_KM * 1000;
+const METERS_PER_LATITUDE_DEGREE = 111320;
+const RADAR_VIEW_PADDING = 1.28;
+
+function radarRegion(center: MapCoordinate): Region {
+  const latitudeDelta = (RADAR_RADIUS_METERS * 2 * RADAR_VIEW_PADDING) / METERS_PER_LATITUDE_DEGREE;
+  const latitudeRadians = (center.latitude * Math.PI) / 180;
+  const metersPerLongitudeDegree = Math.max(
+    METERS_PER_LATITUDE_DEGREE * Math.cos(latitudeRadians),
+    1,
+  );
+  const longitudeDelta = (RADAR_RADIUS_METERS * 2 * RADAR_VIEW_PADDING) / metersPerLongitudeDegree;
+
+  return {
+    ...center,
+    latitudeDelta,
+    longitudeDelta,
+  };
+}
+
+function normalizeNearbyUser(scanOrigin: MapCoordinate, user: NearbyUser): NearbyUser | null {
+  const latitude = Number(user.latitude);
+  const longitude = Number(user.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return null;
+  }
+
+  const distance = Number(user.distanceKm);
+
+  return {
+    ...user,
+    latitude,
+    longitude,
+    distanceKm: Number.isFinite(distance) ? distance : distanceKm(scanOrigin, { latitude, longitude }),
+  };
+}
+
 function HomeScreen({
   session,
   currentUser,
@@ -40,11 +78,7 @@ function HomeScreen({
   const [scanning, setScanning] = useState(false);
   const [selected, setSelected] = useState<NearbyUser | null>(null);
   const [origin, setOrigin] = useState<MapCoordinate | null>(null);
-  const [region, setRegion] = useState<Region>({
-    ...DEFAULT_LOCATION,
-    latitudeDelta: 0.08,
-    longitudeDelta: 0.08,
-  });
+  const [region, setRegion] = useState<Region>(radarRegion(DEFAULT_LOCATION));
   const hasCenteredOnUser = useRef(false);
   const rotate = useSpin(scanning);
   const navScale = Math.min(Math.max(screenWidth / 390, 0.92), 1.22);
@@ -66,12 +100,7 @@ function HomeScreen({
 
     if (centerMap || !hasCenteredOnUser.current) {
       hasCenteredOnUser.current = true;
-      setRegion((current) => ({
-        ...current,
-        ...nextOrigin,
-        latitudeDelta: centerMap ? 0.08 : current.latitudeDelta,
-        longitudeDelta: centerMap ? 0.08 : current.longitudeDelta,
-      }));
+      setRegion((current) => (centerMap ? radarRegion(nextOrigin) : { ...current, ...nextOrigin }));
     }
   };
 
@@ -111,6 +140,38 @@ function HomeScreen({
     }
   };
 
+  const updateServerLocation = async (coordinate: MapCoordinate) => {
+    if (!session?.accessToken) return;
+
+    await apiRequest<BaseResponse<{ message?: string; status?: boolean }>>(
+      'api/v1/location/update',
+      {
+        method: 'PUT',
+        body: JSON.stringify({
+          latitude: coordinate.latitude,
+          longitude: coordinate.longitude,
+        }),
+      },
+      session.accessToken,
+    );
+  };
+
+  const ensureBuddyActive = async () => {
+    if (!session?.accessToken) return;
+    if (currentUser?.buddyActive) return;
+
+    const response = await apiRequest<BaseResponse<UserDto>>(
+      `api/v1/profile/${session.userId}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ buddyActive: true }),
+      },
+      session.accessToken,
+    );
+
+    setCurrentUser(response.data);
+  };
+
   useEffect(() => {
     if (!session) return;
     apiRequest<BaseResponse<UserDto>>(`api/v1/profile/${session.userId}`, {}, session.accessToken)
@@ -125,6 +186,7 @@ function HomeScreen({
       const coordinate = await readCurrentCoordinate(false);
       if (!cancelled && coordinate) {
         syncOrigin(coordinate, true);
+        updateServerLocation(coordinate).catch(() => undefined);
       }
     };
 
@@ -133,29 +195,60 @@ function HomeScreen({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [session?.accessToken]);
 
   const scan = async () => {
+    if (!session?.accessToken) {
+      showToast('Vui lòng đăng nhập để quét radar', 'error');
+      return;
+    }
+
     setScanning(true);
     const scanOrigin = (await readCurrentCoordinate(true)) ?? origin ?? DEFAULT_LOCATION;
 
     syncOrigin(scanOrigin, true);
 
     try {
+      await ensureBuddyActive();
+      await updateServerLocation(scanOrigin);
+      const radarPath = `api/v1/location/radar?lat=${scanOrigin.latitude}&lng=${scanOrigin.longitude}&radius=${RADAR_RADIUS_KM}`;
       const response = await apiRequest<BaseResponse<NearbyUser[]>>(
-        `api/v1/location/radar?lat=${scanOrigin.latitude}&lng=${scanOrigin.longitude}&radius=${RADAR_RADIUS_KM}`,
+        radarPath,
         {},
-        session?.accessToken,
+        session.accessToken,
       );
-      const filtered = (response.data ?? [])
-        .filter((user) => Number.isFinite(user.latitude) && Number.isFinite(user.longitude))
-        .map((user) => ({ ...user, distanceKm: user.distanceKm ?? distanceKm(scanOrigin, user) }))
-        .filter((user) => (user.distanceKm ?? 999) <= RADAR_RADIUS_KM);
-      setNearby(filtered);
-      showToast(`Đã quét ${filtered.length} bạn học gần đây`, 'success');
+
+      const users = (response.data ?? [])
+        .map((user) => normalizeNearbyUser(scanOrigin, user))
+        .filter((user): user is NearbyUser => Boolean(user));
+
+      if (__DEV__) {
+        console.log('[radar]', {
+          path: radarPath,
+          userId: session.userId,
+          origin: scanOrigin,
+          rawCount: response.data?.length ?? 0,
+          visibleCount: users.length,
+          users,
+        });
+      }
+
+      setNearby(users);
+      showToast(
+        users.length
+          ? `Đã quét ${users.length} bạn học gần đây`
+          : 'Chưa tìm thấy ai. Hãy chắc người kia đã bật quét radar và cập nhật vị trí.',
+        users.length ? 'success' : 'info',
+      );
     } catch (err) {
       setNearby([]);
-      showToast(err instanceof Error ? err.message : 'Không thể quét radar', 'error');
+      const message = err instanceof Error ? err.message : 'Không thể quét radar';
+      showToast(
+        message.includes('Buddy Active')
+          ? 'Hãy bật Cho phép quét radar trong Cài đặt tài khoản rồi thử lại'
+          : message,
+        'error',
+      );
     } finally {
       setScanning(false);
     }
@@ -218,7 +311,7 @@ function HomeScreen({
           <>
             <Circle
               center={origin}
-              radius={RADAR_RADIUS_KM * 1000}
+              radius={RADAR_RADIUS_METERS}
               strokeColor="rgba(220,107,83,0.9)"
               fillColor="rgba(248,149,4,0.14)"
               strokeWidth={2}
