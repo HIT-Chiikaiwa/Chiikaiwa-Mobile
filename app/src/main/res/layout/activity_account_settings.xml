@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/layoutToolbar"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="@dimen/_45sdp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,21 +18,21 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
             android:background="@color/bg_2"
             android:contentDescription="@string/back"
-            android:padding="12dp"
+            android:padding="@dimen/_10sdp"
             android:src="@drawable/ic_arrow_back"
             app:tint="@color/brown" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/_10sdp"
             android:text="@string/setting"
             android:textColor="@color/brown"
-            android:textSize="22sp"
+            android:textSize="@dimen/_16ssp"
             android:textStyle="bold"/>
     </LinearLayout>
 
@@ -49,148 +49,143 @@
             android:id="@+id/layoutMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginHorizontal="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_20sdp"
             android:orientation="vertical">
 
-            <!-- 1. Cho phép quét rada -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardEnableRadar"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="10dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
                 app:cardElevation="0dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_card_retro"
-                    android:paddingHorizontal="16dp">
+                    android:paddingHorizontal="@dimen/_12sdp"
+                    android:background="@drawable/bg_card_retro">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:text="@string/enable_radar"
                         android:textColor="@color/brown"
-                        android:textSize="16sp"/>
+                        android:textSize="@dimen/_13ssp"/>
 
-                    <androidx.appcompat.widget.SwitchCompat
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switchRadar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        app:thumbTint="@color/brown"
-                        app:trackTint="@color/hint"/>
+                        app:trackTint="@color/switch_track_selector"
+                        app:thumbTint="@color/switch_thumb_selector"/>
                 </RelativeLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 2. Thông tin đăng kí -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardPersonalInfo"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="10dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
                 app:cardElevation="0dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/_12sdp"
                     android:background="@drawable/bg_card_retro"
                     android:text="@string/register_infor"
                     android:textColor="@color/brown"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/_13ssp"/>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 3. Đổi mật khẩu -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardChangePassword"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="10dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
                 app:cardElevation="0dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/_12sdp"
                     android:background="@drawable/bg_card_retro"
                     android:text="@string/change_password"
                     android:textColor="@color/brown"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/_13ssp"/>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 4. Cài đặt thông báo -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardNotificationSettings"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="10dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
                 app:cardElevation="0dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/_12sdp"
                     android:background="@drawable/bg_card_retro"
                     android:text="@string/notification_settings"
                     android:textColor="@color/brown"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/_13ssp"/>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 5. Trợ giúp -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardHelp"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="10dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
                 app:cardElevation="0dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/_12sdp"
                     android:background="@drawable/bg_card_retro"
                     android:text="@string/help"
                     android:textColor="@color/brown"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/_13ssp"/>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- 6. Đăng xuất -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLogout"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="10dp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
                 app:cardElevation="0dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:paddingStart="16dp"
+                    android:paddingStart="@dimen/_12sdp"
                     android:background="@drawable/bg_card_retro"
                     android:text="@string/log_out"
                     android:textColor="@color/brown"
-                    android:textSize="16sp"/>
+                    android:textSize="@dimen/_13ssp"/>
 
             </androidx.cardview.widget.CardView>
 

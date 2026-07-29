@@ -15,7 +15,7 @@
         <LinearLayout
             android:id="@+id/layoutHeader"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="@dimen/_45sdp"
             android:background="@color/bg_2"
             android:gravity="center_vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -24,12 +24,12 @@
 
             <ImageView
                 android:id="@+id/ivBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="16dp"
+                android:layout_width="@dimen/_32sdp"
+                android:layout_height="@dimen/_32sdp"
+                android:layout_marginStart="@dimen/_12sdp"
                 android:background="@color/bg_2"
                 android:contentDescription="@string/back"
-                android:padding="8dp"
+                android:padding="@dimen/_6sdp"
                 android:src="@drawable/ic_arrow_back"
                 app:tint="@color/brown" />
 
@@ -37,28 +37,28 @@
                 android:id="@+id/tvHeaderTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="@dimen/_16sdp"
                 android:text="@string/profile_title"
                 android:textColor="@color/brown"
-                android:textSize="20sp"
+                android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <ImageView
             android:id="@+id/ivTogglePassword1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_marginEnd="@dimen/_4sdp"
             android:src="@drawable/edit_profile"
             app:layout_constraintTop_toBottomOf="@+id/layoutHeader"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <ImageView
             android:id="@+id/ivWoodLeft1"
-            android:layout_width="20dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="50dp"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginStart="@dimen/_40sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -68,9 +68,9 @@
 
         <ImageView
             android:id="@+id/ivWoodRight1"
-            android:layout_width="20dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginEnd="@dimen/_40sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -82,9 +82,9 @@
             android:id="@+id/cvProfile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="35dp"
-            app:cardCornerRadius="18dp"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_28sdp"
+            app:cardCornerRadius="@dimen/_14sdp"
             app:cardElevation="-4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -95,38 +95,39 @@
                 android:layout_height="wrap_content"
                 android:background="@color/bg_2"
                 android:orientation="vertical"
-                android:padding="15dp">
+                android:padding="@dimen/_12sdp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/profile"
                     android:gravity="center_vertical"
-                    android:padding="5dp">
+                    android:padding="@dimen/_4sdp">
 
                     <FrameLayout
-                        android:layout_width="80dp"
-                        android:layout_height="80dp">
+                        android:layout_width="@dimen/_65sdp"
+                        android:layout_height="@dimen/_65sdp">
 
                         <ImageView
                             android:id="@+id/imgAvatar"
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
+                            android:layout_width="@dimen/_58sdp"
+                            android:layout_height="@dimen/_58sdp"
+                            android:scaleType="centerCrop"
                             android:src="@drawable/ic_launcher_foreground"/>
 
                         <ImageView
                             android:id="@+id/imgEditAvatar"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
+                            android:layout_width="@dimen/_24sdp"
+                            android:layout_height="@dimen/_24sdp"
                             android:layout_gravity="end|bottom"
                             android:src="@drawable/edit_profile"
-                            android:padding="4dp" />
+                            android:padding="@dimen/_3sdp" />
                     </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="@dimen/_12sdp"
                         android:orientation="vertical">
 
                         <TextView
@@ -135,7 +136,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/username"
                             android:textColor="@color/brown"
-                            android:textSize="18sp"
+                            android:textSize="@dimen/_14ssp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -143,14 +144,16 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/id"
-                            android:textColor="@color/brown" />
+                            android:textColor="@color/brown"
+                            android:textSize="@dimen/_11ssp" />
 
                         <TextView
                             android:id="@+id/tvFriendsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/friends"
-                            android:textColor="@color/brown" />
+                            android:textColor="@color/brown"
+                            android:textSize="@dimen/_11ssp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -159,8 +162,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:layout_marginTop="5dp">
+                    android:padding="@dimen/_4sdp"
+                    android:layout_marginTop="@dimen/_4sdp">
 
                     <TextView
                         android:id="@+id/tvIntroduction"
@@ -168,36 +171,38 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="@string/introduction"
-                        android:textColor="@color/brown" />
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_11ssp" />
 
                     <ImageView
                         android:id="@+id/ivTogglePassword"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_width="@dimen/_16sdp"
+                        android:layout_height="@dimen/_16sdp"
+                        android:layout_marginStart="@dimen/_4sdp"
+                        android:layout_marginEnd="@dimen/_4sdp"
                         android:src="@drawable/edit_profile"/>
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/btnUpdateProfile"
-                    android:layout_width="125dp"
-                    android:layout_height="48dp"
+                    android:layout_width="@dimen/_100sdp"
+                    android:layout_height="@dimen/_38sdp"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/_8sdp"
                     android:background="@drawable/bg_button"
                     android:text="@string/save_changes"
                     android:textColor="@color/brown"
+                    android:textSize="@dimen/_12ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <ImageView
             android:id="@+id/ivWoodLeft2"
-            android:layout_width="20dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="50dp"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginStart="@dimen/_40sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -207,9 +212,9 @@
 
         <ImageView
             android:id="@+id/ivWoodRight2"
-            android:layout_width="20dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginEnd="@dimen/_40sdp"
             android:contentDescription="@null"
             android:elevation="-1dp"
             android:src="@drawable/rectangle"
@@ -221,9 +226,9 @@
             android:id="@+id/cvInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="15dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginHorizontal="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            app:cardCornerRadius="@dimen/_13sdp"
             app:cardElevation="-4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -234,64 +239,69 @@
                 android:layout_height="wrap_content"
                 android:background="@color/bg_2"
                 android:orientation="vertical"
-                android:padding="15dp">
+                android:padding="@dimen/_12sdp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/infor"
                     android:textColor="@color/brown"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_14ssp"
                     android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/_8sdp"
                     android:background="@color/profile"
                     android:orientation="vertical"
-                    android:padding="10dp">
+                    android:padding="@dimen/_8sdp">
 
                     <TextView
                         android:id="@+id/tvAge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/age"
-                        android:textColor="@color/brown" />
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_11ssp" />
 
                     <TextView
                         android:id="@+id/tvGender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/sex"
-                        android:textColor="@color/brown" />
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_11ssp" />
 
                     <TextView
                         android:id="@+id/tvSchool"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/school"
-                        android:textColor="@color/brown" />
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_11ssp" />
 
                     <TextView
                         android:id="@+id/tvMajor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/major"
-                        android:textColor="@color/brown" />
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_11ssp" />
 
                     <TextView
                         android:id="@+id/tvCountry"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/country"
-                        android:textColor="@color/brown" />
+                        android:textColor="@color/brown"
+                        android:textSize="@dimen/_11ssp" />
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="@dimen/_2sdp"
                         android:background="@color/brown"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="@dimen/_8sdp"/>
 
                     <TextView
                         android:id="@+id/tvAddInfo"
@@ -299,7 +309,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/add_infor"
                         android:textColor="@color/brown"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/_11ssp"
                         android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>

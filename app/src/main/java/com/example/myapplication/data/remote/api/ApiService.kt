@@ -31,6 +31,13 @@ interface ApiService {
     @GET("api/v1/profile/{userId}")
     suspend fun getProfile(@Path("userId") userId: String): Response<BaseResponse<UserDto>>
 
+    @Multipart
+    @POST("api/v1/profile/{userId}/avatar")
+    suspend fun uploadAvatar(
+        @Path("userId") userId: String,
+        @Part file: MultipartBody.Part
+    ): Response<BaseResponse<UserDto>>
+
     @PATCH("api/v1/profile/{userId}/status")
     suspend fun toggleBuddyStatus(
         @Path("userId") userId: String,
@@ -160,10 +167,6 @@ interface ApiService {
         @Path("id") conversationId: String,
         @Part file: MultipartBody.Part
     ): Response<BaseResponse<String>>
-
-    // ==========================================
-    // FRIENDSHIP CONTROLLER ENDPOINTS
-    // ==========================================
 
     @GET("api/v1/users/search/phone")
     suspend fun searchUserByPhone(

@@ -5,13 +5,13 @@
     android:layout_width="@dimen/_40sdp"
     android:layout_height="@dimen/_40sdp"
     android:background="@drawable/bg_avatar_marker_frame"
-    android:padding="@dimen/_2sdp">
+    android:padding="@dimen/_3sdp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cardBackgroundColor="@color/profile"
-        app:cardCornerRadius="@dimen/_5sdp"
+        app:cardCornerRadius="@dimen/_6sdp"
         app:cardElevation="0dp">
 
         <ImageView

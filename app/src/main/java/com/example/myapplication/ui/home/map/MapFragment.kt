@@ -174,7 +174,7 @@ class MapFragment : Fragment() {
 
     private fun scanNearby(latitude: Double, longitude: Double) {
         currentUserLatLng = LatLng(latitude, longitude)
-        mapLibreMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 15.0))
+        mapLibreMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 12.0))
         mapManager?.updateMyLocationMarker(latitude, longitude)
         viewModel.getNearbyUsers(latitude, longitude)
     }

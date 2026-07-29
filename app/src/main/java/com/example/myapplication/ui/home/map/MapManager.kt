@@ -30,7 +30,7 @@ class MapManager(
     private val context = fragment.requireContext()
     private val avatarBitmapCache = HashMap<String, Bitmap>()
     private val radarRenderer = RadarRenderer(map)
-    private val markerSize by lazy { context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp) }
+    private val markerSize by lazy { context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._24sdp) }
 
     fun setup() {
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
@@ -123,7 +123,9 @@ class MapManager(
     private fun createMarkerBitmapFromLayout(srcBitmap: Bitmap): Bitmap {
         val view = LayoutInflater.from(context).inflate(R.layout.layout_avatar, null)
         val ivAvatar = view.findViewById<android.widget.ImageView>(R.id.ivAvatar)
-        ivAvatar.setImageBitmap(srcBitmap)
+        
+        val roundedBitmap = getRoundedCornerBitmap(srcBitmap, 24f)
+        ivAvatar.setImageBitmap(roundedBitmap)
 
         view.measure(
             View.MeasureSpec.makeMeasureSpec(markerSize, View.MeasureSpec.EXACTLY),
@@ -134,6 +136,26 @@ class MapManager(
         val output = Bitmap.createBitmap(markerSize, markerSize, Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(output)
         view.draw(canvas)
+        return output
+    }
+
+    private fun getRoundedCornerBitmap(bitmap: Bitmap, pixels: Float): Bitmap {
+        val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(output)
+        val color = -0xbdbdbe
+        val paint = android.graphics.Paint()
+        val rect = android.graphics.Rect(0, 0, bitmap.width, bitmap.height)
+        val rectF = android.graphics.RectF(rect)
+        val roundPx = pixels
+
+        paint.isAntiAlias = true
+        canvas.drawARGB(0, 0, 0, 0)
+        paint.color = color
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
+
+        paint.xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(bitmap, rect, rect, paint)
+
         return output
     }
 

@@ -42,6 +42,24 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         }
     }
 
+    fun uploadAvatar(imageFile: java.io.File) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.uploadAvatar(userId, imageFile)) {
+                is Resource.Success -> {
+                    val updatedUser = result.data.data
+                    _uiState.value = UiState.Success(updatedUser)
+                    _event.emit(UiEvent.ShowToast("Cập nhật ảnh đại diện thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                    _event.emit(UiEvent.ShowToast("Lỗi cập nhật ảnh: ${result.message}"))
+                }
+            }
+        }
+    }
+
     fun toggleBuddyStatus(buddyActive: Boolean) {
         val userId = getUserId() ?: return
         viewModelScope.launch {

@@ -115,11 +115,15 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
         binding.tvMajor.text = "Ngành học: ${user.majorName ?: "Chưa cập nhật"}"
         binding.tvCountry.text = "Quê quán: ${user.location ?: "Chưa cập nhật"}"
 
-        Glide.with(this)
-            .load(user.avatar)
-            .placeholder(R.drawable.ic_launcher_foreground)
-            .error(R.drawable.ic_launcher_foreground)
-            .into(binding.ivAvatar)
+        if (!user.avatar.isNullOrEmpty()) {
+            Glide.with(this)
+                .load(user.avatar)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
+                .into(binding.ivAvatar)
+        } else {
+            binding.ivAvatar.setImageResource(R.drawable.ic_launcher_foreground)
+        }
     }
 
     private fun calculateAge(dateOfBirth: String?): String {

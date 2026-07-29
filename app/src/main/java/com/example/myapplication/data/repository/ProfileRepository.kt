@@ -8,6 +8,8 @@ import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.data.remote.dto.response.SubjectDto
 import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.MultipartBody
 import com.example.myapplication.data.remote.api.ApiService
 
@@ -16,6 +18,12 @@ class ProfileRepository(context: Context) : BaseRepository() {
 
     suspend fun getProfile(userId: String): Resource<BaseResponse<UserDto>> {
         return safeApiCall { api.getProfile(userId) }
+    }
+
+    suspend fun uploadAvatar(userId: String, imageFile: java.io.File): Resource<BaseResponse<UserDto>> {
+        val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
+        val body = okhttp3.MultipartBody.Part.createFormData("file", imageFile.name, requestFile)
+        return safeApiCall { api.uploadAvatar(userId, body) }
     }
 
     suspend fun toggleBuddyStatus(userId: String, buddyActive: Boolean): Resource<BaseResponse<UserDto>> {

@@ -52,6 +52,7 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
 
     fun getNearbyUsers(lat: Double, lng: Double, radiusKm: Double = 6.0) {
         viewModelScope.launch {
+            val startTime = System.currentTimeMillis()
             _uiState.value = UiState.Loading
 
             when (val result = mapRepository.getNearbyUsers(lat, lng, radiusKm)) {
@@ -69,11 +70,23 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
                             }
                         }
                     }
+
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    val minScanDuration = 5000L
+                    if (elapsedTime < minScanDuration) {
+                        kotlinx.coroutines.delay(minScanDuration - elapsedTime)
+                    }
+
                     _nearbyUsers.value = filtered
                     _uiState.value = UiState.Success(filtered)
                     fetchAvatars(filtered)
                 }
                 is Resource.Error -> {
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    val minScanDuration = 5000L
+                    if (elapsedTime < minScanDuration) {
+                        kotlinx.coroutines.delay(minScanDuration - elapsedTime)
+                    }
                     _uiState.value = UiState.Error(result.message ?: "Lỗi tải dữ liệu vị trí")
                 }
             }

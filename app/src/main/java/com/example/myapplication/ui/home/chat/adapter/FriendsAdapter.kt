@@ -59,6 +59,7 @@ class FriendsAdapter(
             binding.tvTime.text = com.example.myapplication.utils.TimeUtils.formatChatTime(item.lastMessage?.createdDate)
 
             val avatarUrl = item.groupAvatar ?: item.lastMessage?.senderAvatar
+
             if (!avatarUrl.isNullOrEmpty()) {
                 Glide.with(binding.root.context)
                     .load(avatarUrl)
