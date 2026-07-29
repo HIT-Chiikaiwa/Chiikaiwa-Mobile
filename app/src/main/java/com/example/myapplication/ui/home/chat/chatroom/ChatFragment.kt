@@ -159,7 +159,7 @@ class ChatFragment : Fragment() {
                 val part = MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
 
                 withContext(Dispatchers.Main) {
-                    viewModel.sendImageMessage(part)
+                    viewModel.sendImageMessage(part, tempFile.absolutePath)
                     scrollHelper.scrollToBottom(delayMs = 100)
                 }
             } catch (e: Exception) {

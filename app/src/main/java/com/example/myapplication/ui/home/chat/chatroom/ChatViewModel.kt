@@ -128,14 +128,14 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         socketService.sendMessage(activeConversationId, msgText)
     }
 
-    fun sendImageMessage(file: MultipartBody.Part) {
+    fun sendImageMessage(file: MultipartBody.Part, localImagePath: String = "") {
         if (activeConversationId.isEmpty()) return
 
         val tempMsg = Message(
             id = "temp_${System.currentTimeMillis()}",
             conversationId = activeConversationId,
             sender = User(id = currentUserId, fullName = "Tôi", avatar = null),
-            content = "",
+            content = localImagePath,
             type = MessageType.IMAGE,
             status = MessageStatus.SENT,
             createdAt = "Vừa xong",
