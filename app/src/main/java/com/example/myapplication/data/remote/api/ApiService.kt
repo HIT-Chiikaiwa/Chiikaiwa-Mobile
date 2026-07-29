@@ -160,4 +160,55 @@ interface ApiService {
         @Path("id") conversationId: String,
         @Part file: MultipartBody.Part
     ): Response<BaseResponse<String>>
+
+    // ==========================================
+    // FRIENDSHIP CONTROLLER ENDPOINTS
+    // ==========================================
+
+    @GET("api/v1/users/search/phone")
+    suspend fun searchUserByPhone(
+        @Query("phone") phone: String
+    ): Response<BaseResponse<UserSearchDto>>
+
+    @POST("api/v1/friends/request/{targetUserId}")
+    suspend fun sendFriendRequest(
+        @Path("targetUserId") targetUserId: String
+    ): Response<BaseResponse<FriendActionResponse>>
+
+    @PUT("api/v1/friends/request/{requestId}/accept")
+    suspend fun acceptFriendRequest(
+        @Path("requestId") requestId: String
+    ): Response<BaseResponse<FriendActionResponse>>
+
+    @PUT("api/v1/friends/request/{requestId}/reject")
+    suspend fun rejectFriendRequest(
+        @Path("requestId") requestId: String
+    ): Response<BaseResponse<FriendActionResponse>>
+
+    @GET("api/v1/friends")
+    suspend fun getFriends(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<FriendDto>>>
+
+    @GET("api/v1/friends/search")
+    suspend fun searchFriends(
+        @Query("keyword") keyword: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<FriendDto>>>
+
+    @GET("api/v1/friends/requests/pending")
+    suspend fun getPendingFriendRequests(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<FriendDto>>>
+
+    @DELETE("api/v1/friends/{friendId}")
+    suspend fun unfriend(
+        @Path("friendId") friendId: String
+    ): Response<BaseResponse<FriendActionResponse>>
 }
