@@ -1,0 +1,21 @@
+export const colors = {
+  black: '#000000',
+  white: '#FFFFFF',
+  brown: '#B67B5D',
+  hint: '#C8A58A',
+  error: '#E53935',
+  bg: '#FCE740',
+  orange: '#F89504',
+  bg2: '#FFFCE2',
+  profile: '#F4F0CA',
+  dragHandle: '#D7CCC8',
+  divider: '#E0E0E0',
+  brownStroke: '#B2725D',
+  chatSent: '#DC6B53',
+  online: '#4CAF50',
+  menuDivider: '#E8D5C4',
+  deleteRed: '#D93838',
+  mapLand: '#E7F2D0',
+  mapWater: '#C8E9F5',
+};
+

@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Study Date",
+    "slug": "study-date",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chiikaiwa.studydate",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Study Date cần vị trí của bạn để quét radar và tìm bạn học gần đây.",
+        "NSPhotoLibraryUsageDescription": "Study Date cần quyền thư viện ảnh để bạn chọn avatar."
+      }
+    },
+    "android": {
+      "package": "com.chiikaiwa.studydate",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Study Date cần quyền thư viện ảnh để bạn chọn avatar."
+        }
+      ]
+    ]
+  }
+}
