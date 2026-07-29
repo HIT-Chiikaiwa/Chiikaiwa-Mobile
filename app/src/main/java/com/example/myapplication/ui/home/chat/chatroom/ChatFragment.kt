@@ -24,10 +24,13 @@ import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.MessageAdapter
 import com.example.myapplication.ui.home.chat.component.ReactionPopup
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 class ChatFragment : Fragment() {
 
@@ -45,13 +48,8 @@ class ChatFragment : Fragment() {
     private var targetUserId: String = ""
     private var userName: String = ""
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { handleImageSelected(it) }
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) pickImageLauncher.launch("image/*")
-        else Toast.makeText(requireContext(), "Cần cấp quyền truy cập ảnh", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,30 +138,36 @@ class ChatFragment : Fragment() {
     }
 
     private fun openImagePicker() {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            Manifest.permission.READ_MEDIA_IMAGES
-        else
-            Manifest.permission.READ_EXTERNAL_STORAGE
-
-        if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            pickImageLauncher.launch("image/*")
-        } else {
-            requestPermissionLauncher.launch(permission)
-        }
+        pickImageLauncher.launch(
+            androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        )
     }
 
     private fun handleImageSelected(uri: Uri) {
         val context = requireContext()
-        val inputStream = context.contentResolver.openInputStream(uri) ?: return
-        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-        val bytes = inputStream.readBytes()
-        inputStream.close()
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val tempFile = File(context.cacheDir, "upload_${System.currentTimeMillis()}.jpg")
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    tempFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
 
-        val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
-        val part = MultipartBody.Part.createFormData("file", "image.jpg", requestBody)
+                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+                val requestBody = tempFile.asRequestBody(mimeType.toMediaTypeOrNull())
+                val part = MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
 
-        viewModel.sendImageMessage(part)
-        scrollHelper.scrollToBottom(delayMs = 100)
+                withContext(Dispatchers.Main) {
+                    viewModel.sendImageMessage(part)
+                    scrollHelper.scrollToBottom(delayMs = 100)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi chọn ảnh: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun sendMessage() {

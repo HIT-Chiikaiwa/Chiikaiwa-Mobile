@@ -30,8 +30,27 @@ class FriendsAdapter(
             val name = item.groupName ?: item.lastMessage?.senderName ?: "Người dùng"
             binding.tvFriendName.text = name
 
+            val context = binding.root.context
+            val currentUserId = com.example.myapplication.data.local.PreferenceManager(context).getUserId()
+
             val lastMsgText = if (item.lastMessage != null) {
-                if (item.lastMessage.isRecalled) "Tin nhắn đã thu hồi" else (item.lastMessage.content ?: "")
+                val msg = item.lastMessage
+                if (msg.isRecalled) {
+                    "Tin nhắn đã thu hồi"
+                } else {
+                    val isMe = msg.senderId == currentUserId
+                    val prefix = if (isMe) "Bạn: " else if (!msg.senderName.isNullOrEmpty()) "${msg.senderName}: " else ""
+
+                    val contentDescription = when (msg.messageType?.uppercase()) {
+                        "IMAGE" -> "Đã gửi 1 hình ảnh"
+                        "VIDEO" -> "Đã gửi 1 video"
+                        "VOICE", "AUDIO" -> "Đã gửi 1 tin nhắn thoại"
+                        "FILE" -> "Đã gửi 1 tệp tài liệu"
+                        "LOCATION" -> "Đã chia sẻ 1 vị trí"
+                        else -> msg.content ?: ""
+                    }
+                    "$prefix$contentDescription"
+                }
             } else {
                 "Chưa có tin nhắn"
             }
