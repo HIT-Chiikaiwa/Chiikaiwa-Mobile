@@ -8,8 +8,8 @@ import com.example.myapplication.utils.resource.Resource
 class FriendRepository(context: Context) : BaseRepository() {
     private val api = RetrofitClient.create(context)
 
-    suspend fun searchUserByPhone(phone: String): Resource<BaseResponse<UserSearchDto>> {
-        return safeApiCall { api.searchUserByPhone(phone) }
+    suspend fun searchUsers(keyword: String): Resource<BaseResponse<List<UserSearchDto>>> {
+        return safeApiCall { api.searchUsers(keyword) }
     }
 
     suspend fun sendFriendRequest(targetUserId: String): Resource<BaseResponse<FriendActionResponse>> {

@@ -176,10 +176,10 @@ interface ApiService {
         @Part file: MultipartBody.Part
     ): Response<BaseResponse<String>>
 
-    @GET("api/v1/users/search/phone")
-    suspend fun searchUserByPhone(
-        @Query("phone") phone: String
-    ): Response<BaseResponse<UserSearchDto>>
+    @GET("api/v1/users/search")
+    suspend fun searchUsers(
+        @Query("keyword") keyword: String
+    ): Response<BaseResponse<List<UserSearchDto>>>
 
     @POST("api/v1/friends/request/{targetUserId}")
     suspend fun sendFriendRequest(

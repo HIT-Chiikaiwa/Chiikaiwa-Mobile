@@ -51,30 +51,55 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
     }
 
     private fun showNewChatDialog() {
-        val input = EditText(this).apply {
-            hint = "Nhập User ID"
-            setPadding(48, 32, 48, 32)
-        }
+        val dialog = AlertDialog.Builder(this).create()
+        val binding = com.example.myapplication.databinding.DialogSearchUserBinding.inflate(layoutInflater)
+        dialog.setView(binding.root)
 
-        AlertDialog.Builder(this)
-            .setTitle("Chat mới")
-            .setMessage("Nhập User ID của người bạn muốn nhắn tin:")
-            .setView(input)
-            .setPositiveButton("Chat") { _, _ ->
-                val userId = input.text.toString().trim()
-                if (userId.isNotEmpty()) {
-                    viewModel.startDirectChat(userId) { convId, userName ->
-                        val intent = Intent(this, ChatActivity::class.java).apply {
-                            putExtra("conversation_id", convId)
-                            putExtra("target_user_id", userId)
-                            putExtra("user_name", userName)
-                        }
-                        startActivity(intent)
+        val searchAdapter = com.example.myapplication.ui.home.chat.adapter.UserSearchAdapter(
+            onSendFriendRequest = { user ->
+                val targetId = user.id ?: return@UserSearchAdapter
+                viewModel.sendFriendRequest(targetId) {
+                    showToast("Đã gửi yêu cầu kết bạn")
+                    dialog.dismiss()
+                }
+            },
+            onStartChat = { user ->
+                val targetId = user.id ?: return@UserSearchAdapter
+                viewModel.startDirectChat(targetId) { convId, userName ->
+                    dialog.dismiss()
+                    val intent = Intent(this, ChatActivity::class.java).apply {
+                        putExtra("conversation_id", convId)
+                        putExtra("target_user_id", targetId)
+                        putExtra("user_name", userName)
                     }
+                    startActivity(intent)
                 }
             }
-            .setNegativeButton("Hủy", null)
-            .show()
+        )
+
+        binding.rvSearchResults.layoutManager = LinearLayoutManager(this)
+        binding.rvSearchResults.adapter = searchAdapter
+
+        val performSearch = {
+            val kw = binding.edtKeyword.text.toString().trim()
+            if (kw.isNotEmpty()) {
+                binding.progressBar.visibility = android.view.View.VISIBLE
+                viewModel.searchUsers(kw) { results ->
+                    binding.progressBar.visibility = android.view.View.GONE
+                    searchAdapter.submitList(results)
+                }
+            }
+        }
+
+        binding.btnSearch.setOnClickListener { performSearch() }
+        binding.edtKeyword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                performSearch()
+                true
+            } else false
+        }
+
+        dialog.show()
     }
 
     override fun onResume() {

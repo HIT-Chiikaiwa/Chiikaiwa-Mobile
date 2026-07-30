@@ -76,6 +76,35 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
+    private val friendRepository = com.example.myapplication.data.repository.FriendRepository(application)
+
+    fun searchUsers(keyword: String, onResult: (List<com.example.myapplication.data.remote.dto.response.UserSearchDto>) -> Unit) {
+        viewModelScope.launch {
+            when (val result = friendRepository.searchUsers(keyword)) {
+                is Resource.Success -> {
+                    onResult(result.data?.data ?: emptyList())
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                    onResult(emptyList())
+                }
+            }
+        }
+    }
+
+    fun sendFriendRequest(targetUserId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = friendRepository.sendFriendRequest(targetUserId)) {
+                is Resource.Success -> {
+                    onSuccess()
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
     fun searchConversations(keyword: String) {
         if (keyword.isBlank()) {
             fetchConversations()
