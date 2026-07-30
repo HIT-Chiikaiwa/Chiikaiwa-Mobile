@@ -36,6 +36,16 @@
             android:textStyle="bold" />
 
         <ImageView
+            android:id="@+id/btnPendingRequests"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_toStartOf="@id/btnNewChat"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_notification"
+            app:tint="@color/brown" />
+
+        <ImageView
             android:id="@+id/btnNewChat"
             android:layout_width="@dimen/_40sdp"
             android:layout_height="@dimen/_40sdp"

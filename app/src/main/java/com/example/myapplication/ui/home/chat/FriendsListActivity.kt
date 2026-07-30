@@ -25,6 +25,10 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             finish()
         }
 
+        binding.btnPendingRequests.setOnClickListener {
+            showPendingRequestsDialog()
+        }
+
         binding.btnNewChat.setOnClickListener {
             showNewChatDialog()
         }
@@ -99,6 +103,53 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             } else false
         }
 
+        dialog.show()
+    }
+
+    private fun showPendingRequestsDialog() {
+        val dialog = AlertDialog.Builder(this).create()
+        val binding = com.example.myapplication.databinding.DialogPendingRequestsBinding.inflate(layoutInflater)
+        dialog.setView(binding.root)
+
+        lateinit var pendingAdapter: com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter
+
+        fun loadData() {
+            binding.progressBar.visibility = android.view.View.VISIBLE
+            viewModel.getPendingFriendRequests { list ->
+                binding.progressBar.visibility = android.view.View.GONE
+                if (list.isEmpty()) {
+                    binding.tvEmptyState.visibility = android.view.View.VISIBLE
+                    binding.rvPendingRequests.visibility = android.view.View.GONE
+                } else {
+                    binding.tvEmptyState.visibility = android.view.View.GONE
+                    binding.rvPendingRequests.visibility = android.view.View.VISIBLE
+                    pendingAdapter.submitList(list)
+                }
+            }
+        }
+
+        pendingAdapter = com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter(
+            onAccept = { item ->
+                val reqId = item.requestId ?: return@PendingRequestsAdapter
+                viewModel.acceptFriendRequest(reqId) {
+                    showToast("Đã đồng ý kết bạn với ${item.lastName ?: ""} ${item.firstName ?: ""}")
+                    loadData()
+                    viewModel.fetchConversations()
+                }
+            },
+            onReject = { item ->
+                val reqId = item.requestId ?: return@PendingRequestsAdapter
+                viewModel.rejectFriendRequest(reqId) {
+                    showToast("Đã từ chối lời mời kết bạn")
+                    loadData()
+                }
+            }
+        )
+
+        binding.rvPendingRequests.layoutManager = LinearLayoutManager(this)
+        binding.rvPendingRequests.adapter = pendingAdapter
+
+        loadData()
         dialog.show()
     }
 

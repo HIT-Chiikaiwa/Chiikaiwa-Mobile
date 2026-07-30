@@ -105,6 +105,45 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
+    fun getPendingFriendRequests(onResult: (List<com.example.myapplication.data.remote.dto.response.FriendDto>) -> Unit) {
+        viewModelScope.launch {
+            when (val result = friendRepository.getPendingFriendRequests()) {
+                is Resource.Success -> {
+                    onResult(result.data?.data?.content ?: emptyList())
+                }
+                is Resource.Error -> {
+                    onResult(emptyList())
+                }
+            }
+        }
+    }
+
+    fun acceptFriendRequest(requestId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = friendRepository.acceptFriendRequest(requestId)) {
+                is Resource.Success -> {
+                    onSuccess()
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun rejectFriendRequest(requestId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = friendRepository.rejectFriendRequest(requestId)) {
+                is Resource.Success -> {
+                    onSuccess()
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
     fun searchConversations(keyword: String) {
         if (keyword.isBlank()) {
             fetchConversations()
