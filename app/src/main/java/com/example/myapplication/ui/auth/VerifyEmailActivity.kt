@@ -44,6 +44,7 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
                 }
                 is UiState.Success -> {
                     setLoading(false)
+                    viewModel.resetState()
                     startActivity(
                         Intent(this, VerifyOtpActivity::class.java).apply {
                             putExtra("email", email)

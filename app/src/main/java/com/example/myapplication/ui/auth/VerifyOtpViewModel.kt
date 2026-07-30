@@ -75,7 +75,7 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
 
             when (val result = apiCall) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Đã gửi lại mã OTP")
+                    _uiState.value = UiState.Idle
                     viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Đã gửi lại mã OTP")) }
                     startResendTimer()
                 }

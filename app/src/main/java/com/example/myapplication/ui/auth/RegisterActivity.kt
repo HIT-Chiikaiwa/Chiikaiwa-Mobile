@@ -100,9 +100,8 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
                 }
 
                 is UiState.Success -> {
-
                     setLoading(false)
-
+                    viewModel.resetState()
                     startActivity(
                         Intent(this, VerifyEmailActivity::class.java).apply {
                             putExtra("email", registeredEmail)
