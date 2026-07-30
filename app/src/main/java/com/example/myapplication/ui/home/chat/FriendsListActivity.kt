@@ -95,6 +95,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             }
         }
 
+        binding.btnBack.setOnClickListener { dialog.dismiss() }
         binding.btnSearch.setOnClickListener { performSearch() }
         binding.edtKeyword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
@@ -146,6 +147,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             }
         )
 
+        binding.btnBack.setOnClickListener { dialog.dismiss() }
         binding.rvPendingRequests.layoutManager = LinearLayoutManager(this)
         binding.rvPendingRequests.adapter = pendingAdapter
 
