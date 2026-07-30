@@ -73,6 +73,14 @@ interface ApiService {
         @Path("userId") userId: String
     ): Response<BaseResponse<CommonResponse>>
 
+    @PUT("api/v1/location/update")
+    suspend fun updateLocation(
+        @Body request: UpdateLocationRequest
+    ): Response<BaseResponse<CommonResponse>>
+
+    @DELETE("api/v1/location/remove")
+    suspend fun removeLocation(): Response<BaseResponse<CommonResponse>>
+
     @GET("api/v1/location/radar")
     suspend fun getNearbyUsers(
         @Query("lat") lat: Double,

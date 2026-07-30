@@ -67,11 +67,13 @@ class MapFragment : Fragment() {
 
         setupClickListeners()
         setupObservers()
+        viewModel.loadCurrentUserAvatar()
 
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync { map ->
             mapLibreMap = map
             mapManager = MapManager(this, map, viewModel).also { it.setup() }
+            showMyLocationOnMapOpen()
         }
     }
 
@@ -130,6 +132,31 @@ class MapFragment : Fragment() {
             requestPermissionLauncher.launch(
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION)
             )
+        }
+    }
+
+    private fun showMyLocationOnMapOpen() {
+        val hasFine = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!hasFine && !hasCoarse) return
+
+        val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        var location: Location? = null
+        try {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            }
+            if (location == null && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            }
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
+
+        location?.let {
+            currentUserLatLng = LatLng(it.latitude, it.longitude)
+            mapLibreMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 15.0))
+            mapManager?.updateMyLocationMarker(it.latitude, it.longitude)
         }
     }
 

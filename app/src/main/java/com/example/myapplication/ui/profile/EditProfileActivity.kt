@@ -138,8 +138,8 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
     private fun bindProfile(user: UserDto) {
         val fullName = "${user.lastName ?: ""} ${user.firstName ?: ""}".trim()
         binding.tvUsername.text = fullName.ifEmpty { "Chưa cập nhật" }
-        binding.tvUserId.text = "ID: ${user.id}"
-        binding.tvFriendsCount.text = "Điểm tin cậy: ${user.trustScore ?: 100.0} | Buddy: ${if (user.buddyActive == true) "Bật" else "Tắt"}"
+        binding.tvFriendsCount.text = "Điểm tin cậy: ${user.trustScore ?: 100.0}"
+        binding.tvBuddyStatus.text = "Trạng thái quét: ${if (user.buddyActive == true) "Bật" else "Tắt"}"
         binding.tvIntroduction.text = user.statusTag ?: "Chưa có giới thiệu"
 
         val ageStr = calculateAge(user.dateOfBirth)

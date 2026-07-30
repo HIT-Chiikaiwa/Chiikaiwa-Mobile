@@ -20,6 +20,10 @@ import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.maplibre.geojson.Point
 
 class MapManager(
@@ -36,9 +40,13 @@ class MapManager(
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { bitmap ->
-                val scaled = Bitmap.createScaledBitmap(bitmap, markerSize, markerSize, false)
-                style.addImage("my_marker", scaled)
-                style.addImage("my_location_marker", scaled)
+                val scaledChicken = Bitmap.createScaledBitmap(bitmap, markerSize, markerSize, false)
+                style.addImage("my_location_marker", scaledChicken)
+            }
+
+            BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground)?.let { bitmap ->
+                val defaultUserMarker = createMarkerBitmapFromLayout(bitmap)
+                style.addImage("my_marker", defaultUserMarker)
             }
 
             radarRenderer.setupRadarLayers()
@@ -80,20 +88,38 @@ class MapManager(
                 }
             }
 
+
+
             map.addOnMapClickListener { point ->
                 val screenPoint = map.projection.toScreenLocation(point)
                 val clicked = map.queryRenderedFeatures(screenPoint, "user-layer")
                 if (clicked.isNotEmpty()) {
                     val feat = clicked[0]
-                    val userId = feat.getStringProperty("id") ?: ""
-                    val name = feat.getStringProperty("name") ?: "Người dùng"
-                    val university = feat.getStringProperty("university") ?: "N/A"
-                    val major = feat.getStringProperty("major") ?: "N/A"
-                    val statusTag = feat.getStringProperty("statusTag") ?: "N/A"
-                    val distance = feat.getNumberProperty("distance")?.toDouble() ?: 0.0
+
+                    fun safeString(key: String, default: String = ""): String {
+                        val prop = feat.getProperty(key)
+                        return if (prop != null && !prop.isJsonNull && prop.isJsonPrimitive) {
+                            prop.asString
+                        } else default
+                    }
+
+                    fun safeDouble(key: String, default: Double = 0.0): Double {
+                        val prop = feat.getProperty(key)
+                        return if (prop != null && !prop.isJsonNull && prop.isJsonPrimitive) {
+                            try { prop.asDouble } catch (e: Exception) { default }
+                        } else default
+                    }
+
+                    val userId = safeString("id")
+                    val name = safeString("name", "Người dùng")
+                    val university = safeString("university", "N/A")
+                    val major = safeString("major", "N/A")
+                    val statusTag = safeString("statusTag", "N/A")
+                    val avatarUrl = safeString("avatar")
+                    val distance = safeDouble("distance", 0.0)
                     val avatar = if (userId.isNotEmpty()) viewModel.avatarBitmaps.value[userId] else null
 
-                    showUserInfoDialog(userId, name, university, major, statusTag, distance, avatar)
+                    showUserInfoDialog(userId, name, university, major, statusTag, distance, avatar, avatarUrl)
                 }
                 true
             }
@@ -164,7 +190,7 @@ class MapManager(
         if (!style.isFullyLoaded) return
         val source = style.getSourceAs<GeoJsonSource>("user-source") ?: return
 
-        val features = users.map { user ->
+        val features = users.filter { it.userId != viewModel.currentUserId }.map { user ->
             val feature = Feature.fromGeometry(Point.fromLngLat(user.longitude, user.latitude))
             feature.addStringProperty("id", user.userId)
             feature.addStringProperty("name", "${user.lastName ?: ""} ${user.firstName ?: ""}".trim())
@@ -188,7 +214,8 @@ class MapManager(
         major: String,
         statusTag: String,
         distance: Double,
-        avatarBitmap: Bitmap?
+        avatarBitmap: Bitmap?,
+        avatarUrl: String? = null
     ) {
         val dialog = BottomSheetDialog(context)
         val binding = DialogUserInfoBinding.inflate(fragment.layoutInflater)
@@ -200,7 +227,13 @@ class MapManager(
         binding.tvStatusTag.text = statusTag
         binding.tvDistance.text = context.getString(R.string.distance_format, distance)
 
-        if (avatarBitmap != null) {
+        if (!avatarUrl.isNullOrEmpty()) {
+            com.bumptech.glide.Glide.with(context)
+                .load(avatarUrl)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
+                .into(binding.ivAvatar)
+        } else if (avatarBitmap != null) {
             binding.ivAvatar.setImageBitmap(avatarBitmap)
         } else {
             binding.ivAvatar.setImageResource(R.drawable.ic_launcher_foreground)

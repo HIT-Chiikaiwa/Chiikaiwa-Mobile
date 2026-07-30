@@ -29,7 +29,12 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
         }
 
         binding.tvLogin.setOnClickListener {
-            viewModel.sendOtp(email, flow)
+            startActivity(
+                Intent(this, VerifyOtpActivity::class.java).apply {
+                    putExtra("email", email)
+                    putExtra("flow", flow)
+                }
+            )
         }
     }
 
