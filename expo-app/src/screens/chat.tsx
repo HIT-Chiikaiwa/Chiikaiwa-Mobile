@@ -56,6 +56,10 @@ function conversationIdFromTarget(target: ChatTarget, conversation: Conversation
   return target.receiverId ? undefined : target.id;
 }
 
+function maskSocketUrl(url: string) {
+  return url.replace(/token=[^&]+/, 'token=<hidden>');
+}
+
 function ChatScreen({
   session,
   currentUser,
@@ -80,7 +84,7 @@ function ChatScreen({
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listRef = useRef<FlatList<MessageResponse>>(null);
   const conversationId = conversationIdFromTarget(target, conversation);
-  const canSend = socketState === 'connected' && Boolean(session?.userId && target.receiverId);
+  const canSend = socketState === 'connected' && Boolean(session?.userId && conversationId);
 
   const connectionText = useMemo(() => {
     if (socketState === 'connecting') return 'Đang kết nối WebSocket...';
@@ -131,7 +135,7 @@ function ChatScreen({
   }, [conversationId, session?.accessToken]);
 
   useEffect(() => {
-    if (!session?.accessToken || !session.userId) {
+    if (!session?.accessToken || !session.userId || !conversationId) {
       setSocketState('disconnected');
       return undefined;
     }
@@ -167,7 +171,7 @@ function ChatScreen({
       const ws = transport.socket;
       socketRef.current = ws;
       transportRef.current = transport;
-      if (__DEV__) console.log('[chat-socket]', { event: 'connecting', mode: transport.mode, url: transport.url });
+      if (__DEV__) console.log('[chat-socket]', { event: 'connecting', mode: transport.mode, url: maskSocketUrl(transport.url) });
 
       const connectStomp = () => {
         transport.send(
@@ -215,8 +219,8 @@ function ChatScreen({
               setSocketState('connected');
               transport.send(
                 buildStompFrame('SUBSCRIBE', {
-                  id: `sub-user-${session.userId}`,
-                  destination: `/user/${session.userId}/queue/messages`,
+                  id: `sub-conversation-${conversationId}`,
+                  destination: `/topic/conversation.${conversationId}`,
                 }),
               );
               heartbeatRef.current = setInterval(() => {
@@ -228,8 +232,10 @@ function ChatScreen({
             if (frame.command === 'MESSAGE' && frame.body) {
               try {
                 const parsed = JSON.parse(frame.body) as MessageResponse;
-                setMessages((current) => mergeMessage(current, parsed));
-                requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+                if (parsed.id && parsed.conversationId) {
+                  setMessages((current) => mergeMessage(current, parsed));
+                  requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+                }
               } catch {
                 showToast('Không thể đọc tin nhắn từ WebSocket', 'error');
               }
@@ -277,13 +283,13 @@ function ChatScreen({
       socketRef.current = null;
       transportRef.current = null;
     };
-  }, [session?.accessToken, session?.userId]);
+  }, [conversationId, session?.accessToken, session?.userId]);
 
   const send = () => {
     const text = draft.trim();
     if (!text) return;
-    if (!session?.userId || !target.receiverId) {
-      showToast('Chưa xác định được người nhận tin nhắn', 'error');
+    if (!session?.userId || !conversationId) {
+      showToast('Chưa xác định được cuộc trò chuyện', 'error');
       return;
     }
     if (!canSend || socketRef.current?.readyState !== WebSocket.OPEN) {
@@ -301,13 +307,13 @@ function ChatScreen({
       messageType: 'TEXT',
       createdDate: new Date().toISOString(),
     };
-    const body = JSON.stringify({ senderId: session.userId, receiverId: target.receiverId, text });
+    const body = JSON.stringify({ conversationId, content: text, messageType: 'TEXT' });
 
     transportRef.current?.send(
       buildStompFrame(
         'SEND',
         {
-          destination: '/app/chat.sendPrivate',
+          destination: '/app/chat.send',
           'content-type': 'application/json',
         },
         body,

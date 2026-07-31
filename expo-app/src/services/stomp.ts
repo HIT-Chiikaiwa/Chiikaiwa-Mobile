@@ -28,11 +28,16 @@ type ReactNativeWebSocketConstructor = new (
   options?: { headers?: StompHeaders },
 ) => WebSocket;
 
-function sockJsWebSocketUrl(url: string) {
+function withTokenQuery(url: string, token: string) {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}token=${encodeURIComponent(token)}`;
+}
+
+function sockJsWebSocketUrl(url: string, token: string) {
   const cleanUrl = url.replace(/\/$/, '').replace(/\/websocket$/, '');
   const serverId = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
   const sessionId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
-  return `${cleanUrl}/${serverId}/${sessionId}/websocket`;
+  return withTokenQuery(`${cleanUrl}/${serverId}/${sessionId}/websocket`, token);
 }
 
 export function createAuthorizedWebSocket(url: string, token: string): WebSocket {
@@ -45,7 +50,9 @@ export function createAuthorizedWebSocket(url: string, token: string): WebSocket
 }
 
 export function createStompTransport(endpoint: StompEndpoint, token: string): StompTransport {
-  const transportUrl = endpoint.mode === 'sockjs' ? sockJsWebSocketUrl(endpoint.url) : endpoint.url;
+  const transportUrl = endpoint.mode === 'sockjs'
+    ? sockJsWebSocketUrl(endpoint.url, token)
+    : withTokenQuery(endpoint.url, token);
   const socket = createAuthorizedWebSocket(transportUrl, token);
   const send = endpoint.mode === 'sockjs'
     ? (frame: string) => socket.send(JSON.stringify([frame]))

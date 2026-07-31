@@ -1,0 +1,2 @@
+- [x] Set `org.gradle.java.home` in `gradle.properties`
+- [x] Verify fix with `gradle_sync`
