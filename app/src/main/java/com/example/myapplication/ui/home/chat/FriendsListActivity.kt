@@ -3,11 +3,15 @@ package com.example.myapplication.ui.home.chat
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.EditText
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupWindow
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityFriendsListBinding
+import com.example.myapplication.databinding.DialogFriendOptionsBinding
+import com.example.myapplication.databinding.LayoutFriendsMenuPopupBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.FriendsAdapter
@@ -25,22 +29,23 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             finish()
         }
 
-        binding.btnPendingRequests.setOnClickListener {
-            showPendingRequestsDialog()
+        binding.btnHeaderMenu.setOnClickListener { view ->
+            showHeaderMenuPopup(view)
         }
 
-        binding.btnNewChat.setOnClickListener {
-            showNewChatDialog()
-        }
-
-        adapter = FriendsAdapter { conversation ->
-            val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
-            val intent = Intent(this, ChatActivity::class.java).apply {
-                putExtra("conversation_id", conversation.id)
-                putExtra("user_name", name)
+        adapter = FriendsAdapter(
+            onItemClick = { conversation ->
+                val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
+                val intent = Intent(this, ChatActivity::class.java).apply {
+                    putExtra("conversation_id", conversation.id)
+                    putExtra("user_name", name)
+                }
+                startActivity(intent)
+            },
+            onMoreClick = { conversation, _ ->
+                showFriendOptionsDialog(conversation)
             }
-            startActivity(intent)
-        }
+        )
 
         binding.rvFriendsList.layoutManager = LinearLayoutManager(this)
         binding.rvFriendsList.adapter = adapter
@@ -52,6 +57,67 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    private fun showHeaderMenuPopup(anchorView: View) {
+        val popupBinding = LayoutFriendsMenuPopupBinding.inflate(layoutInflater)
+        val popupWindow = PopupWindow(
+            popupBinding.root,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popupWindow.elevation = 16f
+
+        popupBinding.btnMenuNewChat.setOnClickListener {
+            popupWindow.dismiss()
+            showNewChatDialog()
+        }
+
+        popupBinding.btnMenuPendingRequests.setOnClickListener {
+            popupWindow.dismiss()
+            showPendingRequestsDialog()
+        }
+
+        popupWindow.showAsDropDown(anchorView, -150, 0)
+    }
+
+    private fun showFriendOptionsDialog(conversation: com.example.myapplication.data.remote.dto.response.ConversationResponse) {
+        val dialog = AlertDialog.Builder(this).create()
+        val binding = DialogFriendOptionsBinding.inflate(layoutInflater)
+        dialog.setView(binding.root)
+
+        val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
+        binding.layoutFriendItemPreview.tvFriendName.text = name
+        binding.layoutFriendItemPreview.tvLastMessage.text = conversation.lastMessage?.content ?: "Chưa có tin nhắn"
+        binding.layoutFriendItemPreview.btnMore.visibility = View.GONE
+
+        binding.tvOptionPin.setOnClickListener {
+            showToast("Đã ghim cuộc hội thoại")
+            dialog.dismiss()
+        }
+
+        binding.tvOptionCreateGroup.setOnClickListener {
+            showToast("Tính năng tạo nhóm đang phát triển")
+            dialog.dismiss()
+        }
+
+        binding.tvOptionViewProfile.setOnClickListener {
+            showToast("Trang cá nhân của $name")
+            dialog.dismiss()
+        }
+
+        binding.tvOptionBlock.setOnClickListener {
+            showToast("Đã chặn $name")
+            dialog.dismiss()
+        }
+
+        binding.tvOptionDelete.setOnClickListener {
+            showToast("Đã xóa cuộc trò chuyện")
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showNewChatDialog() {
@@ -87,9 +153,9 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         val performSearch = {
             val kw = binding.edtKeyword.text.toString().trim()
             if (kw.isNotEmpty()) {
-                binding.progressBar.visibility = android.view.View.VISIBLE
+                binding.progressBar.visibility = View.VISIBLE
                 viewModel.searchUsers(kw) { results ->
-                    binding.progressBar.visibility = android.view.View.GONE
+                    binding.progressBar.visibility = View.GONE
                     searchAdapter.submitList(results)
                 }
             }
@@ -115,15 +181,15 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         lateinit var pendingAdapter: com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter
 
         fun loadData() {
-            binding.progressBar.visibility = android.view.View.VISIBLE
+            binding.progressBar.visibility = View.VISIBLE
             viewModel.getPendingFriendRequests { list ->
-                binding.progressBar.visibility = android.view.View.GONE
+                binding.progressBar.visibility = View.GONE
                 if (list.isEmpty()) {
-                    binding.tvEmptyState.visibility = android.view.View.VISIBLE
-                    binding.rvPendingRequests.visibility = android.view.View.GONE
+                    binding.tvEmptyState.visibility = View.VISIBLE
+                    binding.rvPendingRequests.visibility = View.GONE
                 } else {
-                    binding.tvEmptyState.visibility = android.view.View.GONE
-                    binding.rvPendingRequests.visibility = android.view.View.VISIBLE
+                    binding.tvEmptyState.visibility = View.GONE
+                    binding.rvPendingRequests.visibility = View.VISIBLE
                     pendingAdapter.submitList(list)
                 }
             }

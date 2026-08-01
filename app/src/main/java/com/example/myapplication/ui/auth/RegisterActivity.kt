@@ -29,7 +29,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
 
     override fun initView() {
 
-        binding.ivBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             finish()
         }
 

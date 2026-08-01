@@ -11,7 +11,7 @@ class InputEmailActivity : BaseActivity<ActivityInputEmailBinding>() {
     private var email = ""
 
     override fun initView() {
-        binding.ivBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             finish()
         }
 

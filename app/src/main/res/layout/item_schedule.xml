@@ -9,11 +9,11 @@
     <!-- Item Icon (Cute Yellow Bean / Avatar) -->
     <ImageView
         android:id="@+id/imgItemIcon"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:scaleType="centerCrop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
         android:src="@drawable/ic_schedule_bean"
-        app:layout_bottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

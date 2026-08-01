@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.home.chat.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,7 +12,8 @@ import com.example.myapplication.data.remote.dto.response.ConversationResponse
 import com.example.myapplication.databinding.ItemFriendBinding
 
 class FriendsAdapter(
-    private val onItemClick: (ConversationResponse) -> Unit
+    private val onItemClick: (ConversationResponse) -> Unit,
+    private val onMoreClick: ((ConversationResponse, View) -> Unit)? = null
 ) : ListAdapter<ConversationResponse, FriendsAdapter.FriendViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendViewHolder {
@@ -72,6 +74,10 @@ class FriendsAdapter(
 
             binding.root.setOnClickListener {
                 onItemClick(item)
+            }
+
+            binding.btnMore.setOnClickListener { v ->
+                onMoreClick?.invoke(item, v)
             }
         }
     }

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/_15sdp"
     android:layout_marginVertical="@dimen/_5sdp"
     android:background="@drawable/bg_card_retro"
     android:padding="@dimen/_10sdp">
@@ -69,12 +68,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_4sdp"
-        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_5sdp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/brown"
         android:textSize="@dimen/_12ssp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnMore"
         app:layout_constraintStart_toEndOf="@id/layoutAvatar"
         app:layout_constraintTop_toBottomOf="@id/tvFriendName"
         tools:text="Phong: oke c." />
@@ -88,5 +87,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tvFriendName"
         tools:text="21:26" />
+
+    <ImageView
+        android:id="@+id/btnMore"
+        android:layout_width="@dimen/_24sdp"
+        android:layout_height="@dimen/_24sdp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/_3sdp"
+        android:src="@drawable/ic_more_vert"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTime"
+        app:tint="@color/brown" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
