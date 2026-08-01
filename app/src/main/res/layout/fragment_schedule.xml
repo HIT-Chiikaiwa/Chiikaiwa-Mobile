@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FEF9E7">
+
+    <!-- Top Yellow Header Bar -->
+    <View
+        android:id="@+id/headerBg"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#FDE047"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Back Button -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:src="@drawable/ic_arrow_back"
+        app:layout_bottom_toBottomOf="@id/headerBg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/headerBg"
+        app:tint="#653B2A" />
+
+    <!-- Screen Title -->
+    <TextView
+        android:id="@+id/tvScreenTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Thời gian biểu"
+        android:textColor="#653B2A"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_bottom_toBottomOf="@id/headerBg"
+        app:layout_constraintStart_toEndOf="@id/btnBack"
+        app:layout_constraintTop_toTopOf="@id/headerBg" />
+
+    <!-- Mascot Banner Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mascotContainer"
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        app:layout_constraintTop_toBottomOf="@id/headerBg">
+
+        <!-- Speech Bubble -->
+        <TextView
+            android:id="@+id/tvSpeechBubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="140dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_speech_bubble"
+            android:elevation="2dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:text="Hãy tạo thời gian biểu\ncủa mình!"
+            android:textColor="#784433"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Mascot Illustration -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgMascot"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginStart="45dp"
+            android:elevation="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_schedule_mascot"
+            app:layout_bottom_toBottomOf="@id/viewShelf"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Brown Shelf Line -->
+        <View
+            android:id="@+id/viewShelf"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="#8D5B4C"
+            app:layout_bottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Main Notebook Container Area -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/notebookContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp"
+        app:layout_bottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mascotContainer">
+
+        <!-- 3D Shadow block behind notebook -->
+        <View
+            android:id="@+id/viewNotebookShadow"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="42dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/bg_notebook_shadow"
+            app:layout_bottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Main Notebook Paper Card -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutNotebookPaper"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_notebook_paper"
+            android:elevation="4dp"
+            android:paddingStart="24dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            app:layout_bottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Month/Year Header -->
+            <TextView
+                android:id="@+id/tvMonthYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF6B52"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Tháng 7, 2026" />
+
+            <!-- Schedule Items List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvScheduleList"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_bottom_toTopOf="@id/btnCreateSchedule"
+                app:layout_constraintTop_toBottomOf="@id/tvMonthYear"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_schedule" />
+
+            <!-- Add Schedule Button [+] -->
+            <FrameLayout
+                android:id="@+id/btnCreateSchedule"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_btn_add_schedule"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:layout_bottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_plus"
+                    app:tint="#784433" />
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Binder Spiral Rings on Left Edge -->
+        <LinearLayout
+            android:id="@+id/layoutSpiralRings"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            app:layout_bottom_toBottomOf="@id/layoutNotebookPaper"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/layoutNotebookPaper">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:src="@drawable/bg_spiral_ring" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:src="@drawable/bg_spiral_ring" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:src="@drawable/bg_spiral_ring" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:src="@drawable/bg_spiral_ring" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:src="@drawable/bg_spiral_ring" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:src="@drawable/bg_spiral_ring" />
+        </LinearLayout>
+
+        <!-- Right Side Day Tabs (Planner tabs) -->
+        <LinearLayout
+            android:id="@+id/layoutDayTabs"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="6dp"
+            android:orientation="vertical"
+            app:layout_bottom_toBottomOf="@id/layoutNotebookPaper"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/layoutNotebookPaper">
+
+            <!-- Arrow Up ^ -->
+            <TextView
+                android:id="@+id/btnWeekPrev"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/bg_arrow_button"
+                android:gravity="center"
+                android:text="^"
+                android:textColor="#784433"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Day Tabs (Monday - Sunday) -->
+            <TextView
+                android:id="@+id/tabMon"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_selected"
+                android:gravity="center"
+                android:text="Hai"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabTue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:text="Ba"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabWed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:text="Tư"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabThu"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:text="Năm"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabFri"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:text="Sáu"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabSat"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:text="Bảy"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tabSun"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tab_unselected"
+                android:gravity="center"
+                android:text="CN"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Arrow Down v -->
+            <TextView
+                android:id="@+id/btnWeekNext"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_arrow_button"
+                android:gravity="center"
+                android:text="v"
+                android:textColor="#784433"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Date Tag Pill floating next to active tab (e.g. 13/7) -->
+        <TextView
+            android:id="@+id/tvDateTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="-6dp"
+            android:background="@drawable/bg_date_tag"
+            android:elevation="10dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_bottom_toBottomOf="@id/tabMon"
+            app:layout_constraintEnd_toStartOf="@id/layoutDayTabs"
+            app:layout_constraintTop_toTopOf="@id/tabMon"
+            tools:text="13/7" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
