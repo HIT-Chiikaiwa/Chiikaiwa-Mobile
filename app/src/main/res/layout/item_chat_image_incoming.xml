@@ -33,7 +33,7 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardImage"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8sdp"
         android:layout_marginEnd="@dimen/_30sdp"
@@ -47,7 +47,7 @@
         <ImageView
             android:id="@+id/ivImageContent"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 

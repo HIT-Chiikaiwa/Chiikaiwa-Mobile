@@ -29,11 +29,16 @@ class FriendsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ConversationResponse) {
-            val name = item.groupName ?: item.lastMessage?.senderName ?: "Người dùng"
-            binding.tvFriendName.text = name
-
             val context = binding.root.context
             val currentUserId = com.example.myapplication.data.local.PreferenceManager(context).getUserId()
+
+            val name = when {
+                !item.groupName.isNullOrEmpty() -> item.groupName
+                item.memberCount == 1 -> "Tôi (Ghi chú cá nhân)"
+                item.lastMessage != null && item.lastMessage.senderId != currentUserId && !item.lastMessage.senderName.isNullOrEmpty() -> item.lastMessage.senderName
+                else -> "Người dùng"
+            }
+            binding.tvFriendName.text = name
 
             val lastMsgText = if (item.lastMessage != null) {
                 val msg = item.lastMessage
@@ -60,7 +65,7 @@ class FriendsAdapter(
 
             binding.tvTime.text = com.example.myapplication.utils.TimeUtils.formatChatTime(item.lastMessage?.createdDate)
 
-            val avatarUrl = item.groupAvatar ?: item.lastMessage?.senderAvatar
+            val avatarUrl = item.groupAvatar ?: if (item.lastMessage?.senderId != currentUserId) item.lastMessage?.senderAvatar else null
 
             if (!avatarUrl.isNullOrEmpty()) {
                 Glide.with(binding.root.context)
