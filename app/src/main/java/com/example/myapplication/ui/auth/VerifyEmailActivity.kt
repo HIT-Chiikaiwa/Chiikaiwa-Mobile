@@ -29,12 +29,17 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
         }
 
         binding.tvLogin.setOnClickListener {
-            viewModel.sendOtp(email, flow)
+            startActivity(
+                Intent(this, VerifyOtpActivity::class.java).apply {
+                    putExtra("email", email)
+                    putExtra("flow", flow)
+                }
+            )
         }
     }
 
     override fun observeData() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.uiState.observeState { state ->
             when (state) {
                 UiState.Idle -> {
                     setLoading(false)
@@ -44,6 +49,7 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
                 }
                 is UiState.Success -> {
                     setLoading(false)
+                    viewModel.resetState()
                     startActivity(
                         Intent(this, VerifyOtpActivity::class.java).apply {
                             putExtra("email", email)
@@ -58,7 +64,7 @@ class VerifyEmailActivity : BaseActivity<ActivityVerifyEmailBinding>() {
             }
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observeEvent { event ->
             when (event) {
                 is UiEvent.ShowToast -> {
                     showToast(event.message)

@@ -32,7 +32,7 @@
             android:layout_marginTop="@dimen/_5sdp"
             android:contentDescription="@string/back"
             android:padding="@dimen/_12sdp"
-            android:src="@drawable/arrow_back" />
+            android:src="@drawable/ic_arrow_back" />
 
     </FrameLayout>
 
@@ -205,7 +205,7 @@
                             android:layout_gravity="end|center_vertical"
                             android:layout_marginEnd="@dimen/_5sdp"
                             android:padding="@dimen/_10sdp"
-                            android:src="@drawable/schedule"
+                            android:src="@drawable/ic_schedule"
                             app:tint="@color/brown" />
                     </FrameLayout>
                 </LinearLayout>

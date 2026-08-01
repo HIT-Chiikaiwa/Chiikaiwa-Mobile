@@ -47,7 +47,7 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
     }
 
     override fun observeData() {
-        viewModel.uiState.observe(this) { state ->
+        viewModel.uiState.observeState { state ->
 
             when (state) {
 
@@ -85,7 +85,7 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
             }
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observeEvent { event ->
 
             when (event) {
 
@@ -104,7 +104,7 @@ class VerifyOtpActivity : BaseActivity<ActivityVerifyOtpBinding>() {
             }
         }
 
-        viewModel.resendCooldown.observe(this) { cooldown ->
+        viewModel.resendCooldown.observeState { cooldown ->
             updateResendButton(cooldown)
         }
     }

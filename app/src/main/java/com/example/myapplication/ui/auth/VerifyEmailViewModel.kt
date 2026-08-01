@@ -6,7 +6,7 @@ import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class VerifyEmailViewModel(application: Application) : BaseViewModel<String>(application) {
@@ -31,7 +31,7 @@ class VerifyEmailViewModel(application: Application) : BaseViewModel<String>(app
             when (val result = apiCall) {
                 is Resource.Success -> {
                     _uiState.value = UiState.Success(result.data?.data?.message ?: "Gửi mã OTP thành công")
-                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Gửi mã OTP thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Gửi mã OTP thành công")) }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)

@@ -6,7 +6,7 @@ import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class ForgotPasswordViewModel(application: Application) : BaseViewModel<String>(application) {
@@ -39,7 +39,7 @@ class ForgotPasswordViewModel(application: Application) : BaseViewModel<String>(
             when (val result = repository.resetPassword(email, pass, confirmPass)) {
                 is Resource.Success -> {
                     _uiState.value = UiState.Success(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")
-                    _event.value = UiEvent.ShowToast(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")) }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)

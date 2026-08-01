@@ -22,6 +22,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             return
         }
 
+        val token = preferenceManager.getAccessToken() ?: ""
+        if (token.isNotEmpty()) {
+            com.example.myapplication.data.remote.websocket.WebSocketManager.connect(
+                "${com.example.myapplication.data.remote.network.NetworkConstants.WS_URL}?token=$token",
+                token
+            )
+        }
+
         supportFragmentManager.beginTransaction()
             .replace(binding.fragmentContainer.id, MapFragment())
             .commit()

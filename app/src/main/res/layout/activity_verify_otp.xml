@@ -34,7 +34,7 @@
             android:layout_marginTop="@dimen/_5sdp"
             android:contentDescription="@string/back"
             android:padding="@dimen/_12sdp"
-            android:src="@drawable/arrow_back" />
+            android:src="@drawable/ic_arrow_back" />
     </FrameLayout>
 
     <ScrollView

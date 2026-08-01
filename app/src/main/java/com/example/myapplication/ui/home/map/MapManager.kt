@@ -1,20 +1,29 @@
 package com.example.myapplication.ui.home.map
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import com.example.myapplication.R
-import com.example.myapplication.data.model.response.NearbyUserResponse
+import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
 import com.example.myapplication.databinding.DialogUserInfoBinding
+import com.example.myapplication.ui.home.chat.chatroom.ChatActivity
+import com.example.myapplication.utils.extension.observeState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.maplibre.geojson.Point
 
 class MapManager(
@@ -23,23 +32,21 @@ class MapManager(
     private val viewModel: MapViewModel
 ) {
     private val context = fragment.requireContext()
-    private val defaultLatLng = LatLng(21.028511, 105.804817)
-    private val roundedAvatarsCache = mutableMapOf<String, Bitmap>()
+    private val avatarBitmapCache = HashMap<String, Bitmap>()
     private val radarRenderer = RadarRenderer(map)
+    private val markerSize by lazy { context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._24sdp) }
 
     fun setup() {
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { bitmap ->
-                val markerSize = context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
-                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, markerSize, markerSize, false)
-                style.addImage("my_marker", scaledBitmap)
+                val scaledChicken = Bitmap.createScaledBitmap(bitmap, markerSize, markerSize, false)
+                style.addImage("my_location_marker", scaledChicken)
             }
 
-            BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { myLocationBitmap ->
-                val myLocationSize = context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
-                val scaledBitmap = Bitmap.createScaledBitmap(myLocationBitmap, myLocationSize, myLocationSize, false)
-                style.addImage("my_location_marker", scaledBitmap)
+            BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground)?.let { bitmap ->
+                val defaultUserMarker = createMarkerBitmapFromLayout(bitmap)
+                style.addImage("my_marker", defaultUserMarker)
             }
 
             radarRenderer.setupRadarLayers()
@@ -47,151 +54,203 @@ class MapManager(
             style.addSource(GeoJsonSource("user-source", FeatureCollection.fromFeatures(emptyList())))
             style.addLayer(
                 SymbolLayer("user-layer", "user-source").withProperties(
-                    org.maplibre.android.style.layers.PropertyFactory.iconImage("{avatar_id}"),
-                    org.maplibre.android.style.layers.PropertyFactory.iconAllowOverlap(true)
+                    PropertyFactory.iconImage("{avatar_id}"),
+                    PropertyFactory.iconAllowOverlap(true)
                 )
             )
 
             style.addSource(GeoJsonSource("my-location-source", FeatureCollection.fromFeatures(emptyList())))
             style.addLayer(
                 SymbolLayer("my-location-layer", "my-location-source").withProperties(
-                    org.maplibre.android.style.layers.PropertyFactory.iconImage("my_location_marker"),
-                    org.maplibre.android.style.layers.PropertyFactory.iconAllowOverlap(true)
+                    PropertyFactory.iconImage("my_location_marker"),
+                    PropertyFactory.iconAllowOverlap(true)
                 )
             )
 
-            viewModel.nearbyUsers.observe(fragment.viewLifecycleOwner) { users ->
+            fragment.observeState(viewModel.nearbyUsers) { users ->
                 updateUserMarkers(users)
             }
 
-            viewModel.avatarBitmaps.observe(fragment.viewLifecycleOwner) { bitmaps ->
+            fragment.observeState(viewModel.avatarBitmaps) { bitmaps ->
                 var needsUpdate = false
                 bitmaps.forEach { (userId, bitmap) ->
-                    val avatarImageId = "avatar_$userId"
-                    if (style.getImage(avatarImageId) == null) {
-                        val roundedBitmap = roundedAvatarsCache.getOrPut(userId) {
+                    val imageId = "avatar_$userId"
+                    if (style.getImage(imageId) == null) {
+                        val avatarMarker = avatarBitmapCache.getOrPut(userId) {
                             createMarkerBitmapFromLayout(bitmap)
                         }
-                        style.addImage(avatarImageId, roundedBitmap)
+                        style.addImage(imageId, avatarMarker)
                         needsUpdate = true
                     }
                 }
                 if (needsUpdate) {
-                    viewModel.nearbyUsers.value?.let { users ->
-                        updateUserMarkers(users)
-                    }
+                    viewModel.nearbyUsers.value?.let { updateUserMarkers(it) }
                 }
             }
 
+
+
             map.addOnMapClickListener { point ->
                 val screenPoint = map.projection.toScreenLocation(point)
-                val clickedFeatures = map.queryRenderedFeatures(screenPoint, "user-layer")
-                if (clickedFeatures.isNotEmpty()) {
-                    val feature = clickedFeatures[0]
-                    val name = feature.getStringProperty("name")
-                    val university = feature.getStringProperty("university") ?: "N/A"
-                    val major = feature.getStringProperty("major") ?: "N/A"
-                    val statusTag = feature.getStringProperty("statusTag") ?: "N/A"
-                    val distance = feature.getNumberProperty("distance")?.toDouble() ?: 0.0
-                    val userId = feature.getStringProperty("id")
-                    val avatarBitmap = userId?.let { viewModel.avatarBitmaps.value?.get(it) }
+                val clicked = map.queryRenderedFeatures(screenPoint, "user-layer")
+                if (clicked.isNotEmpty()) {
+                    val feat = clicked[0]
 
-                    showUserInfoDialog(name, university, major, statusTag, distance, avatarBitmap)
+                    fun safeString(key: String, default: String = ""): String {
+                        val prop = feat.getProperty(key)
+                        return if (prop != null && !prop.isJsonNull && prop.isJsonPrimitive) {
+                            prop.asString
+                        } else default
+                    }
+
+                    fun safeDouble(key: String, default: Double = 0.0): Double {
+                        val prop = feat.getProperty(key)
+                        return if (prop != null && !prop.isJsonNull && prop.isJsonPrimitive) {
+                            try { prop.asDouble } catch (e: Exception) { default }
+                        } else default
+                    }
+
+                    val userId = safeString("id")
+                    val name = safeString("name", "Người dùng")
+                    val university = safeString("university", "N/A")
+                    val major = safeString("major", "N/A")
+                    val statusTag = safeString("statusTag", "N/A")
+                    val avatarUrl = safeString("avatar")
+                    val distance = safeDouble("distance", 0.0)
+                    val avatar = if (userId.isNotEmpty()) viewModel.avatarBitmaps.value[userId] else null
+
+                    showUserInfoDialog(userId, name, university, major, statusTag, distance, avatar, avatarUrl)
                 }
                 true
             }
 
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLng, 15.0))
-        }
-    }
-
-    fun startRadar(center: LatLng) {
-        radarRenderer.startRadar(center)
-    }
-
-    fun stopRadar() {
-        radarRenderer.stopRadar()
-    }
-
-    fun clearCache() {
-        roundedAvatarsCache.clear()
-        radarRenderer.stopRadar()
-    }
-
-    fun updateMyLocationMarker(latitude: Double, longitude: Double) {
-        val mapStyle = map.style
-        if (mapStyle != null && mapStyle.isFullyLoaded) {
-            val source = mapStyle.getSourceAs<GeoJsonSource>("my-location-source")
-            if (source != null) {
-                val pointFeature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude))
-                source.setGeoJson(FeatureCollection.fromFeatures(listOf(pointFeature)))
+            fragment.currentUserLatLng?.let { location ->
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0))
             }
         }
     }
 
+    fun startRadar(center: LatLng) = radarRenderer.startRadar(center)
+
+    fun stopRadar() = radarRenderer.stopRadar()
+
+    fun clearCache() {
+        avatarBitmapCache.clear()
+        radarRenderer.stopRadar()
+    }
+
+    fun updateMyLocationMarker(latitude: Double, longitude: Double) {
+        val style = map.style ?: return
+        if (!style.isFullyLoaded) return
+        val source = style.getSourceAs<GeoJsonSource>("my-location-source") ?: return
+        source.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))))
+    }
+
     private fun createMarkerBitmapFromLayout(srcBitmap: Bitmap): Bitmap {
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_marker_avatar, null)
+        val view = LayoutInflater.from(context).inflate(R.layout.layout_avatar, null)
         val ivAvatar = view.findViewById<android.widget.ImageView>(R.id.ivAvatar)
-        ivAvatar.setImageBitmap(srcBitmap)
+        
+        val roundedBitmap = getRoundedCornerBitmap(srcBitmap, 24f)
+        ivAvatar.setImageBitmap(roundedBitmap)
 
-        val size = context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._48sdp)
         view.measure(
-            View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
+            View.MeasureSpec.makeMeasureSpec(markerSize, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(markerSize, View.MeasureSpec.EXACTLY)
         )
-        view.layout(0, 0, size, size)
+        view.layout(0, 0, markerSize, markerSize)
 
-        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val output = Bitmap.createBitmap(markerSize, markerSize, Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(output)
         view.draw(canvas)
+        return output
+    }
+
+    private fun getRoundedCornerBitmap(bitmap: Bitmap, pixels: Float): Bitmap {
+        val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(output)
+        val color = -0xbdbdbe
+        val paint = android.graphics.Paint()
+        val rect = android.graphics.Rect(0, 0, bitmap.width, bitmap.height)
+        val rectF = android.graphics.RectF(rect)
+        val roundPx = pixels
+
+        paint.isAntiAlias = true
+        canvas.drawARGB(0, 0, 0, 0)
+        paint.color = color
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
+
+        paint.xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(bitmap, rect, rect, paint)
 
         return output
     }
 
     private fun updateUserMarkers(users: List<NearbyUserResponse>) {
-        val mapStyle = map.style ?: return
-        if (!mapStyle.isFullyLoaded) return
-        val geoJsonSource = mapStyle.getSourceAs<GeoJsonSource>("user-source") ?: return
+        val style = map.style ?: return
+        if (!style.isFullyLoaded) return
+        val source = style.getSourceAs<GeoJsonSource>("user-source") ?: return
 
-        val features = users.map { user ->
+        val features = users.filter { it.userId != viewModel.currentUserId }.map { user ->
             val feature = Feature.fromGeometry(Point.fromLngLat(user.longitude, user.latitude))
             feature.addStringProperty("id", user.userId)
-            feature.addStringProperty("name", "${user.lastName} ${user.firstName}".trim())
+            feature.addStringProperty("name", "${user.lastName ?: ""} ${user.firstName ?: ""}".trim())
             feature.addStringProperty("avatar", user.avatar)
             feature.addStringProperty("university", user.university)
             feature.addStringProperty("major", user.majorName)
             feature.addStringProperty("statusTag", user.statusTag)
             feature.addNumberProperty("distance", user.distanceKm)
 
-            val avatarImageId = "avatar_${user.userId}"
-            if (mapStyle.getImage(avatarImageId) != null) {
-                feature.addStringProperty("avatar_id", avatarImageId)
-            } else {
-                feature.addStringProperty("avatar_id", "my_marker")
-            }
+            val avatarId = "avatar_${user.userId}"
+            feature.addStringProperty("avatar_id", if (style.getImage(avatarId) != null) avatarId else "my_marker")
             feature
         }
-        geoJsonSource.setGeoJson(FeatureCollection.fromFeatures(features))
+        source.setGeoJson(FeatureCollection.fromFeatures(features))
     }
 
-    private fun showUserInfoDialog(name: String, university: String, major: String, statusTag: String, distance: Double, avatarBitmap: Bitmap?) {
+    private fun showUserInfoDialog(
+        userId: String,
+        name: String,
+        university: String,
+        major: String,
+        statusTag: String,
+        distance: Double,
+        avatarBitmap: Bitmap?,
+        avatarUrl: String? = null
+    ) {
         val dialog = BottomSheetDialog(context)
-        val dialogBinding = DialogUserInfoBinding.inflate(fragment.layoutInflater)
-        dialog.setContentView(dialogBinding.root)
+        val binding = DialogUserInfoBinding.inflate(fragment.layoutInflater)
+        dialog.setContentView(binding.root)
 
-        dialogBinding.tvUserName.text = name
-        dialogBinding.tvSchool.text = university
-        dialogBinding.tvMajor.text = major
-        dialogBinding.tvStatusTag.text = statusTag
-        dialogBinding.tvDistance.text = context.getString(R.string.distance_format, distance)
-        if (avatarBitmap != null) {
-            dialogBinding.ivAvatar.setImageBitmap(avatarBitmap)
+        binding.tvUserName.text = name
+        binding.tvSchool.text = university
+        binding.tvMajor.text = major
+        binding.tvStatusTag.text = statusTag
+        binding.tvDistance.text = context.getString(R.string.distance_format, distance)
+
+        if (!avatarUrl.isNullOrEmpty()) {
+            com.bumptech.glide.Glide.with(context)
+                .load(avatarUrl)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
+                .into(binding.ivAvatar)
+        } else if (avatarBitmap != null) {
+            binding.ivAvatar.setImageBitmap(avatarBitmap)
         } else {
-            dialogBinding.ivAvatar.setImageResource(R.drawable.ic_launcher_foreground)
+            binding.ivAvatar.setImageResource(R.drawable.ic_launcher_foreground)
         }
 
-        dialogBinding.btnSendMessage.setOnClickListener {
-            dialog.dismiss()
+        if (userId == viewModel.currentUserId) {
+            binding.btnSendMessage.visibility = View.GONE
+        } else {
+            binding.btnSendMessage.visibility = View.VISIBLE
+            binding.btnSendMessage.setOnClickListener {
+                dialog.dismiss()
+                val intent = Intent(context, ChatActivity::class.java).apply {
+                    putExtra("target_user_id", userId)
+                    putExtra("user_name", name)
+                }
+                context.startActivity(intent)
+            }
         }
 
         dialog.show()

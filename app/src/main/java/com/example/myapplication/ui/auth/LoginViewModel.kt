@@ -7,7 +7,7 @@ import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : BaseViewModel<Unit>(application) {
@@ -47,8 +47,8 @@ class LoginViewModel(application: Application) : BaseViewModel<Unit>(application
 
                         _uiState.value = UiState.Success(Unit)
 
-                        _event.value = UiEvent.ShowToast("Đăng nhập thành công")
-                        _event.value = UiEvent.NavigateHome
+                        viewModelScope.launch { _event.emit(UiEvent.ShowToast("Đăng nhập thành công")) }
+                        viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
                     }
                 }
 

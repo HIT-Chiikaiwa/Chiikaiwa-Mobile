@@ -1,18 +1,18 @@
 package com.example.myapplication.ui.profile
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
-import com.example.myapplication.data.model.request.*
-import com.example.myapplication.data.model.response.UserDto
-import com.example.myapplication.data.model.response.SubjectDto
+import com.example.myapplication.data.remote.dto.request.*
+import com.example.myapplication.data.remote.dto.response.UserDto
+import com.example.myapplication.data.remote.dto.response.SubjectDto
 import com.example.myapplication.data.repository.ProfileRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.utils.Resource
+import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(application) {
@@ -20,8 +20,8 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     private val repository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
-    private val _subjects = MutableLiveData<List<SubjectDto>>(emptyList())
-    val subjects: LiveData<List<SubjectDto>> get() = _subjects
+    private val _subjects = MutableStateFlow<List<SubjectDto>>(emptyList())
+    val subjects: StateFlow<List<SubjectDto>> get() = _subjects
 
     fun getUserId(): String? = preferenceManager.getUserId()
 
@@ -42,6 +42,24 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         }
     }
 
+    fun uploadAvatar(imageFile: java.io.File) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.uploadAvatar(userId, imageFile)) {
+                is Resource.Success -> {
+                    val updatedUser = result.data.data
+                    _uiState.value = UiState.Success(updatedUser)
+                    _event.emit(UiEvent.ShowToast("Cập nhật ảnh đại diện thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                    _event.emit(UiEvent.ShowToast("Lỗi cập nhật ảnh: ${result.message}"))
+                }
+            }
+        }
+    }
+
     fun toggleBuddyStatus(buddyActive: Boolean) {
         val userId = getUserId() ?: return
         viewModelScope.launch {
@@ -50,7 +68,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                 is Resource.Success -> {
                     val user = result.data.data
                     _uiState.value = UiState.Success(user)
-                    _event.value = UiEvent.ShowToast("Cập nhật trạng thái Buddy thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Cập nhật trạng thái Buddy thành công")) }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
@@ -66,8 +84,8 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
             when (val result = repository.deleteAccount(userId)) {
                 is Resource.Success -> {
                     preferenceManager.logout()
-                    _event.value = UiEvent.ShowToast("Xoá tài khoản thành công")
-                    _event.value = UiEvent.NavigateHome
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Xoá tài khoản thành công")) }
+                    viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
@@ -84,7 +102,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                     _subjects.value = result.data.data ?: emptyList()
                 }
                 is Resource.Error -> {
-                    _event.value = UiEvent.ShowToast("Không thể tải danh sách môn học: ${result.message}")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Không thể tải danh sách môn học: ${result.message}")) }
                 }
             }
         }
@@ -93,20 +111,20 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     fun addSubject(name: String, type: String) {
         val userId = getUserId() ?: return
         if (name.isBlank()) {
-            _event.value = UiEvent.ShowToast("Tên môn học không được để trống")
+            viewModelScope.launch { _event.emit(UiEvent.ShowToast("Tên môn học không được để trống")) }
             return
         }
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             when (val result = repository.addSubject(userId, AddSubjectRequest(name, type))) {
                 is Resource.Success -> {
-                    _event.value = UiEvent.ShowToast("Thêm môn học thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Thêm môn học thành công")) }
                     loadSubjects()
                     loadProfile()
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Idle
-                    _event.value = UiEvent.ShowToast("Lỗi: ${result.message}")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Lỗi: ${result.message}")) }
                 }
             }
         }
@@ -118,13 +136,13 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
             _uiState.value = UiState.Loading
             when (val result = repository.deleteSubject(userId, subjectId)) {
                 is Resource.Success -> {
-                    _event.value = UiEvent.ShowToast("Xoá môn học thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Xoá môn học thành công")) }
                     loadSubjects()
                     loadProfile()
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Idle
-                    _event.value = UiEvent.ShowToast("Lỗi: ${result.message}")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Lỗi: ${result.message}")) }
                 }
             }
         }
@@ -142,7 +160,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                     } else {
                         _uiState.value = UiState.Idle
                     }
-                    _event.value = UiEvent.ShowToast("Đổi mật khẩu thành công")
+                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Đổi mật khẩu thành công")) }
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error("Đổi mật khẩu thất bại: ${result.message}")
@@ -153,6 +171,6 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
 
     fun logout() {
         preferenceManager.logout()
-        _event.value = UiEvent.NavigateHome
+        viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
     }
 }

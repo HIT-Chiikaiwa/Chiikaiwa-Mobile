@@ -27,10 +27,10 @@
 
             <FrameLayout
                 android:id="@+id/layoutAvatarFrame"
-                android:layout_width="@dimen/_60sdp"
-                android:layout_height="@dimen/_60sdp"
+                android:layout_width="@dimen/_55sdp"
+                android:layout_height="@dimen/_55sdp"
                 android:background="@drawable/bg_avatar_marker_frame"
-                android:padding="@dimen/_4sdp">
+                android:padding="@dimen/_3sdp">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardAvatar"
