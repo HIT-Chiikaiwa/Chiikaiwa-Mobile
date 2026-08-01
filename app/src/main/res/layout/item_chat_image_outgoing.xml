@@ -6,6 +6,26 @@
     android:paddingHorizontal="@dimen/_12sdp"
     android:paddingVertical="@dimen/_6sdp">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardImage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_30sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        app:cardCornerRadius="@dimen/_12sdp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toStartOf="@id/layoutAvatar"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivImageContent"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop" />
+    </androidx.cardview.widget.CardView>
+
     <FrameLayout
         android:id="@+id/layoutAvatar"
         android:layout_width="@dimen/_40sdp"
@@ -30,25 +50,5 @@
                 android:src="@drawable/ic_launcher_foreground" />
         </androidx.cardview.widget.CardView>
     </FrameLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardImage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_30sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        app:cardCornerRadius="@dimen/_12sdp"
-        app:cardElevation="0dp"
-        app:layout_constraintEnd_toStartOf="@id/layoutAvatar"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/ivImageContent"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop" />
-    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

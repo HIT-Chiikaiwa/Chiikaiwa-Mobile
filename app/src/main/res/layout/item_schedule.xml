@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:paddingVertical="12dp">
 
-    <!-- Item Icon (Cute Yellow Bean / Avatar) -->
     <ImageView
         android:id="@+id/imgItemIcon"
         android:layout_width="wrap_content"
@@ -17,7 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Time Range Text -->
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="0dp"
@@ -31,7 +29,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="18h - 20h" />
 
-    <!-- Task Description Text -->
     <TextView
         android:id="@+id/tvTaskDescription"
         android:layout_width="0dp"

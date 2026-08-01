@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityFriendsListBinding
 import com.example.myapplication.databinding.DialogFriendOptionsBinding
+import com.example.myapplication.databinding.DialogUserInfoBinding
 import com.example.myapplication.databinding.LayoutFriendsMenuPopupBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiState
@@ -61,8 +62,9 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
     private fun showHeaderMenuPopup(anchorView: View) {
         val popupBinding = LayoutFriendsMenuPopupBinding.inflate(layoutInflater)
+        val popupView: View = popupBinding.root
         val popupWindow = PopupWindow(
-            popupBinding.root,
+            popupView,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
             true
@@ -71,12 +73,12 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
         popupBinding.btnMenuNewChat.setOnClickListener {
             popupWindow.dismiss()
-            showNewChatDialog()
+            startActivity(Intent(this, SearchUserActivity::class.java))
         }
 
         popupBinding.btnMenuPendingRequests.setOnClickListener {
             popupWindow.dismiss()
-            showPendingRequestsDialog()
+            startActivity(Intent(this, PendingRequestsActivity::class.java))
         }
 
         popupWindow.showAsDropDown(anchorView, -150, 0)
@@ -88,9 +90,6 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         dialog.setView(binding.root)
 
         val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
-        binding.layoutFriendItemPreview.tvFriendName.text = name
-        binding.layoutFriendItemPreview.tvLastMessage.text = conversation.lastMessage?.content ?: "Chưa có tin nhắn"
-        binding.layoutFriendItemPreview.btnMore.visibility = View.GONE
 
         binding.tvOptionPin.setOnClickListener {
             showToast("Đã ghim cuộc hội thoại")
@@ -103,8 +102,8 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
 
         binding.tvOptionViewProfile.setOnClickListener {
-            showToast("Trang cá nhân của $name")
             dialog.dismiss()
+            showUserInfoDialog(name)
         }
 
         binding.tvOptionBlock.setOnClickListener {
@@ -118,107 +117,30 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
 
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
-    private fun showNewChatDialog() {
+    private fun showUserInfoDialog(userName: String) {
         val dialog = AlertDialog.Builder(this).create()
-        val binding = com.example.myapplication.databinding.DialogSearchUserBinding.inflate(layoutInflater)
+        val binding = DialogUserInfoBinding.inflate(layoutInflater)
         dialog.setView(binding.root)
 
-        val searchAdapter = com.example.myapplication.ui.home.chat.adapter.UserSearchAdapter(
-            onSendFriendRequest = { user ->
-                val targetId = user.id ?: return@UserSearchAdapter
-                viewModel.sendFriendRequest(targetId) {
-                    showToast("Đã gửi yêu cầu kết bạn")
-                    dialog.dismiss()
-                }
-            },
-            onStartChat = { user ->
-                val targetId = user.id ?: return@UserSearchAdapter
-                viewModel.startDirectChat(targetId) { convId, userName ->
-                    dialog.dismiss()
-                    val intent = Intent(this, ChatActivity::class.java).apply {
-                        putExtra("conversation_id", convId)
-                        putExtra("target_user_id", targetId)
-                        putExtra("user_name", userName)
-                    }
-                    startActivity(intent)
-                }
+        binding.tvUserName.text = userName.ifEmpty { "Người dùng" }
+        binding.tvDistance.visibility = View.GONE
+        binding.tvStatusTag.visibility = View.GONE
+        binding.tvSchool.text = "Chưa cập nhật"
+        binding.tvMajor.text = "Chưa cập nhật"
+
+        binding.btnSendMessage.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, ChatActivity::class.java).apply {
+                putExtra("user_name", userName)
             }
-        )
-
-        binding.rvSearchResults.layoutManager = LinearLayoutManager(this)
-        binding.rvSearchResults.adapter = searchAdapter
-
-        val performSearch = {
-            val kw = binding.edtKeyword.text.toString().trim()
-            if (kw.isNotEmpty()) {
-                binding.progressBar.visibility = View.VISIBLE
-                viewModel.searchUsers(kw) { results ->
-                    binding.progressBar.visibility = View.GONE
-                    searchAdapter.submitList(results)
-                }
-            }
-        }
-
-        binding.btnBack.setOnClickListener { dialog.dismiss() }
-        binding.btnSearch.setOnClickListener { performSearch() }
-        binding.edtKeyword.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
-                performSearch()
-                true
-            } else false
+            startActivity(intent)
         }
 
         dialog.show()
-    }
-
-    private fun showPendingRequestsDialog() {
-        val dialog = AlertDialog.Builder(this).create()
-        val binding = com.example.myapplication.databinding.DialogPendingRequestsBinding.inflate(layoutInflater)
-        dialog.setView(binding.root)
-
-        lateinit var pendingAdapter: com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter
-
-        fun loadData() {
-            binding.progressBar.visibility = View.VISIBLE
-            viewModel.getPendingFriendRequests { list ->
-                binding.progressBar.visibility = View.GONE
-                if (list.isEmpty()) {
-                    binding.tvEmptyState.visibility = View.VISIBLE
-                    binding.rvPendingRequests.visibility = View.GONE
-                } else {
-                    binding.tvEmptyState.visibility = View.GONE
-                    binding.rvPendingRequests.visibility = View.VISIBLE
-                    pendingAdapter.submitList(list)
-                }
-            }
-        }
-
-        pendingAdapter = com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter(
-            onAccept = { item ->
-                val reqId = item.requestId ?: return@PendingRequestsAdapter
-                viewModel.acceptFriendRequest(reqId) {
-                    showToast("Đã đồng ý kết bạn với ${item.lastName ?: ""} ${item.firstName ?: ""}")
-                    loadData()
-                    viewModel.fetchConversations()
-                }
-            },
-            onReject = { item ->
-                val reqId = item.requestId ?: return@PendingRequestsAdapter
-                viewModel.rejectFriendRequest(reqId) {
-                    showToast("Đã từ chối lời mời kết bạn")
-                    loadData()
-                }
-            }
-        )
-
-        binding.btnBack.setOnClickListener { dialog.dismiss() }
-        binding.rvPendingRequests.layoutManager = LinearLayoutManager(this)
-        binding.rvPendingRequests.adapter = pendingAdapter
-
-        loadData()
-        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     override fun onResume() {

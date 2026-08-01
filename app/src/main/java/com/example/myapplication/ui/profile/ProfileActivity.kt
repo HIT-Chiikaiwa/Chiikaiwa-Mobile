@@ -49,6 +49,10 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
         binding.cvFavorite.setOnClickListener {
             showSubjectManagementDialog()
         }
+
+        binding.cvAppointment.setOnClickListener {
+            startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
+        }
     }
 
     override fun onResume() {

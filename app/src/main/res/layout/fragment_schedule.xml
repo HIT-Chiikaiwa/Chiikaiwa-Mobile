@@ -6,29 +6,19 @@
     android:layout_height="match_parent"
     android:background="#FEF9E7">
 
-    <!-- Top Yellow Header Bar -->
-    <View
-        android:id="@+id/headerBg"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="#FDE047"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Back Button -->
     <ImageView
         android:id="@+id/btnBack"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
         android:src="@drawable/ic_arrow_back"
-        app:layout_constraintBottom_toBottomOf="@id/headerBg"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/headerBg"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="#653B2A" />
 
-    <!-- Screen Title -->
     <TextView
         android:id="@+id/tvScreenTitle"
         android:layout_width="wrap_content"
@@ -38,18 +28,16 @@
         android:textColor="#653B2A"
         android:textSize="22sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/headerBg"
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toEndOf="@id/btnBack"
-        app:layout_constraintTop_toTopOf="@id/headerBg" />
+        app:layout_constraintTop_toTopOf="@id/btnBack" />
 
-    <!-- Mascot Banner Container -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mascotContainer"
         android:layout_width="match_parent"
         android:layout_height="145dp"
-        app:layout_constraintTop_toBottomOf="@id/headerBg">
+        app:layout_constraintTop_toBottomOf="@id/btnBack">
 
-        <!-- Speech Bubble -->
         <TextView
             android:id="@+id/tvSpeechBubble"
             android:layout_width="wrap_content"
@@ -67,19 +55,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Mascot Illustration -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgMascot"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_marginStart="45dp"
-            android:elevation="4dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_schedule_mascot"
-            app:layout_constraintBottom_toBottomOf="@id/viewShelf"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <!-- Brown Shelf Line -->
         <View
             android:id="@+id/viewShelf"
             android:layout_width="match_parent"
@@ -87,9 +62,18 @@
             android:background="#8D5B4C"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgMascot"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginStart="45dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_schedule_mascot"
+            app:layout_constraintBottom_toBottomOf="@id/viewShelf"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Main Notebook Container Area -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/notebookContainer"
         android:layout_width="match_parent"
@@ -100,7 +84,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mascotContainer">
 
-        <!-- 3D Shadow block behind notebook -->
         <View
             android:id="@+id/viewNotebookShadow"
             android:layout_width="0dp"
@@ -115,7 +98,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Main Notebook Paper Card -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutNotebookPaper"
             android:layout_width="0dp"
@@ -134,7 +116,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Month/Year Header -->
             <TextView
                 android:id="@+id/tvMonthYear"
                 android:layout_width="wrap_content"
@@ -146,7 +127,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Tháng 7, 2026" />
 
-            <!-- Schedule Items List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvScheduleList"
                 android:layout_width="match_parent"
@@ -160,7 +140,6 @@
                 tools:itemCount="3"
                 tools:listitem="@layout/item_schedule" />
 
-            <!-- Add Schedule Button [+] -->
             <FrameLayout
                 android:id="@+id/btnCreateSchedule"
                 android:layout_width="54dp"
@@ -184,7 +163,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Binder Spiral Rings on Left Edge -->
         <LinearLayout
             android:id="@+id/layoutSpiralRings"
             android:layout_width="wrap_content"
@@ -235,7 +213,6 @@
                 android:src="@drawable/bg_spiral_ring" />
         </LinearLayout>
 
-        <!-- Right Side Day Tabs (Planner tabs) -->
         <LinearLayout
             android:id="@+id/layoutDayTabs"
             android:layout_width="48dp"
@@ -248,7 +225,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/layoutNotebookPaper">
 
-            <!-- Arrow Up ^ -->
             <TextView
                 android:id="@+id/btnWeekPrev"
                 android:layout_width="match_parent"
@@ -261,7 +237,6 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- Day Tabs (Monday - Sunday) -->
             <TextView
                 android:id="@+id/tabMon"
                 android:layout_width="match_parent"
@@ -353,7 +328,6 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <!-- Arrow Down v -->
             <TextView
                 android:id="@+id/btnWeekNext"
                 android:layout_width="match_parent"
