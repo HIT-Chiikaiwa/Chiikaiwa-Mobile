@@ -37,15 +37,17 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         adapter = FriendsAdapter(
             onItemClick = { conversation ->
                 val currentUserId = com.example.myapplication.data.local.PreferenceManager(this).getUserId()
+                val isUserUnavailable = conversation.memberCount == 1 || conversation.hasLeft
                 val name = when {
+                    isUserUnavailable -> "Người dùng không tồn tại"
                     !conversation.groupName.isNullOrEmpty() -> conversation.groupName
-                    conversation.memberCount == 1 -> "Tôi (Ghi chú cá nhân)"
                     conversation.lastMessage != null && conversation.lastMessage.senderId != currentUserId && !conversation.lastMessage.senderName.isNullOrEmpty() -> conversation.lastMessage.senderName
                     else -> "Người dùng"
                 }
                 val intent = Intent(this, ChatActivity::class.java).apply {
                     putExtra("conversation_id", conversation.id)
                     putExtra("user_name", name)
+                    putExtra("is_disabled", isUserUnavailable)
                 }
                 startActivity(intent)
             },

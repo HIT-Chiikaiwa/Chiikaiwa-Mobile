@@ -47,6 +47,7 @@ class ChatFragment : Fragment() {
     private var conversationId: String = ""
     private var targetUserId: String = ""
     private var userName: String = ""
+    private var isDisabled: Boolean = false
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { handleImageSelected(it) }
@@ -57,6 +58,7 @@ class ChatFragment : Fragment() {
         conversationId = arguments?.getString(ARG_CONVERSATION_ID) ?: ""
         targetUserId = arguments?.getString(ARG_TARGET_USER_ID) ?: ""
         userName = arguments?.getString(ARG_USER_NAME) ?: ""
+        isDisabled = arguments?.getBoolean(ARG_IS_DISABLED, false) ?: false
     }
 
     override fun onCreateView(
@@ -79,7 +81,20 @@ class ChatFragment : Fragment() {
         setupListeners()
         observeViewModel()
 
+        if (isDisabled) {
+            disableMessagingInput()
+        }
+
         viewModel.initChatSession(conversationId, targetUserId)
+    }
+
+    private fun disableMessagingInput() {
+        binding.etMessage.isEnabled = false
+        binding.etMessage.hint = "Không thể gửi tin nhắn"
+        binding.btnSend.isEnabled = false
+        binding.btnSend.alpha = 0.5f
+        binding.btnGallery.isEnabled = false
+        binding.btnGallery.alpha = 0.5f
     }
 
     private fun setupHelpers() {
@@ -220,13 +235,20 @@ class ChatFragment : Fragment() {
         private const val ARG_CONVERSATION_ID = "conversation_id"
         private const val ARG_TARGET_USER_ID = "target_user_id"
         private const val ARG_USER_NAME = "user_name"
+        private const val ARG_IS_DISABLED = "is_disabled"
 
-        fun newInstance(conversationId: String, targetUserId: String = "", userName: String = ""): ChatFragment {
+        fun newInstance(
+            conversationId: String,
+            targetUserId: String = "",
+            userName: String = "",
+            isDisabled: Boolean = false
+        ): ChatFragment {
             return ChatFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CONVERSATION_ID, conversationId)
                     putString(ARG_TARGET_USER_ID, targetUserId)
                     putString(ARG_USER_NAME, userName)
+                    putBoolean(ARG_IS_DISABLED, isDisabled)
                 }
             }
         }

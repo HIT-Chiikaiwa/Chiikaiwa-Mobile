@@ -303,17 +303,22 @@
             android:layout_height="@dimen/_80sdp"
             android:layout_marginHorizontal="@dimen/_4sdp"
             android:layout_marginTop="@dimen/_12sdp"
+            android:clickable="true"
+            android:focusable="true"
             app:cardCornerRadius="@dimen/_15sdp"
-            app:cardElevation="-3dp"
+            app:cardElevation="2dp"
             app:layout_constraintEnd_toStartOf="@id/cvHonor"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toEndOf="@id/cvFavorite"
             app:layout_constraintTop_toBottomOf="@id/cvInfo">
 
             <LinearLayout
+                android:id="@+id/layoutAppointmentInner"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/bg_2"
+                android:clickable="false"
+                android:focusable="false"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -321,6 +326,8 @@
                     android:id="@+id/tvAppointment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
                     android:text="@string/appointment"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_12ssp"

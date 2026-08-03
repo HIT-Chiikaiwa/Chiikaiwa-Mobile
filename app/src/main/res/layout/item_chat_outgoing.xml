@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_30sdp"
         android:layout_marginEnd="@dimen/_8sdp"
-        android:background="@drawable/bg_chat_bubble_sent"
+        android:background="@drawable/bg_date_tag"
         android:padding="@dimen/_12sdp"
         android:textColor="@color/white"
         android:textSize="@dimen/_12ssp"

@@ -32,9 +32,11 @@ class FriendsAdapter(
             val context = binding.root.context
             val currentUserId = com.example.myapplication.data.local.PreferenceManager(context).getUserId()
 
+            val isUserUnavailable = item.memberCount == 1 || item.hasLeft
+
             val name = when {
+                isUserUnavailable -> "Người dùng không tồn tại"
                 !item.groupName.isNullOrEmpty() -> item.groupName
-                item.memberCount == 1 -> "Tôi (Ghi chú cá nhân)"
                 item.lastMessage != null && item.lastMessage.senderId != currentUserId && !item.lastMessage.senderName.isNullOrEmpty() -> item.lastMessage.senderName
                 else -> "Người dùng"
             }
@@ -65,7 +67,7 @@ class FriendsAdapter(
 
             binding.tvTime.text = com.example.myapplication.utils.TimeUtils.formatChatTime(item.lastMessage?.createdDate)
 
-            val avatarUrl = item.groupAvatar ?: if (item.lastMessage?.senderId != currentUserId) item.lastMessage?.senderAvatar else null
+            val avatarUrl = if (isUserUnavailable) null else (item.groupAvatar ?: if (item.lastMessage?.senderId != currentUserId) item.lastMessage?.senderAvatar else null)
 
             if (!avatarUrl.isNullOrEmpty()) {
                 Glide.with(binding.root.context)

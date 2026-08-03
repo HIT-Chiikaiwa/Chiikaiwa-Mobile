@@ -87,6 +87,11 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.home.schedule.CreateAppointmentActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
     </application>
 
 </manifest>

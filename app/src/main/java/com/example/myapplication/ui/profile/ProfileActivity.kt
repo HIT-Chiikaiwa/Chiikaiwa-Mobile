@@ -50,9 +50,12 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             showSubjectManagementDialog()
         }
 
-        binding.cvAppointment.setOnClickListener {
+        val openScheduleAction = View.OnClickListener {
             startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
         }
+        binding.cvAppointment.setOnClickListener(openScheduleAction)
+        binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)
+        binding.tvAppointment.setOnClickListener(openScheduleAction)
     }
 
     override fun onResume() {

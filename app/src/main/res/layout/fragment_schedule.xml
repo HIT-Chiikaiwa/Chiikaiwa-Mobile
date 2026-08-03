@@ -16,8 +16,7 @@
         android:padding="8dp"
         android:src="@drawable/ic_arrow_back"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="#653B2A" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvScreenTitle"
@@ -25,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="Thời gian biểu"
-        android:textColor="#653B2A"
+        android:textColor="@color/brown"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
@@ -49,7 +48,7 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="10dp"
             android:text="Hãy tạo thời gian biểu\ncủa mình!"
-            android:textColor="#784433"
+            android:textColor="@color/brown"
             android:textSize="13sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +61,7 @@
             android:background="#8D5B4C"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/imgMascot"
             android:layout_width="110dp"
             android:layout_height="110dp"
@@ -105,7 +104,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="48dp"
             android:layout_marginBottom="8dp"
-            android:background="@drawable/bg_notebook_paper"
+            android:background="@drawable/bg_edittext"
             android:elevation="4dp"
             android:paddingStart="24dp"
             android:paddingTop="20dp"
@@ -145,7 +144,7 @@
                 android:layout_width="54dp"
                 android:layout_height="54dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/bg_btn_add_schedule"
+                android:background="@drawable/bg_button"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
