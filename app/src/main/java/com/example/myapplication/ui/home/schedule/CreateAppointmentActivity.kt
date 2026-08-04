@@ -5,20 +5,31 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
+import com.example.myapplication.data.remote.dto.request.CreateBookingRequest
 import com.example.myapplication.databinding.ActivityCreateAppointmentBinding
 import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.UiEvent
+import com.example.myapplication.ui.base.UiState
 import java.util.Calendar
 import java.util.Locale
 
 class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>() {
 
+    private val viewModel: BookingViewModel by viewModels()
+
     private var selectedYear = 0
     private var selectedMonth = 0
     private var selectedDay = 0
+    private var conversationId: String = ""
 
     override fun inflateBinding() = ActivityCreateAppointmentBinding.inflate(layoutInflater)
 
     override fun initView() {
+        conversationId = intent.getStringExtra("conversation_id")
+            ?: intent.getStringExtra("conversationId")
+            ?: ""
+
         val userName = intent.getStringExtra("target_user_name")
             ?: intent.getStringExtra("user_name")
             ?: intent.getStringExtra("name")
@@ -103,7 +114,8 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                 return@setOnClickListener
             }
 
-            if (binding.spMode.selectedItemPosition == 1) {
+            val isOffline = binding.spMode.selectedItemPosition == 0
+            if (isOffline) {
                 val locationName = binding.etLocationName.text.toString().trim()
                 if (locationName.isEmpty()) {
                     Toast.makeText(this, "Vui lòng nhập tên địa điểm", Toast.LENGTH_SHORT).show()
@@ -111,11 +123,51 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                 }
             }
 
-            Toast.makeText(this, "Tạo cuộc hẹn thành công!", Toast.LENGTH_SHORT).show()
-            finish()
+            val scheduledAt = String.format(
+                Locale.getDefault(),
+                "%04d-%02d-%02dT%02d:%02d:00Z",
+                selectedYear,
+                selectedMonth + 1,
+                selectedDay,
+                binding.npHour.value,
+                binding.npMinute.value
+            )
+
+            val request = CreateBookingRequest(
+                subject = binding.tvScreenTitle.text.toString(),
+                scheduledAt = scheduledAt,
+                durationMinutes = 60,
+                locationName = if (isOffline) binding.etLocationName.text.toString().trim() else "Online",
+                locationAddress = if (isOffline) binding.etStreet.text.toString().trim() else null,
+                locationDistrict = if (isOffline) binding.etDistrict.text.toString().trim() else null,
+                locationCity = if (isOffline) binding.etProvince.text.toString().trim() else null,
+                note = null,
+                isRecurring = binding.cbIsRecurring.isChecked,
+                reminderMinutesBefore = 15
+            )
+
+            viewModel.createBooking(conversationId, request)
         }
     }
 
     override fun observeData() {
+        viewModel.uiState.observeState { state ->
+            when (state) {
+                is UiState.Success -> {
+                    finish()
+                }
+                is UiState.Error -> {
+                    showToast(state.message)
+                }
+                else -> {}
+            }
+        }
+
+        viewModel.event.observeEvent { event ->
+            when (event) {
+                is UiEvent.ShowToast -> showToast(event.message)
+                else -> {}
+            }
+        }
     }
 }

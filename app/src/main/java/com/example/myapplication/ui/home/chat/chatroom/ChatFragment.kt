@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -149,6 +150,14 @@ class ChatFragment : Fragment() {
 
         binding.btnGallery.setOnClickListener {
             openImagePicker()
+        }
+
+        binding.btnCreateSchedule.setOnClickListener {
+            val intent = Intent(requireContext(), com.example.myapplication.ui.home.schedule.CreateAppointmentActivity::class.java).apply {
+                putExtra("conversation_id", conversationId)
+                putExtra("target_user_name", userName)
+            }
+            startActivity(intent)
         }
     }
 
