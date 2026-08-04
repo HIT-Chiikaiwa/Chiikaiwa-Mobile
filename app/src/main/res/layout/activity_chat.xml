@@ -120,10 +120,10 @@
             app:tint="@color/brown" />
 
         <ImageView
-            android:id="@+id/btnUserAction"
+            android:id="@+id/btnCreateSchedule"
             android:layout_width="@dimen/_18sdp"
             android:layout_height="@dimen/_18sdp"
-            android:src="@drawable/ic_locate"
+            android:src="@drawable/ic_schedule"
             app:tint="@color/brown" />
 
         <ImageView

@@ -173,4 +173,52 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         preferenceManager.logout()
         viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
     }
+
+    fun updateStatusTag(statusTag: String) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updateStatusTag(userId, UpdateStatusTagRequest(statusTag))) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật trạng thái thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun updatePersonalInfo(request: UpdatePersonalInfoRequest) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updatePersonalInfo(userId, request)) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật thông tin cá nhân thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun updateAcademicInfo(request: UpdateAcademicInfoRequest) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updateAcademicInfo(userId, request)) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật thông tin học vấn thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
 }

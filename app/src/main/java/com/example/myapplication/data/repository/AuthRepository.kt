@@ -42,4 +42,8 @@ class AuthRepository(context: Context) : BaseRepository() {
     suspend fun resetPassword(email: String, pass: String, confirmPass: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.resetPassword(ResetPasswordRequest(email, pass, confirmPass)) }
     }
+
+    suspend fun refreshToken(refreshToken: String): Resource<LoginResponse> {
+        return safeApiCall { api.refreshToken(RefreshTokenRequest(refreshToken)) }
+    }
 }

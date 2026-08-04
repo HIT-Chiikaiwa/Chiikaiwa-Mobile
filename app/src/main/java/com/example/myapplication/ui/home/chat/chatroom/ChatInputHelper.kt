@@ -19,7 +19,7 @@ class ChatInputHelper(
                 binding.btnMic.visibility = if (hasContent) View.GONE else View.VISIBLE
                 binding.btnFolder.visibility = if (hasContent) View.GONE else View.VISIBLE
                 binding.btnGallery.visibility = if (hasContent) View.GONE else View.VISIBLE
-                binding.btnUserAction.visibility = if (hasContent) View.GONE else View.VISIBLE
+                binding.btnCreateSchedule.visibility = if (hasContent) View.GONE else View.VISIBLE
             }
 
             override fun afterTextChanged(s: Editable?) {}

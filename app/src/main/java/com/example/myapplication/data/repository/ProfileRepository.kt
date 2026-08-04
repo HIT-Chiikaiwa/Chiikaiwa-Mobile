@@ -49,4 +49,16 @@ class ProfileRepository(context: Context) : BaseRepository() {
     suspend fun deleteAccount(userId: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.deleteAccount(userId) }
     }
+
+    suspend fun updateStatusTag(userId: String, request: UpdateStatusTagRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updateStatusTag(userId, request) }
+    }
+
+    suspend fun updatePersonalInfo(userId: String, request: UpdatePersonalInfoRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updatePersonalInfo(userId, request) }
+    }
+
+    suspend fun updateAcademicInfo(userId: String, request: UpdateAcademicInfoRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updateAcademicInfo(userId, request) }
+    }
 }

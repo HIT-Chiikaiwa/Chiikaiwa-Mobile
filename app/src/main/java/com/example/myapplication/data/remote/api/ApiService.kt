@@ -28,8 +28,29 @@ interface ApiService {
     @POST("api/v1/auth/forgot-password/reset")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<BaseResponse<CommonResponse>>
 
+    @POST("api/v1/auth/refresh")
+    suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<LoginResponse>
+
     @GET("api/v1/profile/{userId}")
     suspend fun getProfile(@Path("userId") userId: String): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/status-tag")
+    suspend fun updateStatusTag(
+        @Path("userId") userId: String,
+        @Body request: UpdateStatusTagRequest
+    ): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/personal-info")
+    suspend fun updatePersonalInfo(
+        @Path("userId") userId: String,
+        @Body request: UpdatePersonalInfoRequest
+    ): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/academic-info")
+    suspend fun updateAcademicInfo(
+        @Path("userId") userId: String,
+        @Body request: UpdateAcademicInfoRequest
+    ): Response<BaseResponse<UserDto>>
 
     @Multipart
     @POST("api/v1/profile/{userId}/avatar")

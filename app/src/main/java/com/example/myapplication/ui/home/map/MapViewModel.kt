@@ -55,7 +55,6 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
             val startTime = System.currentTimeMillis()
             _uiState.value = UiState.Loading
 
-            // Cập nhật vị trí GPS của chính mình lên Server trước khi quét radar
             mapRepository.updateLocation(lat, lng)
 
             when (val result = mapRepository.getNearbyUsers(lat, lng, radiusKm)) {
