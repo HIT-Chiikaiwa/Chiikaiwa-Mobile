@@ -52,36 +52,6 @@ class GroupDetailFragment : Fragment() {
         }
     }
 
-    fun updateGroupName(newName: String, avatarUrl: String? = null) {
-        if (conversationId.isNotEmpty()) {
-            viewModel.updateGroupInfo(conversationId, newName, avatarUrl)
-        }
-    }
-
-    fun addMembers(memberIds: List<String>) {
-        if (conversationId.isNotEmpty()) {
-            viewModel.addMembers(conversationId, memberIds)
-        }
-    }
-
-    fun removeMember(userId: String) {
-        if (conversationId.isNotEmpty()) {
-            viewModel.removeMember(conversationId, userId)
-        }
-    }
-
-    fun dissolveGroup() {
-        if (conversationId.isNotEmpty()) {
-            viewModel.dissolveGroup(conversationId)
-        }
-    }
-
-    fun transferOwnership(newOwnerId: String) {
-        if (conversationId.isNotEmpty()) {
-            viewModel.transferOwnership(conversationId, newOwnerId)
-        }
-    }
-
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

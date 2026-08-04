@@ -32,12 +32,4 @@ class ConversationRepository(context: Context) : BaseRepository() {
     suspend fun createOrGetDirectConversation(targetUserId: String): Resource<BaseResponse<ConversationResponse>> {
         return safeApiCall { api.createOrGetDirectConversation(DirectChatRequest(targetUserId)) }
     }
-
-    suspend fun createGroup(
-        groupName: String,
-        groupAvatar: String?,
-        memberIds: List<String>
-    ): Resource<BaseResponse<ConversationResponse>> {
-        return safeApiCall { api.createGroup(CreateGroupRequest(groupName, groupAvatar, memberIds)) }
-    }
 }

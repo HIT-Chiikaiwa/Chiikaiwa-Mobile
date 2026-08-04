@@ -129,40 +129,6 @@ interface ApiService {
         @Body request: DirectChatRequest
     ): Response<BaseResponse<ConversationResponse>>
 
-    @POST("api/v1/chat/conversations/group")
-    suspend fun createGroup(
-        @Body request: CreateGroupRequest
-    ): Response<BaseResponse<ConversationResponse>>
-
-    @PUT("api/v1/chat/conversations/{id}")
-    suspend fun updateGroup(
-        @Path("id") id: String,
-        @Body request: UpdateGroupRequest
-    ): Response<BaseResponse<ConversationResponse>>
-
-    @POST("api/v1/chat/conversations/{id}/members")
-    suspend fun addMembers(
-        @Path("id") id: String,
-        @Body request: AddMemberRequest
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @DELETE("api/v1/chat/conversations/{id}/members/{userId}")
-    suspend fun removeMember(
-        @Path("id") id: String,
-        @Path("userId") userId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @PUT("api/v1/chat/conversations/{id}/transfer-ownership")
-    suspend fun transferOwnership(
-        @Path("id") id: String,
-        @Query("newOwnerId") newOwnerId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @DELETE("api/v1/chat/conversations/{id}/dissolve")
-    suspend fun dissolveGroup(
-        @Path("id") id: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
     @GET("api/v1/chat/conversations/{id}/messages")
     suspend fun getMessages(
         @Path("id") id: String,
