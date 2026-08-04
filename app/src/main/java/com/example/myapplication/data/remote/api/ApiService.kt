@@ -209,4 +209,50 @@ interface ApiService {
     suspend fun unfriend(
         @Path("friendId") friendId: String
     ): Response<BaseResponse<FriendActionResponse>>
+
+    @POST("api/v1/bookings/conversation/{conversationId}")
+    suspend fun createBookingInConversation(
+        @Path("conversationId") conversationId: String,
+        @Body request: CreateBookingRequest
+    ): Response<BaseResponse<BookingDto>>
+
+    @GET("api/v1/bookings")
+    suspend fun getMyBookings(): Response<BaseResponse<List<BookingDto>>>
+
+    @GET("api/v1/bookings/weekly")
+    suspend fun getWeeklyBookings(
+        @Query("weekStart") weekStart: String
+    ): Response<BaseResponse<WeeklyBookingResponse>>
+
+    @GET("api/v1/bookings/{bookingId}")
+    suspend fun getBookingDetail(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PUT("api/v1/bookings/{bookingId}/accept")
+    suspend fun acceptBooking(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PUT("api/v1/bookings/{bookingId}/reject")
+    suspend fun rejectBooking(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PATCH("api/v1/bookings/{bookingId}/complete")
+    suspend fun completeBooking(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PATCH("api/v1/bookings/{bookingId}/cancel")
+    suspend fun cancelBooking(
+        @Path("bookingId") bookingId: String,
+        @Body request: CancelBookingRequest
+    ): Response<BaseResponse<BookingDto>>
+
+    @POST("api/v1/bookings/{bookingId}/rate")
+    suspend fun rateBooking(
+        @Path("bookingId") bookingId: String,
+        @Body request: RateBookingRequest
+    ): Response<BaseResponse<ActionStatusDto>>
 }
