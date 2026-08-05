@@ -22,7 +22,11 @@ import java.util.Locale
 class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
 
     private val viewModel: BookingViewModel by viewModels()
-    private val adapter = ScheduleAdapter()
+    private val adapter = ScheduleAdapter { booking ->
+        BookingDetailDialog(this, booking, viewModel) {
+            loadDataForCurrentWeek()
+        }.show()
+    }
 
     private val currentCalendar = Calendar.getInstance()
     private var selectedDayOfWeek = Calendar.MONDAY

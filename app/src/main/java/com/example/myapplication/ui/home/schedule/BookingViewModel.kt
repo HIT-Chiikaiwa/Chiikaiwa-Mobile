@@ -122,4 +122,48 @@ class BookingViewModel(application: Application) : BaseViewModel<BookingDto>(app
             }
         }
     }
+
+    fun getBookingDetail(bookingId: String) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.getBookingDetail(bookingId)) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun completeBooking(bookingId: String) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.completeBooking(bookingId)) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Đã hoàn thành cuộc hẹn"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun rateBooking(bookingId: String, score: Int) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.rateBooking(bookingId, score)) {
+                is Resource.Success -> {
+                    _event.emit(UiEvent.ShowToast("Đã gửi đánh giá thành công"))
+                    getBookingDetail(bookingId)
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
 }
