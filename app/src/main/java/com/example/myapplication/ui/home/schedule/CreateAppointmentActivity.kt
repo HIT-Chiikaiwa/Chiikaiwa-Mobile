@@ -109,8 +109,11 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
 
     private fun setupCreateButton() {
         binding.btnCreate.setOnClickListener {
+            binding.tvErrorMessage.visibility = View.GONE
+
             if (binding.tvSelectedDate.text.isNullOrEmpty() || binding.tvSelectedDate.text == "Chọn ngày") {
-                Toast.makeText(this, "Vui lòng chọn ngày hẹn", Toast.LENGTH_SHORT).show()
+                binding.tvErrorMessage.text = "Vui lòng chọn ngày hẹn"
+                binding.tvErrorMessage.visibility = View.VISIBLE
                 return@setOnClickListener
             }
 
@@ -118,7 +121,8 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
             if (isOffline) {
                 val locationName = binding.etLocationName.text.toString().trim()
                 if (locationName.isEmpty()) {
-                    Toast.makeText(this, "Vui lòng nhập tên địa điểm", Toast.LENGTH_SHORT).show()
+                    binding.tvErrorMessage.text = "Vui lòng nhập tên địa điểm"
+                    binding.tvErrorMessage.visibility = View.VISIBLE
                     return@setOnClickListener
                 }
             }
@@ -157,7 +161,8 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                     finish()
                 }
                 is UiState.Error -> {
-                    showToast(state.message)
+                    binding.tvErrorMessage.text = state.message
+                    binding.tvErrorMessage.visibility = View.VISIBLE
                 }
                 else -> {}
             }

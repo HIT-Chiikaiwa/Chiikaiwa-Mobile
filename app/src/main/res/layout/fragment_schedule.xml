@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FEF9E7">
+    android:background="@color/bg_2">
 
     <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
+        android:layout_width="@dimen/_32sdp"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_10sdp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
+        android:contentDescription="@string/back"
+        android:padding="@dimen/_6sdp"
         android:src="@drawable/ic_arrow_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,10 +23,10 @@
         android:id="@+id/tvScreenTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Thời gian biểu"
+        android:layout_marginStart="@dimen/_6sdp"
+        android:text="@string/title_schedule"
         android:textColor="@color/brown"
-        android:textSize="22sp"
+        android:textSize="@dimen/_18ssp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toEndOf="@id/btnBack"
@@ -34,22 +35,22 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mascotContainer"
         android:layout_width="match_parent"
-        android:layout_height="145dp"
+        android:layout_height="@dimen/_115sdp"
         app:layout_constraintTop_toBottomOf="@id/btnBack">
 
         <TextView
             android:id="@+id/tvSpeechBubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="140dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="@dimen/_110sdp"
+            android:layout_marginTop="@dimen/_15sdp"
             android:background="@drawable/bg_speech_bubble"
-            android:elevation="2dp"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:text="Hãy tạo thời gian biểu\ncủa mình!"
+            android:elevation="@dimen/_2sdp"
+            android:paddingHorizontal="@dimen/_12sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            android:text="@string/schedule_mascot_speech"
             android:textColor="@color/brown"
-            android:textSize="13sp"
+            android:textSize="@dimen/_10ssp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -57,15 +58,16 @@
         <View
             android:id="@+id/viewShelf"
             android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:background="#8D5B4C"
+            android:layout_height="@dimen/_25sdp"
+            android:background="@color/brown"
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <ImageView
             android:id="@+id/imgMascot"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:layout_marginStart="45dp"
+            android:layout_width="@dimen/_90sdp"
+            android:layout_height="@dimen/_90sdp"
+            android:layout_marginStart="@dimen/_35sdp"
+            android:contentDescription="@null"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_schedule_mascot"
             app:layout_constraintBottom_toBottomOf="@id/viewShelf"
@@ -77,9 +79,9 @@
         android:id="@+id/notebookContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="16dp"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_12sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mascotContainer">
 
@@ -87,10 +89,10 @@
             android:id="@+id/viewNotebookShadow"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="42dp"
-            android:layout_marginBottom="2dp"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_6sdp"
+            android:layout_marginEnd="@dimen/_35sdp"
+            android:layout_marginBottom="@dimen/_2sdp"
             android:background="@drawable/bg_notebook_shadow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,15 +103,15 @@
             android:id="@+id/layoutNotebookPaper"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="48dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginStart="@dimen/_16sdp"
+            android:layout_marginEnd="@dimen/_38sdp"
+            android:layout_marginBottom="@dimen/_6sdp"
             android:background="@drawable/bg_edittext"
-            android:elevation="4dp"
-            android:paddingStart="24dp"
-            android:paddingTop="20dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp"
+            android:elevation="@dimen/_3sdp"
+            android:paddingStart="@dimen/_20sdp"
+            android:paddingTop="@dimen/_16sdp"
+            android:paddingEnd="@dimen/_12sdp"
+            android:paddingBottom="@dimen/_12sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,8 +121,8 @@
                 android:id="@+id/tvMonthYear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#FF6B52"
-                android:textSize="22sp"
+                android:textColor="@color/orange"
+                android:textSize="@dimen/_18ssp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -130,8 +132,8 @@
                 android:id="@+id/rvScheduleList"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_6sdp"
                 android:clipToPadding="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toTopOf="@id/btnCreateSchedule"
@@ -141,9 +143,9 @@
 
             <FrameLayout
                 android:id="@+id/btnCreateSchedule"
-                android:layout_width="54dp"
-                android:layout_height="54dp"
-                android:layout_marginBottom="8dp"
+                android:layout_width="@dimen/_42sdp"
+                android:layout_height="@dimen/_42sdp"
+                android:layout_marginBottom="@dimen/_6sdp"
                 android:background="@drawable/bg_button"
                 android:clickable="true"
                 android:focusable="true"
@@ -153,11 +155,12 @@
                 app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
                     android:layout_gravity="center"
+                    android:contentDescription="@null"
                     android:src="@drawable/ic_plus"
-                    app:tint="#784433" />
+                    app:tint="@color/brown" />
             </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -166,59 +169,65 @@
             android:id="@+id/layoutSpiralRings"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp"
-            android:elevation="8dp"
+            android:layout_marginStart="@dimen/_6sdp"
+            android:layout_marginTop="@dimen/_25sdp"
+            android:layout_marginBottom="@dimen/_25sdp"
+            android:elevation="@dimen/_6sdp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@id/layoutNotebookPaper"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/layoutNotebookPaper">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_16sdp"
                 android:layout_weight="1"
+                android:contentDescription="@null"
                 android:src="@drawable/bg_spiral_ring" />
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_16sdp"
                 android:layout_weight="1"
+                android:contentDescription="@null"
                 android:src="@drawable/bg_spiral_ring" />
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_16sdp"
                 android:layout_weight="1"
+                android:contentDescription="@null"
                 android:src="@drawable/bg_spiral_ring" />
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_16sdp"
                 android:layout_weight="1"
+                android:contentDescription="@null"
                 android:src="@drawable/bg_spiral_ring" />
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_16sdp"
                 android:layout_weight="1"
+                android:contentDescription="@null"
                 android:src="@drawable/bg_spiral_ring" />
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="20dp"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_16sdp"
                 android:layout_weight="1"
+                android:contentDescription="@null"
                 android:src="@drawable/bg_spiral_ring" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layoutDayTabs"
-            android:layout_width="48dp"
+            android:layout_width="@dimen/_38sdp"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:elevation="6dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:elevation="@dimen/_5sdp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@id/layoutNotebookPaper"
             app:layout_constraintEnd_toEndOf="parent"
@@ -227,116 +236,116 @@
             <TextView
                 android:id="@+id/btnWeekPrev"
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:layout_marginBottom="4dp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_marginBottom="@dimen/_3sdp"
                 android:background="@drawable/bg_arrow_button"
                 android:gravity="center"
                 android:text="^"
-                android:textColor="#784433"
-                android:textSize="16sp"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_13ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabMon"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_selected"
                 android:gravity="center"
-                android:text="Hai"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_mon"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabTue"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_unselected"
                 android:gravity="center"
-                android:text="Ba"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_tue"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabWed"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_unselected"
                 android:gravity="center"
-                android:text="Tư"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_wed"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabThu"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_unselected"
                 android:gravity="center"
-                android:text="Năm"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_thu"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabFri"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_unselected"
                 android:gravity="center"
-                android:text="Sáu"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_fri"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabSat"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_unselected"
                 android:gravity="center"
-                android:text="Bảy"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_sat"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabSun"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginVertical="2dp"
+                android:layout_marginVertical="@dimen/_2sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_tab_unselected"
                 android:gravity="center"
-                android:text="CN"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:text="@string/day_sun"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnWeekNext"
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:layout_marginTop="4dp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_marginTop="@dimen/_3sdp"
                 android:background="@drawable/bg_arrow_button"
                 android:gravity="center"
                 android:text="v"
-                android:textColor="#784433"
-                android:textSize="14sp"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_11ssp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -346,11 +355,11 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="-6dp"
             android:background="@drawable/bg_date_tag"
-            android:elevation="10dp"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:textColor="#FFFFFF"
-            android:textSize="11sp"
+            android:elevation="@dimen/_8sdp"
+            android:paddingHorizontal="@dimen/_8sdp"
+            android:paddingVertical="@dimen/_3sdp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_9ssp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/tabMon"
             app:layout_constraintEnd_toStartOf="@id/layoutDayTabs"

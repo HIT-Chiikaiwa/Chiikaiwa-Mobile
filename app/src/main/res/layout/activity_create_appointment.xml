@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:text="Chọn ngày hẹn"
+                android:text="@string/label_select_date"
                 android:textColor="@color/brown"
                 android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
@@ -66,22 +66,23 @@
                 android:layout_height="@dimen/_45sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_edittext"
-                android:paddingHorizontal="12dp">
+                android:paddingHorizontal="@dimen/_10sdp">
 
                 <TextView
                     android:id="@+id/tvSelectedDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:hint="Chọn ngày"
+                    android:hint="@string/label_select_date"
                     android:textColor="@color/brown"
                     android:textColorHint="@color/hint"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/_11ssp" />
 
                 <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="@dimen/_18sdp"
+                    android:layout_height="@dimen/_18sdp"
                     android:layout_gravity="end|center_vertical"
+                    android:contentDescription="@null"
                     android:src="@drawable/ic_calendar" />
             </FrameLayout>
 
@@ -89,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:text="Chọn thời gian"
+                android:text="@string/label_select_time"
                 android:textColor="@color/brown"
                 android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
@@ -104,23 +105,23 @@
 
                 <NumberPicker
                     android:id="@+id/npHour"
-                    android:layout_width="60dp"
-                    android:layout_height="120dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_100sdp"
                     android:descendantFocusability="blocksDescendants" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginHorizontal="@dimen/_10sdp"
                     android:text=":"
                     android:textColor="@color/brown"
-                    android:textSize="24sp"
+                    android:textSize="@dimen/_20ssp"
                     android:textStyle="bold" />
 
                 <NumberPicker
                     android:id="@+id/npMinute"
-                    android:layout_width="60dp"
-                    android:layout_height="120dp"
+                    android:layout_width="@dimen/_50sdp"
+                    android:layout_height="@dimen/_100sdp"
                     android:descendantFocusability="blocksDescendants" />
             </LinearLayout>
 
@@ -128,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:text="Chọn hình thức"
+                android:text="@string/label_mode"
                 android:textColor="@color/brown"
                 android:textSize="@dimen/_15ssp"
                 android:textStyle="bold" />
@@ -139,7 +140,7 @@
                 android:layout_height="@dimen/_45sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/bg_edittext"
-                android:paddingHorizontal="12dp" />
+                android:paddingHorizontal="@dimen/_10sdp" />
 
             <LinearLayout
                 android:id="@+id/layoutLocationSection"
@@ -152,7 +153,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:text="Chọn địa điểm"
+                    android:text="@string/label_location_info"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_15ssp"
                     android:textStyle="bold" />
@@ -161,7 +162,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:text="Tên địa điểm"
+                    android:text="@string/label_location_name"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_10ssp" />
 
@@ -169,18 +170,18 @@
                     android:id="@+id/etLocationName"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_40sdp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:background="@drawable/bg_edittext"
                     android:inputType="text"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="@dimen/_10sdp"
                     android:textColor="@color/brown"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/_11ssp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Đường/ ngõ/ ngách/ số nhà"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/label_street"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_10ssp" />
 
@@ -188,18 +189,18 @@
                     android:id="@+id/etStreet"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_40sdp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:background="@drawable/bg_edittext"
                     android:inputType="text"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="@dimen/_10sdp"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textSize="@dimen/_10ssp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:text="Quận/ huyện/ thị xã"
+                    android:text="@string/label_district"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_10ssp" />
 
@@ -207,18 +208,18 @@
                     android:id="@+id/etDistrict"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_40sdp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:background="@drawable/bg_edittext"
                     android:inputType="text"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="@dimen/_10sdp"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textSize="@dimen/_10ssp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:text="Tỉnh/ thành phố"
+                    android:text="@string/label_province"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_10ssp" />
 
@@ -226,10 +227,10 @@
                     android:id="@+id/etProvince"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_40sdp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/_3sdp"
                     android:background="@drawable/bg_edittext"
                     android:inputType="text"
-                    android:paddingHorizontal="12dp"
+                    android:paddingHorizontal="@dimen/_10sdp"
                     android:textColor="@color/brown"
                     android:textSize="@dimen/_10ssp" />
             </LinearLayout>
@@ -240,22 +241,33 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:buttonTint="@color/brown"
-                android:text="Đặt làm cố định"
+                android:text="@string/label_set_recurring"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_10sdp"
+                android:textSize="@dimen/_10ssp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:gravity="center"
+                android:textColor="@color/error"
+                android:textSize="@dimen/_11ssp"
+                android:visibility="gone"
+                tools:text="Vui lòng nhập đầy đủ thông tin" />
 
             <TextView
                 android:id="@+id/btnCreate"
                 android:layout_width="@dimen/_100sdp"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginVertical="@dimen/_10sdp"
                 android:background="@drawable/bg_button"
                 android:gravity="center"
-                android:text="Tạo"
+                android:text="@string/btn_create"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_15sdp"
+                android:textSize="@dimen/_13ssp"
                 android:textStyle="bold" />
 
         </LinearLayout>
