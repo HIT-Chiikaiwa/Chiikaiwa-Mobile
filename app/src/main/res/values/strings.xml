@@ -114,4 +114,11 @@
     <string name="day_fri">Sáu</string>
     <string name="day_sat">Bảy</string>
     <string name="day_sun">CN</string>
+    <string name="title_notification">Thông báo</string>
+    <string name="section_recent">Mới đây</string>
+    <string name="section_earlier">Trước đó</string>
+    <string name="title_booking_invite">Lời mời cuộc hẹn</string>
+    <string name="title_booking_reminder">Nhắc nhở cuộc hẹn</string>
+    <string name="btn_view_detail">Xem chi tiết</string>
+    <string name="btn_close">Đóng</string>
 </resources>

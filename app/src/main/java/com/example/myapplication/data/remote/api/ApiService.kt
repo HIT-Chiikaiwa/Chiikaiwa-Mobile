@@ -255,4 +255,45 @@ interface ApiService {
         @Path("bookingId") bookingId: String,
         @Body request: RateBookingRequest
     ): Response<BaseResponse<ActionStatusDto>>
+
+    @GET("api/v1/notifications")
+    suspend fun getNotifications(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<NotificationDto>>>
+
+    @GET("api/v1/notifications/unread-count")
+    suspend fun getUnreadNotificationCount(): Response<BaseResponse<Int>>
+
+    @PATCH("api/v1/notifications/{notificationId}/read")
+    suspend fun markNotificationAsRead(
+        @Path("notificationId") notificationId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @PATCH("api/v1/notifications/read-all")
+    suspend fun markAllNotificationsAsRead(): Response<BaseResponse<ActionStatusDto>>
+
+    @POST("api/v1/devices")
+    suspend fun registerDevice(
+        @Body request: RegisterDeviceRequest
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/devices")
+    suspend fun unregisterDevice(
+        @Query("fcmToken") fcmToken: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/notifications/{notificationId}")
+    suspend fun deleteNotification(
+        @Path("notificationId") notificationId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @HTTP(method = "DELETE", path = "api/v1/notifications/batch", hasBody = true)
+    suspend fun deleteNotificationsBatch(
+        @Body request: DeleteNotificationsBatchRequest
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/notifications/all")
+    suspend fun deleteAllNotifications(): Response<BaseResponse<ActionStatusDto>>
 }
