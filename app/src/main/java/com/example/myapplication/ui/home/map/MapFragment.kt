@@ -81,7 +81,7 @@ class MapFragment : Fragment() {
         binding.imgAvatar.setOnClickListener { navigateTo(ProfileActivity::class.java) }
         binding.btnProfile.setOnClickListener { navigateTo(ProfileActivity::class.java) }
         binding.btnFriend.setOnClickListener { navigateTo(FriendsListActivity::class.java) }
-        binding.btnNotification.setOnClickListener { showToast("Tính năng Thông báo đang phát triển") }
+        binding.btnNotification.setOnClickListener { navigateTo(com.example.myapplication.ui.notification.NotificationActivity::class.java) }
         binding.btnCalendar.setOnClickListener { navigateTo(com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java) }
 
         val scanAction = View.OnClickListener { checkLocationPermissionsAndScan() }
