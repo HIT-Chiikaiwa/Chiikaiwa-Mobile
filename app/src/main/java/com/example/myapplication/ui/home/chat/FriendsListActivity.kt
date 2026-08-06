@@ -111,7 +111,8 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
         binding.tvOptionViewProfile.setOnClickListener {
             dialog.dismiss()
-            showUserInfoDialog(name)
+            val userId = conversation.lastMessage?.senderId
+            showUserInfoDialog(name, userId)
         }
 
         binding.tvOptionBlock.setOnClickListener {
@@ -128,7 +129,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
-    private fun showUserInfoDialog(userName: String) {
+    private fun showUserInfoDialog(userName: String, userId: String? = null) {
         val dialog = AlertDialog.Builder(this).create()
         val binding = DialogUserInfoBinding.inflate(layoutInflater)
         dialog.setView(binding.root)
@@ -144,13 +145,20 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
             dialog.dismiss()
             val intent = Intent(this, ChatActivity::class.java).apply {
                 putExtra("user_name", userName)
+                if (!userId.isNullOrEmpty()) {
+                    putExtra("target_user_id", userId)
+                }
             }
             startActivity(intent)
         }
 
         binding.btnViewProfile.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, com.example.myapplication.ui.profile.ProfileActivity::class.java)
+            val intent = Intent(this, com.example.myapplication.ui.profile.ProfileActivity::class.java).apply {
+                if (!userId.isNullOrEmpty()) {
+                    putExtra("target_user_id", userId)
+                }
+            }
             startActivity(intent)
         }
 

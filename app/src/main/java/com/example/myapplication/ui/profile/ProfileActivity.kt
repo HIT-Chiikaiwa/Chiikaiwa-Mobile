@@ -35,7 +35,10 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
 
     override fun initView() {
         targetUserId = intent.getStringExtra("target_user_id")
-        val isOtherUser = targetUserId != null && targetUserId != viewModel.getUserId()
+            ?: intent.getStringExtra("targetUserId")
+            ?: intent.getStringExtra("userId")
+            ?: intent.getStringExtra("id")
+        val isOtherUser = !targetUserId.isNullOrEmpty() && targetUserId != viewModel.getUserId()
 
         binding.ivBack.setOnClickListener {
             finish()
