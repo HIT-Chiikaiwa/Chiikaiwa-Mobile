@@ -5,8 +5,46 @@ import com.google.gson.JsonObject
 
 object BookingJsonParser {
 
-    fun isBookingMessage(content: String): Boolean {
-        return content.trim().startsWith("{") && content.contains("bookingId")
+    fun isBookingMessage(content: String?): Boolean {
+        if (content.isNullOrBlank()) return false
+        val trimmed = content.trim()
+        return trimmed.startsWith("{") && (
+            trimmed.contains("bookingId") ||
+            trimmed.contains("scheduledAt") ||
+            trimmed.contains("duration") ||
+            trimmed.contains("locationName") ||
+            trimmed.contains("subject")
+        )
+    }
+
+    fun formatBookingSummary(content: String?): String {
+        if (content.isNullOrBlank()) return "Lịch hẹn"
+        return try {
+            val json = Gson().fromJson(content, JsonObject::class.java)
+            val subject = json.get("subject")?.takeIf { !it.isJsonNull }?.asString
+            val duration = json.get("durationMinutes")?.takeIf { !it.isJsonNull }?.asInt
+                ?: json.get("duration")?.takeIf { !it.isJsonNull }?.asInt
+                ?: 30
+            val status = json.get("status")?.takeIf { !it.isJsonNull }?.asString?.uppercase() ?: "PENDING"
+
+            val statusText = when (status) {
+                "CANCELLED" -> " (Đã hủy)"
+                "REJECTED" -> " (Đã từ chối)"
+                "CONFIRMED", "ACCEPTED" -> " (Đã chấp nhận)"
+                "COMPLETED" -> " (Đã hoàn thành)"
+                else -> ""
+            }
+
+            if (statusText.isNotEmpty()) {
+                "Lịch hẹn$statusText"
+            } else if (!subject.isNullOrEmpty()) {
+                "$subject ($duration phút)"
+            } else {
+                "Lịch hẹn ($duration phút)"
+            }
+        } catch (e: Exception) {
+            "Lịch hẹn"
+        }
     }
 
     fun parseBookingJson(

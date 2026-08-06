@@ -122,6 +122,15 @@
             android:textSize="@dimen/_11ssp"
             android:textStyle="bold"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_6sdp"
+            android:textColor="@color/hint"
+            android:textSize="@dimen/_9ssp"
+            tools:text="10:32" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

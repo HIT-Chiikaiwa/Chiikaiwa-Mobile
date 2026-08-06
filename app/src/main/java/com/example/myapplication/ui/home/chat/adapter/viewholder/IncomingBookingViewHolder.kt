@@ -7,6 +7,7 @@ import com.example.myapplication.R
 import com.example.myapplication.data.model.Message
 import com.example.myapplication.databinding.ItemChatBookingIncomingBinding
 import com.example.myapplication.utils.BookingMessageHelper
+import com.example.myapplication.utils.TimeUtils
 
 class IncomingBookingViewHolder(
     private val binding: ItemChatBookingIncomingBinding,
@@ -24,6 +25,7 @@ class IncomingBookingViewHolder(
         )
 
         binding.tvBookingTitle.text = parsed.title
+        binding.tvTime.text = TimeUtils.formatRelativeTime(message.createdAt)
 
         val status = parsed.status?.uppercase() ?: ""
         val isCreator = (parsed.creatorId != null && parsed.creatorId == currentUserId) || 

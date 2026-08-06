@@ -168,8 +168,7 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                 return@setOnClickListener
             }
 
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
-            val scheduledAt = sdf.format(cal.time)
+            val scheduledAt = com.example.myapplication.utils.TimeUtils.formatToUtc(cal.time)
 
             val selectedDuration = durationValues.getOrElse(binding.spDuration.selectedItemPosition) { 30 }
 

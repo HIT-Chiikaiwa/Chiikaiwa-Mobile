@@ -55,9 +55,7 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
             content = content,
             type = messageType,
             status = com.example.myapplication.data.model.MessageStatus.SENT,
-            createdAt = if (rawCreatedDate.isNotEmpty()) {
-                com.example.myapplication.utils.TimeUtils.formatChatTime(rawCreatedDate)
-            } else "Vừa xong",
+            createdAt = if (rawCreatedDate.isNotEmpty()) rawCreatedDate else "Vừa xong",
             updatedAt = "",
             isRecalled = false
         )

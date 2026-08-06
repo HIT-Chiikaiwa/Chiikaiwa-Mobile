@@ -84,6 +84,10 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             }
         }
 
+        viewModel.appointmentCount.observeState { count ->
+            binding.tvAppointmentCount.text = "$count"
+        }
+
         viewModel.event.observeEvent { event ->
             when (event) {
                 is UiEvent.ShowToast -> {
@@ -103,7 +107,8 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
     private fun bindProfile(user: UserDto) {
         val fullName = "${user.lastName ?: ""} ${user.firstName ?: ""}".trim()
         binding.tvUsername.text = fullName.ifEmpty { "Chưa cập nhật" }
-        binding.tvFriendsCount.text = "Điểm tin cậy: ${user.trustScore ?: 100.0}"
+        val trustScore = user.trustScore ?: 100.0
+        binding.tvFavoriteRating.text = String.format(Locale.US, "%.1f", trustScore)
         binding.tvBuddyStatus.text = "Trạng thái quét: ${if (user.buddyActive == true) "Bật" else "Tắt"}"
         binding.tvIntroduction.text = user.statusTag ?: "Chưa có giới thiệu"
 

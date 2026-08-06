@@ -6,6 +6,7 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.data.model.Message
 import com.example.myapplication.databinding.ItemChatIncomingBinding
+import com.example.myapplication.utils.TimeUtils
 
 class IncomingTextViewHolder(
     private val binding: ItemChatIncomingBinding,
@@ -25,6 +26,7 @@ class IncomingTextViewHolder(
             )
         }
         binding.tvMessageContent.text = displayContent
+        binding.tvTime.text = TimeUtils.formatRelativeTime(message.createdAt)
 
         val avatar = message.sender.avatar
         if (!avatar.isNullOrEmpty()) {

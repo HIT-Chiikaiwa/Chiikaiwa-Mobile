@@ -135,33 +135,10 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginBottom="@dimen/_6sdp"
                 android:clipToPadding="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toTopOf="@id/btnCreateSchedule"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvMonthYear"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_schedule" />
-
-            <FrameLayout
-                android:id="@+id/btnCreateSchedule"
-                android:layout_width="@dimen/_42sdp"
-                android:layout_height="@dimen/_42sdp"
-                android:layout_marginBottom="@dimen/_6sdp"
-                android:background="@drawable/bg_button"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <ImageView
-                    android:layout_width="@dimen/_20sdp"
-                    android:layout_height="@dimen/_20sdp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_plus"
-                    app:tint="@color/brown" />
-            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

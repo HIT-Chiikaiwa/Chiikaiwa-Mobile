@@ -6,6 +6,7 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.data.model.Message
 import com.example.myapplication.databinding.ItemChatImageOutgoingBinding
+import com.example.myapplication.utils.TimeUtils
 
 class OutgoingImageViewHolder(
     private val binding: ItemChatImageOutgoingBinding,
@@ -13,6 +14,8 @@ class OutgoingImageViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
+        binding.tvTime.text = TimeUtils.formatRelativeTime(message.createdAt)
+
         val avatar = message.sender.avatar
         if (!avatar.isNullOrEmpty()) {
             Glide.with(binding.ivMyAvatar.context)

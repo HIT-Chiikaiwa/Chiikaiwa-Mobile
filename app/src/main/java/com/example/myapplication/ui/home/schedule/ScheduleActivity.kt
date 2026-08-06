@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
 
@@ -41,10 +42,6 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
 
         binding.rvScheduleList.layoutManager = LinearLayoutManager(this)
         binding.rvScheduleList.adapter = adapter
-
-        binding.btnCreateSchedule.setOnClickListener {
-            startActivity(Intent(this, CreateAppointmentActivity::class.java))
-        }
 
         setupWeekNavigation()
         setupDayTabs()
@@ -166,11 +163,35 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
         }
 
         val filteredFromAll = allMyBookings.filter { booking ->
-            booking.scheduledAt?.startsWith(targetDateStr) == true
+            val utcTime = booking.scheduledAt ?: return@filter false
+            val vnDate = com.example.myapplication.utils.TimeUtils.utcToVnDate(utcTime)
+            vnDate == targetDateStr
         }
 
-        val combinedList = (filteredFromWeekly.orEmpty() + filteredFromAll).distinctBy { it.id ?: it.toString() }
+        val combinedList = (filteredFromWeekly.orEmpty() + filteredFromAll)
+            .distinctBy { it.id ?: it.toString() }
+            .filter { booking -> isBookingValidForSchedule(booking) }
+
         adapter.submitList(combinedList)
+    }
+
+    private fun isBookingValidForSchedule(booking: BookingDto): Boolean {
+        val status = booking.status?.uppercase(Locale.getDefault())
+        if (status == "CANCELLED" || status == "REJECTED" || status == "EXPIRED") {
+            return false
+        }
+
+        val scheduledAt = booking.scheduledAt ?: return true
+        return try {
+            val date = com.example.myapplication.utils.TimeUtils.parseUtcDate(scheduledAt)
+            if (date != null && status == "PENDING" && date.time < System.currentTimeMillis()) {
+                false
+            } else {
+                true
+            }
+        } catch (e: Exception) {
+            true
+        }
     }
 
     override fun observeData() {

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/svProfile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -119,13 +120,7 @@
 
 
 
-                        <TextView
-                            android:id="@+id/tvFriendsCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/friends"
-                            android:textColor="@color/brown"
-                            android:textSize="@dimen/_12ssp" />
+
 
                         <TextView
                             android:id="@+id/tvBuddyStatus"
@@ -292,8 +287,19 @@
                     android:layout_height="wrap_content"
                     android:text="@string/favorite"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_12ssp"
+                    android:textSize="@dimen/_11ssp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvFavoriteRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:text="100.0"
+                    android:textColor="@color/brown"
+                    android:textSize="@dimen/_16ssp"
+                    android:textStyle="bold"
+                    tools:text="100.0" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -330,8 +336,21 @@
                     android:focusable="false"
                     android:text="@string/appointment"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_12ssp"
+                    android:textSize="@dimen/_11ssp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAppointmentCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:text="0"
+                    android:textColor="@color/brown"
+                    android:textSize="@dimen/_16ssp"
+                    android:textStyle="bold"
+                    tools:text="0" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

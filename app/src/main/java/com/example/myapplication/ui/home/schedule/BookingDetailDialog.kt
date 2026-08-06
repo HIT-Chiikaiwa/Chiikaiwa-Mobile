@@ -9,6 +9,8 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.BookingDto
 import com.example.myapplication.databinding.DialogBookingDetailBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class BookingDetailDialog(
     private val context: Context,
@@ -44,8 +46,8 @@ class BookingDetailDialog(
         binding.tvStatus.text = status
 
         val duration = booking.durationMinutes ?: 30
-        val timeStr = booking.scheduledAt ?: ""
-        binding.tvTimeAndDate.text = "Thời gian: $timeStr ($duration phút)"
+        val formattedScheduledAt = formatScheduledAt(booking.scheduledAt)
+        binding.tvTimeAndDate.text = "Thời gian: $formattedScheduledAt ($duration phút)"
 
         val locName = booking.locationName ?: "Online"
         val locAddr = booking.locationAddress ?: ""
@@ -136,5 +138,11 @@ class BookingDetailDialog(
                 onStatusChanged(null, null, score)
             }
         }
+    }
+
+    private fun formatScheduledAt(rawTime: String?): String {
+        if (rawTime.isNullOrEmpty()) return "Chưa xác định"
+        val result = com.example.myapplication.utils.TimeUtils.formatUtcToVn(rawTime, "HH:mm, dd/MM/yyyy")
+        return result.ifEmpty { rawTime }
     }
 }

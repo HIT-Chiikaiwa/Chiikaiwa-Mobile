@@ -52,10 +52,8 @@ class ScheduleAdapter(
         private fun formatTimeRange(scheduledAt: String?, durationMinutes: Int): String {
             if (scheduledAt.isNullOrEmpty()) return "Chưa xếp giờ"
             return try {
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-                inputFormat.timeZone = TimeZone.getTimeZone("UTC")
-                val date = inputFormat.parse(scheduledAt) ?: return scheduledAt
-                val calendar = Calendar.getInstance().apply { time = date }
+                val date = com.example.myapplication.utils.TimeUtils.parseUtcDate(scheduledAt) ?: return scheduledAt
+                val calendar = Calendar.getInstance(com.example.myapplication.utils.TimeUtils.VN_TIMEZONE).apply { time = date }
 
                 val startHour = calendar.get(Calendar.HOUR_OF_DAY)
                 val startMinute = calendar.get(Calendar.MINUTE)

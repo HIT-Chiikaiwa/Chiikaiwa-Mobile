@@ -50,12 +50,15 @@ class FriendsAdapter(
                     val isMe = msg.senderId == currentUserId
                     val prefix = if (isMe) "Bạn: " else if (!msg.senderName.isNullOrEmpty()) "${msg.senderName}: " else ""
 
-                    val contentDescription = when (msg.messageType?.uppercase()) {
-                        "IMAGE" -> "Đã gửi 1 hình ảnh"
-                        "VIDEO" -> "Đã gửi 1 video"
-                        "VOICE", "AUDIO" -> "Đã gửi 1 tin nhắn thoại"
-                        "FILE" -> "Đã gửi 1 tệp tài liệu"
-                        "LOCATION" -> "Đã chia sẻ 1 vị trí"
+                    val contentDescription = when {
+                        msg.messageType?.uppercase() == "IMAGE" -> "Đã gửi 1 hình ảnh"
+                        msg.messageType?.uppercase() == "VIDEO" -> "Đã gửi 1 video"
+                        msg.messageType?.uppercase() == "VOICE" || msg.messageType?.uppercase() == "AUDIO" -> "Đã gửi 1 tin nhắn thoại"
+                        msg.messageType?.uppercase() == "FILE" -> "Đã gửi 1 tệp tài liệu"
+                        msg.messageType?.uppercase() == "LOCATION" -> "Đã chia sẻ 1 vị trí"
+                        msg.messageType?.uppercase() == "BOOKING" || com.example.myapplication.utils.BookingJsonParser.isBookingMessage(msg.content) -> {
+                            com.example.myapplication.utils.BookingJsonParser.formatBookingSummary(msg.content)
+                        }
                         else -> msg.content ?: ""
                     }
                     "$prefix$contentDescription"
@@ -65,7 +68,7 @@ class FriendsAdapter(
             }
             binding.tvLastMessage.text = lastMsgText
 
-            binding.tvTime.text = com.example.myapplication.utils.TimeUtils.formatChatTime(item.lastMessage?.createdDate)
+            binding.tvTime.text = com.example.myapplication.utils.TimeUtils.formatRelativeTime(item.lastMessage?.createdDate)
 
             val avatarUrl = if (isUserUnavailable) null else (item.groupAvatar ?: if (item.lastMessage?.senderId != currentUserId) item.lastMessage?.senderAvatar else null)
 

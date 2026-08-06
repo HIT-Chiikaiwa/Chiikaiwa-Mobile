@@ -7,6 +7,7 @@ import com.example.myapplication.R
 import com.example.myapplication.data.model.Message
 import com.example.myapplication.databinding.ItemChatBookingOutgoingBinding
 import com.example.myapplication.utils.BookingMessageHelper
+import com.example.myapplication.utils.TimeUtils
 
 class OutgoingBookingViewHolder(
     private val binding: ItemChatBookingOutgoingBinding,
@@ -22,7 +23,7 @@ class OutgoingBookingViewHolder(
         )
 
         binding.tvBookingTitle.text = parsed.title
-        binding.tvTime.text = parsed.time
+        binding.tvTime.text = TimeUtils.formatRelativeTime(message.createdAt)
 
         val status = parsed.status?.uppercase() ?: ""
         if (status == "CANCELLED" || status == "REJECTED") {

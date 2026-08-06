@@ -20,13 +20,18 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     private val repository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
+    private val bookingRepository = com.example.myapplication.data.repository.BookingRepository(application)
     private val _subjects = MutableStateFlow<List<SubjectDto>>(emptyList())
     val subjects: StateFlow<List<SubjectDto>> get() = _subjects
+
+    private val _appointmentCount = MutableStateFlow<Int>(0)
+    val appointmentCount: StateFlow<Int> get() = _appointmentCount
 
     fun getUserId(): String? = preferenceManager.getUserId()
 
     fun loadProfile() {
         val userId = getUserId() ?: return
+        loadAppointmentCount()
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             when (val result = repository.getProfile(userId)) {
@@ -37,6 +42,24 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun loadAppointmentCount() {
+        viewModelScope.launch {
+            when (val result = bookingRepository.getMyBookings()) {
+                is Resource.Success -> {
+                    val list = result.data.data ?: emptyList()
+                    val validCount = list.count { booking ->
+                        val status = booking.status?.uppercase(java.util.Locale.getDefault())
+                        status != "CANCELLED" && status != "REJECTED" && status != "EXPIRED"
+                    }
+                    _appointmentCount.value = validCount
+                }
+                is Resource.Error -> {
+                    _appointmentCount.value = 0
                 }
             }
         }

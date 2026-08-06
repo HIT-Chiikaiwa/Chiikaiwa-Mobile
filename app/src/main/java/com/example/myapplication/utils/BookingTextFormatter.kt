@@ -62,17 +62,17 @@ object BookingTextFormatter {
                 } else ""
 
                 val builder = StringBuilder()
-                builder.append("📅 ").append(subject).append("\n")
+                builder.append("Lịch").append(subject).append("\n")
                 if (formattedTime.isNotEmpty()) {
                     builder.append("⏰ ").append(formattedTime).append(" (").append(duration).append(" phút)\n")
                 }
                 if (!location.isNullOrEmpty()) {
-                    builder.append("📍 Địa điểm: ").append(location).append("\n")
+                    builder.append("Địa điểm: ").append(location).append("\n")
                 }
                 if (!note.isNullOrEmpty()) {
-                    builder.append("📝 Ghi chú: ").append(note).append("\n")
+                    builder.append("Ghi chú: ").append(note).append("\n")
                 }
-                builder.append("📌 Trạng thái: ").append(translateStatus(status))
+                builder.append("Trạng thái: ").append(translateStatus(status))
 
                 builder.toString()
             } catch (e: Exception) {
