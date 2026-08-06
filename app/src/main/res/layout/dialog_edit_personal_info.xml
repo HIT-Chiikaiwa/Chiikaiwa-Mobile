@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_2">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_16sdp">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Chỉnh Sửa Thông Tin"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold" />
+
+        <!-- Name Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etLastName"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:background="@drawable/bg_edittext"
+                android:hint="Họ"
+                android:inputType="textPersonName"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:textColor="@color/brown"
+                android:textColorHint="@color/hint"
+                android:textSize="@dimen/_12ssp" />
+
+            <EditText
+                android:id="@+id/etFirstName"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:background="@drawable/bg_edittext"
+                android:hint="Tên"
+                android:inputType="textPersonName"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:textColor="@color/brown"
+                android:textColorHint="@color/hint"
+                android:textSize="@dimen/_12ssp" />
+        </LinearLayout>
+
+        <!-- Date of Birth -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Ngày sinh (YYYY-MM-DD):"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etDateOfBirth"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:background="@drawable/bg_edittext"
+            android:hint="VD: 2002-05-15"
+            android:inputType="date"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_12ssp" />
+
+        <!-- Gender Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Giới tính:"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/rgGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_12sdp"
+                android:text="Nam"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_11ssp" />
+
+            <RadioButton
+                android:id="@+id/rbFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_12sdp"
+                android:text="Nữ"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_11ssp" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khác"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_11ssp" />
+        </RadioGroup>
+
+        <!-- Academic Info -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Trường học:"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etUniversity"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Nhập tên trường học"
+            android:inputType="text"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_12ssp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Ngành học:"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etMajorName"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Nhập tên ngành học"
+            android:inputType="text"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_12ssp" />
+
+        <!-- Phone & Email -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Số điện thoại:"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Số điện thoại"
+            android:inputType="phone"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_12ssp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_36sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:background="@drawable/bg_card_retro"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_18sdp"
+                android:text="Hủy"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_12ssp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_36sdp"
+                android:background="@drawable/bg_button"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/_18sdp"
+                android:text="Lưu"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_12ssp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

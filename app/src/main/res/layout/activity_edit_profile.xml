@@ -291,13 +291,6 @@
                         android:textColor="@color/brown"
                         android:textSize="@dimen/_11ssp" />
 
-                    <TextView
-                        android:id="@+id/tvCountry"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/country"
-                        android:textColor="@color/brown"
-                        android:textSize="@dimen/_11ssp" />
 
                     <View
                         android:layout_width="match_parent"

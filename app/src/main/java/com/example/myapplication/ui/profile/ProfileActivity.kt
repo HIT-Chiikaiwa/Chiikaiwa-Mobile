@@ -44,29 +44,34 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             finish()
         }
 
+        binding.cvHonor.setOnClickListener {
+            showSubjectManagementDialog(isOtherUser)
+        }
+
         if (isOtherUser) {
             binding.btnUpdateProfile.visibility = View.GONE
             binding.cvSettings.visibility = View.GONE
+            binding.ivWoodBottomLeft.visibility = View.GONE
+            binding.ivWoodBottomRight.visibility = View.GONE
         } else {
             binding.btnUpdateProfile.visibility = View.VISIBLE
+            binding.cvSettings.visibility = View.VISIBLE
+            binding.ivWoodBottomLeft.visibility = View.VISIBLE
+            binding.ivWoodBottomRight.visibility = View.VISIBLE
+
             binding.btnUpdateProfile.setOnClickListener {
                 startActivity(Intent(this, EditProfileActivity::class.java))
             }
             binding.cvSettings.setOnClickListener {
                 startActivity(Intent(this, AccountSettingsActivity::class.java))
             }
+            val openScheduleAction = View.OnClickListener {
+                startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
+            }
+            binding.cvAppointment.setOnClickListener(openScheduleAction)
+            binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)
+            binding.tvAppointment.setOnClickListener(openScheduleAction)
         }
-
-        binding.cvHonor.setOnClickListener {
-            showSubjectManagementDialog()
-        }
-
-        val openScheduleAction = View.OnClickListener {
-            startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
-        }
-        binding.cvAppointment.setOnClickListener(openScheduleAction)
-        binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)
-        binding.tvAppointment.setOnClickListener(openScheduleAction)
     }
 
     override fun onResume() {
@@ -139,7 +144,6 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
 
         binding.tvSchool.text = "Trường học: ${user.university ?: "Chưa cập nhật"}"
         binding.tvMajor.text = "Ngành học: ${user.majorName ?: "Chưa cập nhật"}"
-        binding.tvCountry.text = "Quê quán: ${user.location ?: "Chưa cập nhật"}"
 
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(this)
@@ -169,7 +173,7 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
         }
     }
 
-    private fun showSubjectManagementDialog() {
+    private fun showSubjectManagementDialog(isOtherUser: Boolean = false) {
         val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
         val binding = com.example.myapplication.databinding.DialogSubjectManagementBinding.inflate(layoutInflater)
         dialog.setView(binding.root)
@@ -178,9 +182,16 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
             dialog.dismiss()
         }
 
-        binding.btnAddSubject.setOnClickListener {
-            showAddSubjectDialog {
-                viewModel.loadSubjects()
+        if (isOtherUser) {
+            binding.tvTitle.text = "Danh Sách Môn Học"
+            binding.btnAddSubject.visibility = View.GONE
+        } else {
+            binding.tvTitle.text = "Quản Lý Môn Học"
+            binding.btnAddSubject.visibility = View.VISIBLE
+            binding.btnAddSubject.setOnClickListener {
+                showAddSubjectDialog {
+                    viewModel.loadSubjects()
+                }
             }
         }
 
@@ -192,8 +203,13 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
                 val parent = if (sub.type == "STRENGTH") binding.layoutStrengthSubjects else binding.layoutReviewSubjects
                 val itemBinding = com.example.myapplication.databinding.ItemDialogSubjectBinding.inflate(layoutInflater, parent, false)
                 itemBinding.tvSubjectName.text = sub.name
-                itemBinding.btnDeleteSubject.setOnClickListener {
-                    viewModel.deleteSubject(sub.id)
+                if (isOtherUser) {
+                    itemBinding.btnDeleteSubject.visibility = View.GONE
+                } else {
+                    itemBinding.btnDeleteSubject.visibility = View.VISIBLE
+                    itemBinding.btnDeleteSubject.setOnClickListener {
+                        viewModel.deleteSubject(sub.id)
+                    }
                 }
                 parent.addView(itemBinding.root)
             }

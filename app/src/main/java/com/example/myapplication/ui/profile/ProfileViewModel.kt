@@ -289,4 +289,29 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
             }
         }
     }
+
+    fun updateFullProfileInfo(personalRequest: UpdatePersonalInfoRequest, academicRequest: UpdateAcademicInfoRequest) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            val personalResult = repository.updatePersonalInfo(userId, personalRequest)
+            if (personalResult is Resource.Error) {
+                _uiState.value = UiState.Error(personalResult.message)
+                _event.emit(UiEvent.ShowToast("Lỗi cập nhật thông tin cá nhân: ${personalResult.message}"))
+                return@launch
+            }
+
+            val academicResult = repository.updateAcademicInfo(userId, academicRequest)
+            if (academicResult is Resource.Error) {
+                _uiState.value = UiState.Error(academicResult.message)
+                _event.emit(UiEvent.ShowToast("Lỗi cập nhật học vấn: ${academicResult.message}"))
+                return@launch
+            }
+
+            if (academicResult is Resource.Success) {
+                _uiState.value = UiState.Success(academicResult.data.data)
+                _event.emit(UiEvent.ShowToast("Cập nhật thông tin thành công"))
+            }
+        }
+    }
 }
