@@ -65,6 +65,18 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
+            android:name=".ui.profile.RegistrationInfoActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.ChangePasswordActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.NotificationSettingsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
             android:name=".ui.home.chat.FriendsListActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
