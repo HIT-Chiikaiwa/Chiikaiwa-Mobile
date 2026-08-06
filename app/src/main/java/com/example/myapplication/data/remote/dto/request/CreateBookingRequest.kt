@@ -1,9 +1,12 @@
 package com.example.myapplication.data.remote.dto.request
 
+import com.google.gson.annotations.SerializedName
+
 data class CreateBookingRequest(
     val subject: String? = null,
     val scheduledAt: String? = null,
-    val durationMinutes: Int? = 0,
+    @SerializedName("durationMinutes", alternate = ["duration"])
+    val durationMinutes: Int? = 30,
     val locationName: String? = null,
     val locationAddress: String? = null,
     val locationDistrict: String? = null,
