@@ -129,44 +129,48 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
         binding.tvDateTag.text = tagFormat.format(weekCal.time)
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadDataForCurrentWeek()
+    }
+
     private fun filterAndDisplayBookings() {
         val weeklyData = viewModel.weeklyBookings.value
         val allMyBookings = viewModel.myBookings.value
 
-        val dayKeyList = when (selectedDayOfWeek) {
-            Calendar.MONDAY -> listOf("MONDAY", "Monday", "0", "1")
-            Calendar.TUESDAY -> listOf("TUESDAY", "Tuesday", "1", "2")
-            Calendar.WEDNESDAY -> listOf("WEDNESDAY", "Wednesday", "2", "3")
-            Calendar.THURSDAY -> listOf("THURSDAY", "Thursday", "3", "4")
-            Calendar.FRIDAY -> listOf("FRIDAY", "Friday", "4", "5")
-            Calendar.SATURDAY -> listOf("SATURDAY", "Saturday", "5", "6")
-            Calendar.SUNDAY -> listOf("SUNDAY", "Sunday", "6", "7")
-            else -> emptyList()
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val targetCal = currentCalendar.clone() as Calendar
+        targetCal.firstDayOfWeek = Calendar.MONDAY
+        targetCal.set(Calendar.DAY_OF_WEEK, selectedDayOfWeek)
+        val targetDateStr = sdf.format(targetCal.time)
+
+        val dayKeyList = mutableListOf(targetDateStr)
+        when (selectedDayOfWeek) {
+            Calendar.MONDAY -> dayKeyList.addAll(listOf("MONDAY", "Monday", "0", "1"))
+            Calendar.TUESDAY -> dayKeyList.addAll(listOf("TUESDAY", "Tuesday", "1", "2"))
+            Calendar.WEDNESDAY -> dayKeyList.addAll(listOf("WEDNESDAY", "Wednesday", "2", "3"))
+            Calendar.THURSDAY -> dayKeyList.addAll(listOf("THURSDAY", "Thursday", "3", "4"))
+            Calendar.FRIDAY -> dayKeyList.addAll(listOf("FRIDAY", "Friday", "4", "5"))
+            Calendar.SATURDAY -> dayKeyList.addAll(listOf("SATURDAY", "Saturday", "5", "6"))
+            Calendar.SUNDAY -> dayKeyList.addAll(listOf("SUNDAY", "Sunday", "6", "7"))
         }
 
-        var filtered: List<BookingDto>? = null
+        var filteredFromWeekly: List<BookingDto>? = null
         if (weeklyData?.daySchedules != null) {
             for (key in dayKeyList) {
                 if (weeklyData.daySchedules.containsKey(key)) {
-                    filtered = weeklyData.daySchedules[key]
+                    filteredFromWeekly = weeklyData.daySchedules[key]
                     break
                 }
             }
         }
 
-        if (filtered == null && allMyBookings.isNotEmpty()) {
-            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val targetCal = currentCalendar.clone() as Calendar
-            targetCal.firstDayOfWeek = Calendar.MONDAY
-            targetCal.set(Calendar.DAY_OF_WEEK, selectedDayOfWeek)
-            val targetDateStr = sdf.format(targetCal.time)
-
-            filtered = allMyBookings.filter { booking ->
-                booking.scheduledAt?.startsWith(targetDateStr) == true
-            }
+        val filteredFromAll = allMyBookings.filter { booking ->
+            booking.scheduledAt?.startsWith(targetDateStr) == true
         }
 
-        adapter.submitList(filtered ?: emptyList())
+        val combinedList = (filteredFromWeekly.orEmpty() + filteredFromAll).distinctBy { it.id ?: it.toString() }
+        adapter.submitList(combinedList)
     }
 
     override fun observeData() {
