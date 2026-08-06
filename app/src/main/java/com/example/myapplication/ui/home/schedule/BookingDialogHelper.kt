@@ -1,11 +1,12 @@
 package com.example.myapplication.ui.home.schedule
 
 import android.content.Context
-import android.widget.EditText
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.myapplication.data.remote.dto.response.BookingDto
 import com.example.myapplication.databinding.DialogBookingDetailBinding
+import com.example.myapplication.databinding.DialogCancelReasonBinding
 
 object BookingDialogHelper {
 
@@ -15,21 +16,23 @@ object BookingDialogHelper {
         viewModel: BookingViewModel,
         onCancelled: (reason: String) -> Unit
     ) {
-        val input = EditText(context).apply {
-            hint = "Nhập lý do hủy hẹn..."
-            setPadding(32, 32, 32, 32)
+        val dialog = AlertDialog.Builder(context).create()
+        val binding = DialogCancelReasonBinding.inflate(LayoutInflater.from(context))
+        dialog.setView(binding.root)
+
+        binding.btnCancel.setOnClickListener {
+            dialog.dismiss()
         }
 
-        AlertDialog.Builder(context)
-            .setTitle("Hủy cuộc hẹn")
-            .setView(input)
-            .setPositiveButton("Hủy hẹn") { _, _ ->
-                val reason = input.text.toString().trim()
-                viewModel.cancelBooking(bookingId, reason)
-                onCancelled(reason)
-            }
-            .setNegativeButton("Quay lại", null)
-            .show()
+        binding.btnConfirmCancel.setOnClickListener {
+            val reason = binding.etCancelReason.text.toString().trim()
+            viewModel.cancelBooking(bookingId, reason)
+            onCancelled(reason)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     fun handleRatingSubmit(

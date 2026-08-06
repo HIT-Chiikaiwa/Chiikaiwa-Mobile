@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_2"
+    android:orientation="vertical"
+    android:padding="@dimen/_16sdp">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Thêm Môn Học"
+        android:textColor="@color/brown"
+        android:textSize="@dimen/_16ssp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etSubjectName"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_42sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:background="@drawable/bg_edittext"
+        android:hint="Tên môn học"
+        android:inputType="text"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:textColor="@color/brown"
+        android:textColorHint="@color/hint"
+        android:textSize="@dimen/_12ssp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:text="Loại môn học:"
+        android:textColor="@color/brown"
+        android:textSize="@dimen/_12ssp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/rgSubjectType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_6sdp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbStrength"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_16sdp"
+            android:checked="true"
+            android:text="Thế mạnh"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_12ssp" />
+
+        <RadioButton
+            android:id="@+id/rbReview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cần ôn tập"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_12ssp" />
+    </RadioGroup>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnCancelAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:background="@drawable/bg_card_retro"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_18sdp"
+            android:text="Hủy"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_12ssp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnConfirmAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_36sdp"
+            android:background="@drawable/bg_button"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/_18sdp"
+            android:text="Xác nhận"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_12ssp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

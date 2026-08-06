@@ -31,6 +31,12 @@ interface ApiService {
     @POST("api/v1/auth/refresh")
     suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<LoginResponse>
 
+    @POST("api/v1/auth/logout")
+    suspend fun logout(@Body request: LogoutRequest): Response<BaseResponse<Any>>
+
+    @GET("api/v1/user/current")
+    suspend fun getCurrentUser(): Response<BaseResponse<UserDto>>
+
     @GET("api/v1/profile/{userId}")
     suspend fun getProfile(@Path("userId") userId: String): Response<BaseResponse<UserDto>>
 

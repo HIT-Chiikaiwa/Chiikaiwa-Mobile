@@ -29,19 +29,56 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
 
     fun getUserId(): String? = preferenceManager.getUserId()
 
-    fun loadProfile() {
-        val userId = getUserId() ?: return
-        loadAppointmentCount()
+    fun loadProfile(targetUserId: String? = null) {
+        val currentUserId = getUserId()
+        val userId = targetUserId ?: currentUserId ?: return
+        val isSelf = targetUserId == null || targetUserId == currentUserId
+        if (isSelf) {
+            loadAppointmentCount()
+        }
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            when (val result = repository.getProfile(userId)) {
-                is Resource.Success -> {
-                    val user = result.data.data
-                    _uiState.value = UiState.Success(user)
-                    _subjects.value = user.subjects ?: emptyList()
+            if (isSelf) {
+                val currentUserRes = repository.getCurrentUser()
+                var currentUserDto: UserDto? = null
+                if (currentUserRes is Resource.Success) {
+                    currentUserDto = currentUserRes.data.data
+                    currentUserDto?.email?.let { email ->
+                        if (email.isNotEmpty()) preferenceManager.saveEmail(email)
+                    }
                 }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+
+                when (val profileRes = repository.getProfile(userId)) {
+                    is Resource.Success -> {
+                        val profileUser = profileRes.data.data
+                        val mergedUser = if (currentUserDto != null) {
+                            profileUser.copy(
+                                email = currentUserDto.email ?: profileUser.email
+                            )
+                        } else {
+                            profileUser
+                        }
+                        _uiState.value = UiState.Success(mergedUser)
+                        _subjects.value = mergedUser.subjects ?: emptyList()
+                    }
+                    is Resource.Error -> {
+                        if (currentUserDto != null) {
+                            _uiState.value = UiState.Success(currentUserDto)
+                        } else {
+                            _uiState.value = UiState.Error(profileRes.message)
+                        }
+                    }
+                }
+            } else {
+                when (val profileRes = repository.getProfile(userId)) {
+                    is Resource.Success -> {
+                        val profileUser = profileRes.data.data
+                        _uiState.value = UiState.Success(profileUser)
+                        _subjects.value = profileUser.subjects ?: emptyList()
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = UiState.Error(profileRes.message)
+                    }
                 }
             }
         }
@@ -192,9 +229,17 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         }
     }
 
+    private val authRepository = com.example.myapplication.data.repository.AuthRepository(application)
+
     fun logout() {
-        preferenceManager.logout()
-        viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
+        val refreshToken = preferenceManager.getRefreshToken()
+        viewModelScope.launch {
+            if (!refreshToken.isNullOrEmpty()) {
+                authRepository.logout(refreshToken)
+            }
+            preferenceManager.logout()
+            _event.emit(UiEvent.NavigateHome)
+        }
     }
 
     fun updateStatusTag(statusTag: String) {

@@ -361,8 +361,10 @@
             android:layout_marginStart="@dimen/_4sdp"
             android:layout_marginTop="@dimen/_12sdp"
             android:layout_marginEnd="@dimen/_25sdp"
+            android:clickable="true"
+            android:focusable="true"
             app:cardCornerRadius="@dimen/_15sdp"
-            app:cardElevation="-3dp"
+            app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toEndOf="@id/cvAppointment"
@@ -379,10 +381,21 @@
                     android:id="@+id/tvHonor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/honor"
+                    android:text="Môn học"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_12ssp"
+                    android:textSize="@dimen/_11ssp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSubjectCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:text="0"
+                    android:textColor="@color/brown"
+                    android:textSize="@dimen/_16ssp"
+                    android:textStyle="bold"
+                    tools:text="0" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

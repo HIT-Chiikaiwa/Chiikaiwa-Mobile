@@ -16,6 +16,10 @@ import com.example.myapplication.data.remote.api.ApiService
 class ProfileRepository(context: Context) : BaseRepository() {
     private val api = RetrofitClient.create(context)
 
+    suspend fun getCurrentUser(): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.getCurrentUser() }
+    }
+
     suspend fun getProfile(userId: String): Resource<BaseResponse<UserDto>> {
         return safeApiCall { api.getProfile(userId) }
     }

@@ -142,21 +142,43 @@
             app:layout_constraintTop_toTopOf="@id/ivMajorIcon"
             tools:text="Kỹ thuật phần mềm" />
 
-        <TextView
-            android:id="@+id/btnSendMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_45sdp"
+        <LinearLayout
+            android:id="@+id/layoutActionButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
-            android:background="@drawable/bg_button"
             android:gravity="center"
-            android:paddingHorizontal="@dimen/_30sdp"
-            android:text="@string/send_message"
-            android:textColor="@color/brown"
-            android:textSize="@dimen/_15ssp"
-            android:textStyle="bold"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvMajor" />
+            app:layout_constraintTop_toBottomOf="@id/tvMajor">
+
+            <TextView
+                android:id="@+id/btnAddFriend"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button"
+                android:gravity="center"
+                android:text="Thêm bạn"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_13ssp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnViewProfile"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card_retro"
+                android:gravity="center"
+                android:text="Trang cá nhân"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_13ssp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

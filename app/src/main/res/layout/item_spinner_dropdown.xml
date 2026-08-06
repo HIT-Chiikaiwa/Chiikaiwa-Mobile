@@ -3,7 +3,9 @@
     android:id="@android:id/text1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/_5sdp"
     android:textColor="@color/brown"
-    android:textSize="@dimen/_15ssp"
+    android:textSize="@dimen/_12ssp"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="@dimen/_12sdp"
+    android:paddingVertical="@dimen/_10sdp"
     android:background="@color/bg_2" />

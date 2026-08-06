@@ -11,6 +11,8 @@ import com.example.myapplication.databinding.ActivityCreateAppointmentBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
+import com.example.myapplication.R
+import com.example.myapplication.utils.extension.setBrownTextColor
 import java.util.Calendar
 import java.util.Locale
 
@@ -89,11 +91,13 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
         binding.npHour.maxValue = 23
         binding.npHour.value = calendar.get(Calendar.HOUR_OF_DAY)
         binding.npHour.setFormatter { String.format(Locale.getDefault(), "%02d", it) }
+        binding.npHour.setBrownTextColor()
 
         binding.npMinute.minValue = 0
         binding.npMinute.maxValue = 59
         binding.npMinute.value = calendar.get(Calendar.MINUTE)
         binding.npMinute.setFormatter { String.format(Locale.getDefault(), "%02d", it) }
+        binding.npMinute.setBrownTextColor()
     }
 
     private fun setupDurationSpinner() {
@@ -106,16 +110,16 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
             "180 phút (3 giờ)",
             "240 phút (4 giờ)"
         )
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, durations)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(this, R.layout.item_spinner_selected, durations)
+        adapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
         binding.spDuration.adapter = adapter
         binding.spDuration.setSelection(0)
     }
 
     private fun setupModeSpinner() {
         val modes = arrayOf("Offline", "Online")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, modes)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(this, R.layout.item_spinner_selected, modes)
+        adapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
         binding.spMode.adapter = adapter
 
         binding.spMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

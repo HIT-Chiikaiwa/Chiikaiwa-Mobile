@@ -139,11 +139,18 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         binding.tvSchool.text = "Chưa cập nhật"
         binding.tvMajor.text = "Chưa cập nhật"
 
-        binding.btnSendMessage.setOnClickListener {
+        binding.btnAddFriend.text = "Nhắn tin"
+        binding.btnAddFriend.setOnClickListener {
             dialog.dismiss()
             val intent = Intent(this, ChatActivity::class.java).apply {
                 putExtra("user_name", userName)
             }
+            startActivity(intent)
+        }
+
+        binding.btnViewProfile.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(this, com.example.myapplication.ui.profile.ProfileActivity::class.java)
             startActivity(intent)
         }
 

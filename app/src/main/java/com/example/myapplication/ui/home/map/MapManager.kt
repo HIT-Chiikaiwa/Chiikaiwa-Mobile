@@ -240,14 +240,63 @@ class MapManager(
         }
 
         if (userId == viewModel.currentUserId) {
-            binding.btnSendMessage.visibility = View.GONE
+            binding.layoutActionButtons.visibility = View.GONE
         } else {
-            binding.btnSendMessage.visibility = View.VISIBLE
-            binding.btnSendMessage.setOnClickListener {
+            binding.layoutActionButtons.visibility = View.VISIBLE
+            binding.btnAddFriend.text = "Thêm bạn"
+            binding.btnAddFriend.isEnabled = true
+            binding.btnAddFriend.alpha = 1.0f
+
+            val friendRepository = com.example.myapplication.data.repository.FriendRepository(context)
+
+            fragment.lifecycleScope.launch {
+                val friendsRes = friendRepository.getFriends(0, 100)
+                if (friendsRes is com.example.myapplication.utils.resource.Resource.Success) {
+                    val friends = friendsRes.data.data.content
+                    if (friends.any { it.userId == userId }) {
+                        binding.btnAddFriend.text = "Bạn bè"
+                        binding.btnAddFriend.isEnabled = false
+                        binding.btnAddFriend.alpha = 0.7f
+                        return@launch
+                    }
+                }
+
+                val pendingRes = friendRepository.getPendingFriendRequests(0, 100)
+                if (pendingRes is com.example.myapplication.utils.resource.Resource.Success) {
+                    val pending = pendingRes.data.data.content
+                    if (pending.any { it.userId == userId }) {
+                        binding.btnAddFriend.text = "Đã gửi yêu cầu"
+                        binding.btnAddFriend.isEnabled = false
+                        binding.btnAddFriend.alpha = 0.6f
+                        return@launch
+                    }
+                }
+            }
+
+            binding.btnAddFriend.setOnClickListener {
+                binding.btnAddFriend.text = "Đã gửi yêu cầu"
+                binding.btnAddFriend.isEnabled = false
+                binding.btnAddFriend.alpha = 0.6f
+
+                fragment.lifecycleScope.launch {
+                    when (val result = friendRepository.sendFriendRequest(userId)) {
+                        is com.example.myapplication.utils.resource.Resource.Success -> {
+                            Toast.makeText(context, "Đã gửi lời mời kết bạn thành công", Toast.LENGTH_SHORT).show()
+                        }
+                        is com.example.myapplication.utils.resource.Resource.Error -> {
+                            binding.btnAddFriend.text = "Thêm bạn"
+                            binding.btnAddFriend.isEnabled = true
+                            binding.btnAddFriend.alpha = 1.0f
+                            Toast.makeText(context, result.message ?: "Gửi lời mời kết bạn thất bại", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
+            binding.btnViewProfile.setOnClickListener {
                 dialog.dismiss()
-                val intent = Intent(context, ChatActivity::class.java).apply {
+                val intent = Intent(context, com.example.myapplication.ui.profile.ProfileActivity::class.java).apply {
                     putExtra("target_user_id", userId)
-                    putExtra("user_name", name)
                 }
                 context.startActivity(intent)
             }

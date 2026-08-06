@@ -46,4 +46,8 @@ class AuthRepository(context: Context) : BaseRepository() {
     suspend fun refreshToken(refreshToken: String): Resource<LoginResponse> {
         return safeApiCall { api.refreshToken(RefreshTokenRequest(refreshToken)) }
     }
+
+    suspend fun logout(refreshToken: String): Resource<BaseResponse<Any>> {
+        return safeApiCall { api.logout(LogoutRequest(refreshToken)) }
+    }
 }
