@@ -163,6 +163,12 @@ interface ApiService {
         @Part file: MultipartBody.Part
     ): Response<BaseResponse<String>>
 
+    @POST("api/v1/chat/conversations/{id}/schedule-invite")
+    suspend fun scheduleInvite(
+        @Path("id") conversationId: String,
+        @Body request: ScheduleInviteRequest
+    ): Response<BaseResponse<Any>>
+
     @GET("api/v1/users/search")
     suspend fun searchUsers(
         @Query("keyword") keyword: String

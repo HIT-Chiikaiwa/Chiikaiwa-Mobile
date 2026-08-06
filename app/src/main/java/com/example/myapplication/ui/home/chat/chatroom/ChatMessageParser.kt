@@ -3,34 +3,43 @@ package com.example.myapplication.ui.home.chat.chatroom
 import android.util.Log
 import com.example.myapplication.data.model.Message
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 
 class ChatMessageParser(private val gson: Gson = Gson()) {
 
+    private fun JsonElement?.asStringOrNull(): String? {
+        return if (this != null && !this.isJsonNull) this.asString else null
+    }
+
     fun parseWsMessage(body: String, activeConversationId: String): Message? {
         val jsonObj = gson.fromJson(body, JsonObject::class.java) ?: return null
-        val data = if (jsonObj.has("data") && jsonObj.get("data").isJsonObject) {
+        val data = if (jsonObj.has("data") && jsonObj.get("data")?.isJsonObject == true) {
             jsonObj.getAsJsonObject("data")
         } else jsonObj
 
-        val content = data.get("content")?.asString ?: data.get("text")?.asString ?: ""
+        val content = data.get("content").asStringOrNull() ?: data.get("text").asStringOrNull() ?: ""
         if (content.isEmpty()) return null
 
-        val msgId = data.get("id")?.asString ?: data.get("messageId")?.asString ?: System.currentTimeMillis().toString()
-        val senderId = data.get("senderId")?.asString
-            ?: data.getAsJsonObject("sender")?.get("id")?.asString ?: ""
-        val senderName = data.get("senderName")?.asString
-            ?: data.getAsJsonObject("sender")?.get("fullName")?.asString ?: "Người dùng"
-        val convId = data.get("conversationId")?.asString ?: activeConversationId
+        val msgId = data.get("id").asStringOrNull()
+            ?: data.get("messageId").asStringOrNull()
+            ?: System.currentTimeMillis().toString()
 
-        val rawCreatedDate = data.get("createdDate")?.asString 
-            ?: data.get("createdAt")?.asString 
-            ?: data.get("timestamp")?.asString 
+        val senderObj = if (data.has("sender") && data.get("sender")?.isJsonObject == true) data.getAsJsonObject("sender") else null
+        val senderId = data.get("senderId").asStringOrNull()
+            ?: senderObj?.get("id").asStringOrNull() ?: ""
+        val senderName = data.get("senderName").asStringOrNull()
+            ?: senderObj?.get("fullName").asStringOrNull() ?: "Hệ thống"
+        val convId = data.get("conversationId").asStringOrNull() ?: activeConversationId
+
+        val rawCreatedDate = data.get("createdDate").asStringOrNull()
+            ?: data.get("createdAt").asStringOrNull()
+            ?: data.get("timestamp").asStringOrNull()
             ?: ""
         Log.d("CHAT_REALTIME_LOG", "[SERVER_TIME_LOG] Raw createdDate from server: '$rawCreatedDate' | Full JSON: $data")
 
-        val rawType = data.get("messageType")?.asString 
-            ?: data.get("type")?.asString 
+        val rawType = data.get("messageType").asStringOrNull()
+            ?: data.get("type").asStringOrNull()
             ?: "TEXT"
 
         val messageType = try {
@@ -58,7 +67,7 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
         return when (data) {
             is String -> data
             is Map<*, *> -> data["url"]?.toString() ?: data["fileUrl"]?.toString() ?: data["path"]?.toString() ?: ""
-            is JsonObject -> data.get("url")?.asString ?: data.get("fileUrl")?.asString ?: data.get("path")?.asString ?: ""
+            is JsonObject -> data.get("url").asStringOrNull() ?: data.get("fileUrl").asStringOrNull() ?: data.get("path").asStringOrNull() ?: ""
             else -> data?.toString() ?: ""
         }
     }

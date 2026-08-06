@@ -1,17 +1,13 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -24,7 +20,7 @@ import com.example.myapplication.databinding.ActivityChatBinding
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.MessageAdapter
-import com.example.myapplication.ui.home.chat.component.ReactionPopup
+import com.example.myapplication.ui.home.schedule.BookingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,6 +36,9 @@ class ChatFragment : Fragment() {
 
     private val viewModel: ChatViewModel by lazy {
         ViewModelProvider(this)[ChatViewModel::class.java]
+    }
+    private val bookingViewModel: BookingViewModel by lazy {
+        ViewModelProvider(this)[BookingViewModel::class.java]
     }
     private lateinit var adapter: MessageAdapter
     private lateinit var inputHelper: ChatInputHelper
@@ -119,24 +118,29 @@ class ChatFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = MessageAdapter(viewModel.currentUserId) { anchorView, message ->
-            showActionPopup(anchorView, message)
-        }
+        adapter = MessageAdapter(
+            currentUserId = viewModel.currentUserId,
+            partnerName = userName,
+            onMessageLongClick = { anchorView, message ->
+                ChatDialogManager.showActionPopup(
+                    context = requireContext(),
+                    anchorView = anchorView,
+                    message = message,
+                    currentUserId = viewModel.currentUserId,
+                    viewModel = viewModel,
+                    bookingViewModel = bookingViewModel,
+                    conversationId = conversationId
+                )
+            },
+            onBookingAction = { bookingId, action ->
+                viewModel.performBookingAction(bookingId, action)
+            }
+        )
         val layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
         }
         binding.rvChatMessages.layoutManager = layoutManager
         binding.rvChatMessages.adapter = adapter
-    }
-
-    private fun showActionPopup(anchorView: View, message: com.example.myapplication.data.model.Message) {
-        val popup = ReactionPopup(
-            context = requireContext(),
-            currentUserId = viewModel.currentUserId,
-            onRecallClick = { msg -> viewModel.recallMessage(msg.id) },
-            onDeleteClick = { msg -> viewModel.deleteMessage(msg.id) }
-        )
-        popup.show(anchorView, message)
     }
 
     private fun setupListeners() {
@@ -149,7 +153,9 @@ class ChatFragment : Fragment() {
         }
 
         binding.btnGallery.setOnClickListener {
-            openImagePicker()
+            pickImageLauncher.launch(
+                androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
         }
 
         binding.btnCreateSchedule.setOnClickListener {
@@ -159,12 +165,6 @@ class ChatFragment : Fragment() {
             }
             startActivity(intent)
         }
-    }
-
-    private fun openImagePicker() {
-        pickImageLauncher.launch(
-            androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-        )
     }
 
     private fun handleImageSelected(uri: Uri) {
@@ -226,6 +226,38 @@ class ChatFragment : Fragment() {
                         when (event) {
                             is UiEvent.ShowToast -> {
                                 Toast.makeText(requireContext(), event.message, Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+
+                launch {
+                    bookingViewModel.event.collect { event ->
+                        when (event) {
+                            is UiEvent.ShowToast -> {
+                                Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+
+                launch {
+                    bookingViewModel.uiState.collect { state ->
+                        when (state) {
+                            is UiState.Error -> {
+                                viewModel.fetchMessages()
+                            }
+                            is UiState.Success -> {
+                                val b = state.data
+                                val bId = b.id
+                                val bStatus = b.status
+                                if (!bId.isNullOrEmpty() && !bStatus.isNullOrEmpty()) {
+                                    viewModel.updateBookingMessageStatus(bId, bStatus, b.cancelReason)
+                                } else {
+                                    viewModel.fetchMessages()
+                                }
                             }
                             else -> {}
                         }

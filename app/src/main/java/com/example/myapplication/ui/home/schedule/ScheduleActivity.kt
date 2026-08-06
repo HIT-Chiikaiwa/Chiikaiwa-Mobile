@@ -23,7 +23,7 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
 
     private val viewModel: BookingViewModel by viewModels()
     private val adapter = ScheduleAdapter { booking ->
-        BookingDetailDialog(this, booking, viewModel) {
+        BookingDetailDialog(this, booking, viewModel) { _, _, _ ->
             loadDataForCurrentWeek()
         }.show()
     }

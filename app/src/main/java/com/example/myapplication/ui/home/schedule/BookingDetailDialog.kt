@@ -5,9 +5,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
-import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.BookingDto
@@ -17,7 +14,7 @@ class BookingDetailDialog(
     private val context: Context,
     private val booking: BookingDto,
     private val viewModel: BookingViewModel,
-    private val onStatusChanged: () -> Unit
+    private val onStatusChanged: (newStatus: String?, reason: String?, rating: Int?) -> Unit = { _, _, _ -> }
 ) {
 
     private val dialog = Dialog(context)
@@ -46,7 +43,7 @@ class BookingDetailDialog(
         val status = booking.status ?: "PENDING"
         binding.tvStatus.text = status
 
-        val duration = booking.durationMinutes ?: 60
+        val duration = booking.durationMinutes ?: 30
         val timeStr = booking.scheduledAt ?: ""
         binding.tvTimeAndDate.text = "Thời gian: $timeStr ($duration phút)"
 
@@ -71,10 +68,21 @@ class BookingDetailDialog(
         binding.btnCancel.visibility = View.GONE
         binding.layoutRatingSection.visibility = View.GONE
 
+        val preferenceManager = com.example.myapplication.data.local.PreferenceManager(context)
+        val currentUserId = preferenceManager.getUserId()
+        val isCreator = if (currentUserId.isNullOrEmpty()) true
+        else if (!booking.creatorId.isNullOrEmpty()) booking.creatorId == currentUserId
+        else if (!booking.partnerId.isNullOrEmpty()) booking.partnerId != currentUserId
+        else true
+
         when (status.uppercase()) {
             "PENDING" -> {
-                binding.btnAccept.visibility = View.VISIBLE
-                binding.btnReject.visibility = View.VISIBLE
+                if (isCreator) {
+                    binding.btnCancel.visibility = View.VISIBLE
+                } else {
+                    binding.btnAccept.visibility = View.VISIBLE
+                    binding.btnReject.visibility = View.VISIBLE
+                }
             }
             "CONFIRMED", "ACCEPTED" -> {
                 binding.btnComplete.visibility = View.VISIBLE
@@ -82,10 +90,12 @@ class BookingDetailDialog(
             }
             "COMPLETED" -> {
                 binding.layoutRatingSection.visibility = View.VISIBLE
-                if (booking.hasRated == true && booking.myRating != null) {
-                    binding.ratingBar.rating = booking.myRating.toFloat()
+                if (booking.hasRated == true || booking.myRating != null) {
+                    binding.ratingBar.rating = (booking.myRating ?: 5).toFloat()
+                    binding.ratingBar.setIsIndicator(true)
                     binding.btnRate.visibility = View.GONE
                 } else {
+                    binding.ratingBar.setIsIndicator(false)
                     binding.btnRate.visibility = View.VISIBLE
                 }
             }
@@ -102,49 +112,29 @@ class BookingDetailDialog(
         binding.btnAccept.setOnClickListener {
             viewModel.acceptBooking(bookingId)
             dialog.dismiss()
-            onStatusChanged()
         }
 
         binding.btnReject.setOnClickListener {
             viewModel.rejectBooking(bookingId)
             dialog.dismiss()
-            onStatusChanged()
         }
 
         binding.btnComplete.setOnClickListener {
             viewModel.completeBooking(bookingId)
             dialog.dismiss()
-            onStatusChanged()
         }
 
         binding.btnCancel.setOnClickListener {
-            showCancelReasonDialog(bookingId)
+            BookingDialogHelper.showCancelReasonDialog(context, bookingId, viewModel) { _ ->
+                dialog.dismiss()
+            }
         }
 
         binding.btnRate.setOnClickListener {
-            val score = binding.ratingBar.rating.toInt()
-            viewModel.rateBooking(bookingId, score)
-            dialog.dismiss()
-            onStatusChanged()
-        }
-    }
-
-    private fun showCancelReasonDialog(bookingId: String) {
-        val input = EditText(context).apply {
-            hint = "Nhập lý do hủy hẹn..."
-            setPadding(32, 32, 32, 32)
-        }
-
-        AlertDialog.Builder(context)
-            .setTitle("Hủy cuộc hẹn")
-            .setView(input)
-            .setPositiveButton("Hủy hẹn") { _, _ ->
-                val reason = input.text.toString().trim()
-                viewModel.cancelBooking(bookingId, reason)
+            BookingDialogHelper.handleRatingSubmit(context, booking, binding, viewModel) { score ->
                 dialog.dismiss()
-                onStatusChanged()
+                onStatusChanged(null, null, score)
             }
-            .setNegativeButton("Quay lại", null)
-            .show()
+        }
     }
 }

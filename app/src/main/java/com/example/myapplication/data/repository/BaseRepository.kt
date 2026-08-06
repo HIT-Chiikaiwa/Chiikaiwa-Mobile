@@ -18,7 +18,16 @@ open class BaseRepository {
                 val errorMsg = try {
                     val errorBodyString = response.errorBody()?.string()
                     val errorObj = Gson().fromJson(errorBodyString, JsonObject::class.java)
-                    errorObj.get("message")?.asString 
+                    val dataElement = errorObj.get("data")
+                    val dataMsg = if (dataElement != null && dataElement.isJsonObject) {
+                        val dataObj = dataElement.asJsonObject
+                        dataObj.get("message")?.asString ?: dataObj.get("error")?.asString
+                    } else if (dataElement != null && dataElement.isJsonPrimitive) {
+                        dataElement.asString
+                    } else null
+
+                    dataMsg
+                        ?: errorObj.get("message")?.asString 
                         ?: errorObj.get("error")?.asString 
                         ?: response.message()
                 } catch (e: Exception) {

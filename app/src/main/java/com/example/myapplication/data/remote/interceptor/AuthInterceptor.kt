@@ -16,33 +16,36 @@ class AuthInterceptor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = preferenceManager.getAccessToken()
-        val request = chain.request().newBuilder()
+        val originalRequest = chain.request()
+        val path = originalRequest.url.encodedPath
+        val isAuthEndpoint = path.contains("/auth/")
 
-        if (!token.isNullOrEmpty()) {
-            request.addHeader(
+        val token = preferenceManager.getAccessToken()
+        val requestBuilder = originalRequest.newBuilder()
+
+        if (!token.isNullOrEmpty() && !isAuthEndpoint) {
+            requestBuilder.addHeader(
                 "Authorization",
                 "Bearer $token"
             )
         }
 
-        val response = chain.proceed(request.build())
+        val response = chain.proceed(requestBuilder.build())
 
-        if (response.code == 401) {
+        if (response.code == 401 && !isAuthEndpoint) {
             synchronized(this) {
-                if (!preferenceManager.getAccessToken().isNullOrEmpty()) {
-                    preferenceManager.logout()
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(context, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", Toast.LENGTH_LONG).show()
-                    }
-                    val intent = Intent(context, LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    context.startActivity(intent)
+                preferenceManager.logout()
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, "Phiên đăng nhập đã hết hạn.", Toast.LENGTH_LONG).show()
                 }
+                val intent = Intent(context, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                context.startActivity(intent)
             }
         }
 
         return response
     }
+
 }

@@ -121,4 +121,9 @@
     <string name="title_booking_reminder">Nhắc nhở cuộc hẹn</string>
     <string name="btn_view_detail">Xem chi tiết</string>
     <string name="btn_close">Đóng</string>
+    <string name="booking_created_success">Đặt lịch hẹn thành công!</string>
+    <string name="booking_cancelled">đã hủy lịch hẹn.</string>
+    <string name="booking_cancel_reason">Lí do: %1$s</string>
+    <string name="booking_accept">Đồng ý</string>
+    <string name="booking_reject">Từ chối</string>
 </resources>

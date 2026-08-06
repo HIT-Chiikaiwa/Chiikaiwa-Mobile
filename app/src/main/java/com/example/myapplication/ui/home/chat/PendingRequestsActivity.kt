@@ -22,8 +22,14 @@ class PendingRequestsActivity : BaseActivity<ActivityPendingRequestsBinding>() {
         pendingAdapter = PendingRequestsAdapter(
             onAccept = { item ->
                 val reqId = item.requestId ?: return@PendingRequestsAdapter
+                val targetUserId = item.userId
                 viewModel.acceptFriendRequest(reqId) {
                     showToast("Đã đồng ý kết bạn với ${item.lastName ?: ""} ${item.firstName ?: ""}")
+                    if (!targetUserId.isNullOrEmpty()) {
+                        viewModel.startDirectChat(targetUserId) { _, _ ->
+                            viewModel.fetchConversations()
+                        }
+                    }
                     loadData()
                 }
             },

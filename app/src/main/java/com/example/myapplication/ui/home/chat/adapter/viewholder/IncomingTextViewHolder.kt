@@ -9,11 +9,22 @@ import com.example.myapplication.databinding.ItemChatIncomingBinding
 
 class IncomingTextViewHolder(
     private val binding: ItemChatIncomingBinding,
-    private val onMessageLongClick: (View, Message) -> Unit
+    private val onMessageLongClick: (View, Message) -> Unit,
+    private val partnerName: String = ""
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
-        binding.tvMessageContent.text = if (message.isRecalled) "Tin nhắn đã được thu hồi" else message.content
+        val displayContent = if (message.isRecalled) {
+            "Tin nhắn đã được thu hồi"
+        } else {
+            com.example.myapplication.utils.BookingMessageHelper.formatIfBookingJson(
+                message.content,
+                isOutgoing = false,
+                senderName = message.sender.fullName ?: "",
+                partnerName = partnerName
+            )
+        }
+        binding.tvMessageContent.text = displayContent
 
         val avatar = message.sender.avatar
         if (!avatar.isNullOrEmpty()) {

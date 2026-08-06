@@ -34,7 +34,7 @@ class ScheduleAdapter(
 
     inner class ScheduleViewHolder(private val binding: ItemScheduleBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(booking: BookingDto) {
-            val timeText = formatTimeRange(booking.scheduledAt, booking.durationMinutes ?: 60)
+            val timeText = formatTimeRange(booking.scheduledAt, booking.durationMinutes ?: 30)
             binding.tvTime.text = timeText
 
             val title = booking.subject ?: "Cuộc hẹn"

@@ -25,6 +25,8 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
 
     override fun inflateBinding() = ActivityCreateAppointmentBinding.inflate(layoutInflater)
 
+    private val durationValues = intArrayOf(30, 45, 60, 90, 120, 180, 240)
+
     override fun initView() {
         conversationId = intent.getStringExtra("conversation_id")
             ?: intent.getStringExtra("conversationId")
@@ -46,15 +48,20 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
 
         setupDatePicker()
         setupTimePickers()
+        setupDurationSpinner()
         setupModeSpinner()
         setupCreateButton()
     }
 
     private fun setupDatePicker() {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.MINUTE, 30)
+        }
         selectedYear = calendar.get(Calendar.YEAR)
         selectedMonth = calendar.get(Calendar.MONTH)
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+        binding.tvSelectedDate.text = String.format(Locale.getDefault(), "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear)
 
         binding.layoutDateField.setOnClickListener {
             val datePickerDialog = DatePickerDialog(
@@ -74,7 +81,9 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
     }
 
     private fun setupTimePickers() {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.MINUTE, 30)
+        }
 
         binding.npHour.minValue = 0
         binding.npHour.maxValue = 23
@@ -85,6 +94,22 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
         binding.npMinute.maxValue = 59
         binding.npMinute.value = calendar.get(Calendar.MINUTE)
         binding.npMinute.setFormatter { String.format(Locale.getDefault(), "%02d", it) }
+    }
+
+    private fun setupDurationSpinner() {
+        val durations = arrayOf(
+            "30 phút",
+            "45 phút",
+            "60 phút (1 giờ)",
+            "90 phút (1.5 giờ)",
+            "120 phút (2 giờ)",
+            "180 phút (3 giờ)",
+            "240 phút (4 giờ)"
+        )
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, durations)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spDuration.adapter = adapter
+        binding.spDuration.setSelection(0)
     }
 
     private fun setupModeSpinner() {
@@ -127,25 +152,41 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                 }
             }
 
-            val scheduledAt = String.format(
-                Locale.getDefault(),
-                "%04d-%02d-%02dT%02d:%02d:00Z",
-                selectedYear,
-                selectedMonth + 1,
-                selectedDay,
-                binding.npHour.value,
-                binding.npMinute.value
-            )
+            val cal = Calendar.getInstance().apply {
+                set(Calendar.YEAR, selectedYear)
+                set(Calendar.MONTH, selectedMonth)
+                set(Calendar.DAY_OF_MONTH, selectedDay)
+                set(Calendar.HOUR_OF_DAY, binding.npHour.value)
+                set(Calendar.MINUTE, binding.npMinute.value)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            if (cal.timeInMillis < System.currentTimeMillis() + (30 * 60 * 1000L - 60_000L)) {
+                binding.tvErrorMessage.text = "Vui lòng chọn thời gian cách hiện tại ít nhất 30 phút"
+                binding.tvErrorMessage.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+            val scheduledAt = sdf.format(cal.time)
+
+            val selectedDuration = durationValues.getOrElse(binding.spDuration.selectedItemPosition) { 30 }
+
+            val locationNameStr = if (isOffline) binding.etLocationName.text.toString().trim().ifEmpty { "Offline" } else "Online"
+            val locationAddressStr = if (isOffline) binding.etStreet.text.toString().trim().ifEmpty { "Offline" } else "Online"
+            val locationDistrictStr = if (isOffline) binding.etDistrict.text.toString().trim().ifEmpty { "Offline" } else "Online"
+            val locationCityStr = if (isOffline) binding.etProvince.text.toString().trim().ifEmpty { "Offline" } else "Online"
 
             val request = CreateBookingRequest(
                 subject = binding.tvScreenTitle.text.toString(),
                 scheduledAt = scheduledAt,
-                durationMinutes = 60,
-                locationName = if (isOffline) binding.etLocationName.text.toString().trim() else "Online",
-                locationAddress = if (isOffline) binding.etStreet.text.toString().trim() else null,
-                locationDistrict = if (isOffline) binding.etDistrict.text.toString().trim() else null,
-                locationCity = if (isOffline) binding.etProvince.text.toString().trim() else null,
-                note = null,
+                durationMinutes = selectedDuration,
+                locationName = locationNameStr,
+                locationAddress = locationAddressStr,
+                locationDistrict = locationDistrictStr,
+                locationCity = locationCityStr,
+                note = "",
                 isRecurring = binding.cbIsRecurring.isChecked,
                 reminderMinutesBefore = 15
             )

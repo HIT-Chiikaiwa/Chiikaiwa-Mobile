@@ -1,11 +1,15 @@
 package com.example.myapplication.data.remote.dto.response
 
+import com.google.gson.annotations.SerializedName
+
 data class BookingDto(
     val id: String? = null,
     val status: String? = null,
     val subject: String? = null,
     val scheduledAt: String? = null,
+    @SerializedName("durationMinutes", alternate = ["duration"])
     val durationMinutes: Int? = null,
+    @SerializedName("locationName", alternate = ["location"])
     val locationName: String? = null,
     val locationAddress: String? = null,
     val locationDistrict: String? = null,
@@ -22,8 +26,8 @@ data class BookingDto(
     val partnerName: String? = null,
     val partnerAvatar: String? = null,
     val participantStatus: String? = null,
-    val hasRated: Boolean? = null,
-    val myRating: Int? = null,
+    var hasRated: Boolean? = null,
+    var myRating: Int? = null,
     val messageId: String? = null,
     val conversationId: String? = null,
     val createdDate: String? = null,

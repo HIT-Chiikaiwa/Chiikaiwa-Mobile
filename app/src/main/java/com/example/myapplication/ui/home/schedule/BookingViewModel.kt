@@ -139,14 +139,23 @@ class BookingViewModel(application: Application) : BaseViewModel<BookingDto>(app
 
     fun completeBooking(bookingId: String) {
         viewModelScope.launch {
+            android.util.Log.d("CHAT_BOOKING_DEBUG", "[COMPLETE_API_CALL] Calling completeBooking for bookingId=$bookingId")
             _uiState.value = UiState.Loading
             when (val result = repository.completeBooking(bookingId)) {
                 is Resource.Success -> {
+                    android.util.Log.d("CHAT_BOOKING_DEBUG", "[COMPLETE_API_SUCCESS] Booking $bookingId completed successfully on server: ${result.data.data.status}")
                     _uiState.value = UiState.Success(result.data.data)
                     _event.emit(UiEvent.ShowToast("Đã hoàn thành cuộc hẹn"))
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    android.util.Log.e("CHAT_BOOKING_DEBUG", "[COMPLETE_API_ERROR] Failed to complete booking $bookingId: ${result.message}")
+                    val msg = if (result.message?.contains("before its scheduled time", ignoreCase = true) == true) {
+                        "Chưa đến thời gian thực hiện cuộc hẹn, không thể hoàn thành!"
+                    } else {
+                        result.message ?: "Không thể hoàn thành cuộc hẹn"
+                    }
+                    _uiState.value = UiState.Error(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
             }
         }
