@@ -24,7 +24,8 @@ class MessageAdapter(
     private val currentUserId: String,
     private val partnerName: String = "",
     private val onMessageLongClick: (View, Message) -> Unit,
-    private val onBookingAction: ((String, String) -> Unit)? = null
+    private val onBookingAction: ((String, String) -> Unit)? = null,
+    private val onAvatarClick: ((String) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val messages = mutableListOf<Message>()
@@ -70,7 +71,7 @@ class MessageAdapter(
             }
             TYPE_INCOMING_TEXT -> {
                 val binding = ItemChatIncomingBinding.inflate(inflater, parent, false)
-                IncomingTextViewHolder(binding, onMessageLongClick, partnerName)
+                IncomingTextViewHolder(binding, onMessageLongClick, partnerName, onAvatarClick)
             }
             TYPE_OUTGOING_IMAGE -> {
                 val binding = ItemChatImageOutgoingBinding.inflate(inflater, parent, false)
@@ -78,7 +79,7 @@ class MessageAdapter(
             }
             TYPE_INCOMING_IMAGE -> {
                 val binding = ItemChatImageIncomingBinding.inflate(inflater, parent, false)
-                IncomingImageViewHolder(binding, onMessageLongClick)
+                IncomingImageViewHolder(binding, onMessageLongClick, onAvatarClick)
             }
             TYPE_OUTGOING_BOOKING -> {
                 val binding = ItemChatBookingOutgoingBinding.inflate(inflater, parent, false)
@@ -86,11 +87,11 @@ class MessageAdapter(
             }
             TYPE_INCOMING_BOOKING -> {
                 val binding = ItemChatBookingIncomingBinding.inflate(inflater, parent, false)
-                IncomingBookingViewHolder(binding, onMessageLongClick, onBookingAction, currentUserId)
+                IncomingBookingViewHolder(binding, onMessageLongClick, onBookingAction, currentUserId, onAvatarClick)
             }
             else -> {
                 val binding = ItemChatIncomingBinding.inflate(inflater, parent, false)
-                IncomingTextViewHolder(binding, onMessageLongClick, partnerName)
+                IncomingTextViewHolder(binding, onMessageLongClick, partnerName, onAvatarClick)
             }
         }
     }

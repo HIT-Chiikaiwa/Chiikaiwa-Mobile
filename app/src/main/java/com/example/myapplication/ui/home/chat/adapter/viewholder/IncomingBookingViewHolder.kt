@@ -13,7 +13,8 @@ class IncomingBookingViewHolder(
     private val binding: ItemChatBookingIncomingBinding,
     private val onMessageLongClick: (View, Message) -> Unit,
     private val onBookingAction: ((String, String) -> Unit)?,
-    private val currentUserId: String = ""
+    private val currentUserId: String = "",
+    private val onAvatarClick: ((String) -> Unit)? = null
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
@@ -63,6 +64,12 @@ class IncomingBookingViewHolder(
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .error(R.drawable.ic_launcher_foreground)
                 .into(binding.ivSenderAvatar)
+        }
+
+        binding.ivSenderAvatar.setOnClickListener {
+            if (message.sender.id.isNotEmpty()) {
+                onAvatarClick?.invoke(message.sender.id)
+            }
         }
 
         binding.btnAccept.setOnClickListener {

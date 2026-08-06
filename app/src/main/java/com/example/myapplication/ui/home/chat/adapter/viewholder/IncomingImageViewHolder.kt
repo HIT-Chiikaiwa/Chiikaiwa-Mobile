@@ -10,7 +10,8 @@ import com.example.myapplication.utils.TimeUtils
 
 class IncomingImageViewHolder(
     private val binding: ItemChatImageIncomingBinding,
-    private val onMessageLongClick: (View, Message) -> Unit
+    private val onMessageLongClick: (View, Message) -> Unit,
+    private val onAvatarClick: ((String) -> Unit)? = null
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
@@ -25,6 +26,12 @@ class IncomingImageViewHolder(
                 .into(binding.ivSenderAvatar)
         } else {
             binding.ivSenderAvatar.setImageResource(R.drawable.ic_launcher_foreground)
+        }
+
+        binding.ivSenderAvatar.setOnClickListener {
+            if (message.sender.id.isNotEmpty()) {
+                onAvatarClick?.invoke(message.sender.id)
+            }
         }
 
         if (message.content.isNotEmpty()) {

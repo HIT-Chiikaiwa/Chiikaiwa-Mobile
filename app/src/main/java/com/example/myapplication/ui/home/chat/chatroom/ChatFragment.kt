@@ -117,6 +117,23 @@ class ChatFragment : Fragment() {
         }
     }
 
+    private fun openPartnerProfile(specifiedUserId: String? = null) {
+        val idToOpen = when {
+            !specifiedUserId.isNullOrEmpty() -> specifiedUserId
+            targetUserId.isNotEmpty() -> targetUserId
+            else -> {
+                val messages = (viewModel.uiState.value as? UiState.Success)?.data ?: emptyList()
+                messages.firstOrNull { it.sender.id != viewModel.currentUserId }?.sender?.id ?: ""
+            }
+        }
+        if (idToOpen.isNotEmpty()) {
+            val intent = Intent(requireContext(), com.example.myapplication.ui.profile.ProfileActivity::class.java).apply {
+                putExtra("target_user_id", idToOpen)
+            }
+            startActivity(intent)
+        }
+    }
+
     private fun setupRecyclerView() {
         adapter = MessageAdapter(
             currentUserId = viewModel.currentUserId,
@@ -134,6 +151,9 @@ class ChatFragment : Fragment() {
             },
             onBookingAction = { bookingId, action ->
                 viewModel.performBookingAction(bookingId, action)
+            },
+            onAvatarClick = { senderId ->
+                openPartnerProfile(senderId)
             }
         )
         val layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -147,6 +167,12 @@ class ChatFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             requireActivity().finish()
         }
+
+        val profileClickListener = View.OnClickListener {
+            openPartnerProfile()
+        }
+        binding.tvChatTitle.setOnClickListener(profileClickListener)
+        binding.btnAddOption.setOnClickListener(profileClickListener)
 
         binding.btnSend.setOnClickListener {
             sendMessage()
