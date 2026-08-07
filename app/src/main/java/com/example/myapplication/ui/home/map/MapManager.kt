@@ -131,7 +131,7 @@ class MapManager(
         }
     }
 
-    fun startRadar(center: LatLng) = radarRenderer.startRadar(center)
+    fun startRadar(center: LatLng, radiusKm: Double) = radarRenderer.startRadar(center, radiusKm)
 
     fun stopRadar() = radarRenderer.stopRadar()
 

@@ -19,6 +19,15 @@ class ChatSocketService(private val stompManager: StompManager) : SocketListener
         stompManager.connect(url, token)
     }
 
+    fun connect(
+        url: String,
+        tokenProvider: () -> String,
+        refreshTokenProvider: () -> String,
+        tokenSaver: (accessToken: String, refreshToken: String) -> Unit
+    ) {
+        stompManager.connect(url, tokenProvider, refreshTokenProvider, tokenSaver)
+    }
+
     fun disconnect() {
         stompManager.disconnect()
     }

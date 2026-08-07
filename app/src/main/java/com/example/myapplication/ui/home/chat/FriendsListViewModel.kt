@@ -28,10 +28,21 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
 
     private fun initWebSocket() {
         val currentUserId = preferenceManager.getUserId() ?: ""
-        val token = preferenceManager.getAccessToken() ?: ""
-        if (currentUserId.isNotEmpty() && token.isNotEmpty()) {
-            val wsUrl = "${NetworkConstants.WS_URL}?token=$token"
-            socketService.connect(wsUrl, token)
+        if (currentUserId.isNotEmpty()) {
+            val wsUrl = NetworkConstants.WS_URL
+            socketService.connect(
+                url = wsUrl,
+                tokenProvider = { preferenceManager.getAccessToken() ?: "" },
+                refreshTokenProvider = { preferenceManager.getRefreshToken() ?: "" },
+                tokenSaver = { newAccess, newRefresh ->
+                    preferenceManager.saveLogin(
+                        accessToken = newAccess,
+                        refreshToken = newRefresh,
+                        userId = currentUserId,
+                        email = preferenceManager.getEmail()
+                    )
+                }
+            )
             socketService.subscribeToChat(currentUserId)
 
             viewModelScope.launch {

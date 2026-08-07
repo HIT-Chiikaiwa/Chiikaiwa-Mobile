@@ -64,7 +64,6 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
             showEditPersonalInfoDialog()
         }
         binding.tvAddInfo.setOnClickListener { openEditInfoListener() }
-        binding.ivTogglePassword1.setOnClickListener { openEditInfoListener() }
 
         val openEditIntroListener = {
             showEditIntroductionDialog()
@@ -254,6 +253,41 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
             val majorName = dialogBinding.etMajorName.text.toString().trim()
             val phone = dialogBinding.etPhone.text.toString().trim()
             val email = currentUserDto?.email ?: ""
+
+            dialogBinding.tvErrorLastName.visibility = android.view.View.GONE
+            dialogBinding.tvErrorFirstName.visibility = android.view.View.GONE
+            dialogBinding.tvErrorDateOfBirth.visibility = android.view.View.GONE
+            dialogBinding.tvErrorUniversity.visibility = android.view.View.GONE
+            dialogBinding.tvErrorMajorName.visibility = android.view.View.GONE
+
+            var isValid = true
+            if (lastName.isEmpty()) {
+                dialogBinding.tvErrorLastName.text = "Họ không được để trống"
+                dialogBinding.tvErrorLastName.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (firstName.isEmpty()) {
+                dialogBinding.tvErrorFirstName.text = "Tên không được để trống"
+                dialogBinding.tvErrorFirstName.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (dob.isEmpty()) {
+                dialogBinding.tvErrorDateOfBirth.text = "Ngày sinh không được để trống"
+                dialogBinding.tvErrorDateOfBirth.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (university.isEmpty()) {
+                dialogBinding.tvErrorUniversity.text = "Trường học không được để trống"
+                dialogBinding.tvErrorUniversity.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (majorName.isEmpty()) {
+                dialogBinding.tvErrorMajorName.text = "Ngành học không được để trống"
+                dialogBinding.tvErrorMajorName.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+
+            if (!isValid) return@setOnClickListener
 
             viewModel.updateFullProfileInfo(
                 personalRequest = UpdatePersonalInfoRequest(

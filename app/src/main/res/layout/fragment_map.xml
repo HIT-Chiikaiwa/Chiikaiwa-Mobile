@@ -48,15 +48,20 @@
                 android:layout_marginStart="@dimen/_10sdp"
                 android:src="@drawable/ic_search" />
 
-            <TextView
-                android:id="@+id/tvSearch"
+            <EditText
+                android:id="@+id/etDistance"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_5sdp"
                 android:layout_weight="1"
-                android:text="@string/who"
+                android:hint="Khoảng cách (1-5 km)"
                 android:textColor="@color/brown"
-                android:textSize="@dimen/_12ssp" />
+                android:textColorHint="@color/hint"
+                android:textSize="@dimen/_12ssp"
+                android:inputType="numberDecimal"
+                android:background="@android:color/transparent"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
 
             <ImageView
                 android:id="@+id/imgAvatar"

@@ -45,7 +45,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_12sdp"
-            android:background="@drawable/bg_unread_dot"
             android:backgroundTint="@color/profile"
             android:orientation="vertical"
             android:padding="@dimen/_12sdp">

@@ -22,14 +22,35 @@ open class BaseRepository {
                     val dataElement = errorObj.get("data")
                     val dataMsg = if (dataElement != null && dataElement.isJsonObject) {
                         val dataObj = dataElement.asJsonObject
-                        dataObj.get("message")?.asString ?: dataObj.get("error")?.asString
+                        val explicitMsg = dataObj.get("message")?.asString ?: dataObj.get("error")?.asString
+                        if (explicitMsg != null) {
+                            explicitMsg
+                        } else {
+                            val fieldErrors = dataObj.entrySet().mapNotNull { entry ->
+                                val valElement = entry.value
+                                if (valElement.isJsonPrimitive) valElement.asString else null
+                            }
+                            if (fieldErrors.isNotEmpty()) {
+                                fieldErrors.joinToString("\n")
+                            } else null
+                        }
+                    } else if (dataElement != null && dataElement.isJsonArray) {
+                        val dataArray = dataElement.asJsonArray
+                        val errors = dataArray.mapNotNull { el ->
+                            if (el.isJsonPrimitive) el.asString
+                            else if (el.isJsonObject) el.asJsonObject.get("message")?.asString ?: el.asJsonObject.get("error")?.asString
+                            else null
+                        }
+                        if (errors.isNotEmpty()) {
+                            errors.joinToString("\n")
+                        } else null
                     } else if (dataElement != null && dataElement.isJsonPrimitive) {
                         dataElement.asString
                     } else null
 
                     dataMsg
-                        ?: errorObj.get("message")?.asString 
-                        ?: errorObj.get("error")?.asString 
+                        ?: errorObj.get("message")?.asString
+                        ?: errorObj.get("error")?.asString
                         ?: response.message()
                 } catch (e: Exception) {
                     response.message()

@@ -19,12 +19,13 @@ import org.maplibre.geojson.Polygon
 class RadarRenderer(private val mapLibreMap: MapLibreMap) {
 
     companion object {
-        private const val RADAR_RADIUS_KM = 6.0
         private const val R_EARTH_KM = 6371.0
         private const val CIRCLE_STEPS = 48
         private const val SECTOR_STEPS = 20
         private const val SWEEP_ANGLE = 40.0
     }
+
+    private var radarRadiusKm: Double = 3.0
 
     private var radarBeamAnimator: ValueAnimator? = null
     private var centerLatLng: LatLng? = null
@@ -69,10 +70,11 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         }
     }
 
-    fun startRadar(center: LatLng) {
+    fun startRadar(center: LatLng, radiusKm: Double = 3.0) {
         if (center.latitude.isNaN() || center.longitude.isNaN() || (center.latitude == 0.0 && center.longitude == 0.0)) {
             return
         }
+        radarRadiusKm = radiusKm
         centerLatLng = center
         showRadarLayers(true)
         updateRadarCircle(center)
@@ -136,7 +138,7 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
 
         val latRad = Math.toRadians(centerLat)
         val lngRad = Math.toRadians(centerLng)
-        val dDivR = RADAR_RADIUS_KM / R_EARTH_KM
+        val dDivR = radarRadiusKm / R_EARTH_KM
         val sinD = Math.sin(dDivR)
         val cosD = Math.cos(dDivR)
         val cosLat = Math.cos(latRad)
@@ -166,7 +168,7 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         val points = ArrayList<Point>(CIRCLE_STEPS + 1)
         val latRad = Math.toRadians(centerLat)
         val lngRad = Math.toRadians(centerLng)
-        val dDivR = RADAR_RADIUS_KM / R_EARTH_KM
+        val dDivR = radarRadiusKm / R_EARTH_KM
         val sinD = Math.sin(dDivR)
         val cosD = Math.cos(dDivR)
         val cosLat = Math.cos(latRad)

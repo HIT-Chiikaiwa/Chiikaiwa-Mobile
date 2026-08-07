@@ -25,33 +25,63 @@
             android:layout_marginTop="@dimen/_12sdp"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/etLastName"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_40sdp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="@dimen/_4sdp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Họ"
-                android:inputType="textPersonName"
-                android:paddingHorizontal="@dimen/_10sdp"
-                android:textColor="@color/brown"
-                android:textColorHint="@color/hint"
-                android:textSize="@dimen/_12ssp" />
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/etFirstName"
+                <EditText
+                    android:id="@+id/etLastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_40sdp"
+                    android:background="@drawable/bg_edittext"
+                    android:hint="Họ"
+                    android:inputType="textPersonName"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:textColor="@color/brown"
+                    android:textColorHint="@color/hint"
+                    android:textSize="@dimen/_12ssp" />
+
+                <TextView
+                    android:id="@+id/tvErrorLastName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/_10ssp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="@dimen/_40sdp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="@dimen/_4sdp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Tên"
-                android:inputType="textPersonName"
-                android:paddingHorizontal="@dimen/_10sdp"
-                android:textColor="@color/brown"
-                android:textColorHint="@color/hint"
-                android:textSize="@dimen/_12ssp" />
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/etFirstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_40sdp"
+                    android:background="@drawable/bg_edittext"
+                    android:hint="Tên"
+                    android:inputType="textPersonName"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:textColor="@color/brown"
+                    android:textColorHint="@color/hint"
+                    android:textSize="@dimen/_12ssp" />
+
+                <TextView
+                    android:id="@+id/tvErrorFirstName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/_10ssp"
+                    android:visibility="gone" />
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -75,6 +105,15 @@
             android:textColor="@color/brown"
             android:textColorHint="@color/hint"
             android:textSize="@dimen/_12ssp" />
+
+        <TextView
+            android:id="@+id/tvErrorDateOfBirth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:textColor="@color/error"
+            android:textSize="@dimen/_10ssp"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -142,6 +181,15 @@
             android:textSize="@dimen/_12ssp" />
 
         <TextView
+            android:id="@+id/tvErrorUniversity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:textColor="@color/error"
+            android:textSize="@dimen/_10ssp"
+            android:visibility="gone" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
@@ -162,6 +210,15 @@
             android:textColor="@color/brown"
             android:textColorHint="@color/hint"
             android:textSize="@dimen/_12ssp" />
+
+        <TextView
+            android:id="@+id/tvErrorMajorName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:textColor="@color/error"
+            android:textSize="@dimen/_10ssp"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"

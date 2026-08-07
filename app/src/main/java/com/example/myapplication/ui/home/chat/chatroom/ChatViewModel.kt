@@ -90,10 +90,21 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     }
 
     private fun initWebSocket() {
-        val token = preferenceManager.getAccessToken() ?: ""
-        if (currentUserId.isEmpty() || token.isEmpty()) return
+        if (currentUserId.isEmpty()) return
 
-        socketService.connect("${NetworkConstants.WS_URL}?token=$token", token)
+        socketService.connect(
+            url = NetworkConstants.WS_URL,
+            tokenProvider = { preferenceManager.getAccessToken() ?: "" },
+            refreshTokenProvider = { preferenceManager.getRefreshToken() ?: "" },
+            tokenSaver = { newAccess, newRefresh ->
+                preferenceManager.saveLogin(
+                    accessToken = newAccess,
+                    refreshToken = newRefresh,
+                    userId = currentUserId,
+                    email = preferenceManager.getEmail()
+                )
+            }
+        )
         socketService.subscribeToChat(currentUserId, activeConversationId)
 
         viewModelScope.launch {
