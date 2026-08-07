@@ -26,7 +26,7 @@ class ProfileRepository(context: Context) : BaseRepository() {
 
     suspend fun uploadAvatar(userId: String, imageFile: java.io.File): Resource<BaseResponse<UserDto>> {
         val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
-        val body = okhttp3.MultipartBody.Part.createFormData("avatar", imageFile.name, requestFile)
+        val body = okhttp3.MultipartBody.Part.createFormData("file", imageFile.name, requestFile)
         return safeApiCall { api.uploadAvatar(userId, body) }
     }
 

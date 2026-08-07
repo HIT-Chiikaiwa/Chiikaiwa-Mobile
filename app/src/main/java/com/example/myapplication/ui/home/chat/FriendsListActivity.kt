@@ -142,28 +142,24 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         val currentUserId = com.example.myapplication.data.local.PreferenceManager(this).getUserId() ?: ""
         val messageRepository = com.example.myapplication.data.repository.MessageRepository(this)
         
-        val progressDialog = AlertDialog.Builder(this)
-            .setMessage("Đang tải thông tin...")
-            .setCancelable(false)
-            .create()
-        progressDialog.show()
-        
         lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                messageRepository.getMessages(conversationId, page = 0, size = 20)
-            }
-            progressDialog.dismiss()
-            
-            if (result is com.example.myapplication.utils.resource.Resource.Success) {
-                val messages = result.data.data.content
-                val partnerId = messages.firstOrNull { it.senderId != currentUserId }?.senderId
-                if (!partnerId.isNullOrEmpty()) {
-                    showUserInfoDialog(name, partnerId)
-                } else {
-                    showToast("Không tìm thấy thông tin đối phương")
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    messageRepository.getMessages(conversationId, page = 0, size = 20)
                 }
-            } else {
-                showToast("Lỗi tải thông tin: ${(result as? com.example.myapplication.utils.resource.Resource.Error)?.message}")
+                if (result is com.example.myapplication.utils.resource.Resource.Success) {
+                    val messages = result.data.data.content
+                    val partnerId = messages.firstOrNull { it.senderId != currentUserId }?.senderId
+                    if (!partnerId.isNullOrEmpty()) {
+                        showUserInfoDialog(name, partnerId)
+                    } else {
+                        showToast("Không tìm thấy thông tin đối phương")
+                    }
+                } else {
+                    showToast("Lỗi tải thông tin: ${(result as? com.example.myapplication.utils.resource.Resource.Error)?.message}")
+                }
+            } catch (e: Exception) {
+                showToast("Lỗi kết nối: ${e.message}")
             }
         }
     }
