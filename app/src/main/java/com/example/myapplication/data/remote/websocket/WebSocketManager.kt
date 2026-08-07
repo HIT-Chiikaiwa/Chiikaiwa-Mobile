@@ -58,6 +58,9 @@ object WebSocketManager : SocketListener {
     }
 
     override fun onConnected() {
+        stompManager.subscribe("/user/queue/notifications")
+        stompManager.subscribe("/user/queue/friendship")
+
         if (activeUserId.isNotEmpty()) {
             subscribeToChat(activeUserId, activeConversationId)
         }

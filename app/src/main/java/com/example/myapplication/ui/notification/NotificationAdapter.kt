@@ -34,8 +34,6 @@ class NotificationAdapter(
             val trimmed = content.trim()
             if (trimmed.isEmpty()) return ""
 
-            if (isVietnamese(trimmed)) return trimmed
-
             var result = trimmed
 
             if (result.contains("sent you a friend request", ignoreCase = true)) {

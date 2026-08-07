@@ -48,6 +48,8 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private val _messages = mutableListOf<Message>()
     private var currentUserAvatar: String? = null
     private var partnerAvatar: String? = null
+    private var isCreatingConversation = false
+    private val pendingSendActions = mutableListOf<() -> Unit>()
 
     companion object {
         private const val TAG = "ChatViewModel"
@@ -231,19 +233,26 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         }
     }
 
-    private fun reInitWithTargetId(targetId: String, pendingMessage: String? = null) {
+    private fun reInitWithTargetId(targetId: String) {
+        if (isCreatingConversation) return
+        isCreatingConversation = true
         viewModelScope.launch {
             when (val result = conversationRepository.createOrGetDirectConversation(targetId)) {
                 is Resource.Success -> {
                     activeConversationId = result.data.data.id
+                    isCreatingConversation = false
                     socketService.subscribeToChat(currentUserId, activeConversationId)
                     fetchMessages(activeConversationId)
-                    if (!pendingMessage.isNullOrBlank()) {
-                        sendRealtimeMessage(targetId, pendingMessage)
-                    }
+                    
+                    val actions = ArrayList(pendingSendActions)
+                    pendingSendActions.clear()
+                    actions.forEach { it.invoke() }
                 }
                 is Resource.Error -> {
+                    isCreatingConversation = false
                     _uiState.value = UiState.Error(result.message)
+                    _event.emit(UiEvent.ShowToast("Không thể tạo cuộc hội thoại: ${result.message}"))
+                    pendingSendActions.clear()
                 }
             }
         }
@@ -253,8 +262,15 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         if (text.isBlank()) return
         val msgText = text.trim()
 
-        if (activeConversationId.isEmpty() && targetId.isNotEmpty() && targetId != currentUserId) {
-            reInitWithTargetId(targetId, pendingMessage = msgText)
+        if (activeConversationId.isEmpty()) {
+            if (targetId.isNotEmpty() && targetId != currentUserId) {
+                pendingSendActions.add {
+                    sendRealtimeMessage(targetId, msgText)
+                }
+                if (!isCreatingConversation) {
+                    reInitWithTargetId(targetId)
+                }
+            }
             return
         }
 
@@ -267,17 +283,11 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     fun sendImageMessage(file: MultipartBody.Part, localImagePath: String = "") {
         if (activeConversationId.isEmpty()) {
             if (currentTargetUserId.isNotEmpty()) {
-                viewModelScope.launch {
-                    when (val result = conversationRepository.createOrGetDirectConversation(currentTargetUserId)) {
-                        is Resource.Success -> {
-                            activeConversationId = result.data.data.id
-                            socketService.subscribeToChat(currentUserId, activeConversationId)
-                            sendImageMessage(file, localImagePath)
-                        }
-                        is Resource.Error -> {
-                            _event.emit(UiEvent.ShowToast("Gửi ảnh thất bại: ${result.message}"))
-                        }
-                    }
+                pendingSendActions.add {
+                    sendImageMessage(file, localImagePath)
+                }
+                if (!isCreatingConversation) {
+                    reInitWithTargetId(currentTargetUserId)
                 }
             } else {
                 viewModelScope.launch {
