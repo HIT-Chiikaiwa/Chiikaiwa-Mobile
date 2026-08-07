@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository
 
+import com.example.myapplication.utils.ErrorMessageMapper
 import com.example.myapplication.utils.resource.Resource
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -33,11 +34,13 @@ open class BaseRepository {
                 } catch (e: Exception) {
                     response.message()
                 }
-                Resource.Error(errorMsg.ifEmpty { "Đã xảy ra lỗi" })
+                val mappedMsg = ErrorMessageMapper.map(errorMsg, response.code())
+                Resource.Error(mappedMsg)
             }
 
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Không thể kết nối tới server")
+            val mappedMsg = ErrorMessageMapper.map(e.message)
+            Resource.Error(mappedMsg)
 
         }
     }
