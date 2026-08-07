@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.PopupWindow
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityFriendsListBinding
 import com.example.myapplication.databinding.DialogFriendOptionsBinding
@@ -17,6 +18,9 @@ import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.FriendsAdapter
 import com.example.myapplication.ui.home.chat.chatroom.ChatActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
@@ -111,8 +115,13 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
         binding.tvOptionViewProfile.setOnClickListener {
             dialog.dismiss()
-            val userId = conversation.lastMessage?.senderId
-            showUserInfoDialog(name, userId)
+            val currentUserId = com.example.myapplication.data.local.PreferenceManager(this@FriendsListActivity).getUserId()
+            val lastSenderId = conversation.lastMessage?.senderId
+            if (!lastSenderId.isNullOrEmpty() && lastSenderId != currentUserId) {
+                showUserInfoDialog(name, lastSenderId)
+            } else {
+                fetchPartnerIdFromMessages(conversation.id, name)
+            }
         }
 
         binding.tvOptionBlock.setOnClickListener {
@@ -127,6 +136,36 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
         dialog.show()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    }
+
+    private fun fetchPartnerIdFromMessages(conversationId: String, name: String) {
+        val currentUserId = com.example.myapplication.data.local.PreferenceManager(this).getUserId() ?: ""
+        val messageRepository = com.example.myapplication.data.repository.MessageRepository(this)
+        
+        val progressDialog = AlertDialog.Builder(this)
+            .setMessage("Đang tải thông tin...")
+            .setCancelable(false)
+            .create()
+        progressDialog.show()
+        
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                messageRepository.getMessages(conversationId, page = 0, size = 20)
+            }
+            progressDialog.dismiss()
+            
+            if (result is com.example.myapplication.utils.resource.Resource.Success) {
+                val messages = result.data.data.content
+                val partnerId = messages.firstOrNull { it.senderId != currentUserId }?.senderId
+                if (!partnerId.isNullOrEmpty()) {
+                    showUserInfoDialog(name, partnerId)
+                } else {
+                    showToast("Không tìm thấy thông tin đối phương")
+                }
+            } else {
+                showToast("Lỗi tải thông tin: ${(result as? com.example.myapplication.utils.resource.Resource.Error)?.message}")
+            }
+        }
     }
 
     private fun showUserInfoDialog(userName: String, userId: String? = null) {
