@@ -84,6 +84,10 @@ class MapFragment : Fragment() {
         binding.btnNotification.setOnClickListener { navigateTo(com.example.myapplication.ui.notification.NotificationActivity::class.java) }
         binding.btnCalendar.setOnClickListener { navigateTo(com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java) }
 
+        binding.imgCrown.setOnClickListener {
+            showToast("Tính năng đang được phát triển")
+        }
+
         val scanAction = View.OnClickListener { checkLocationPermissionsAndScan() }
         binding.btnRadar.setOnClickListener(scanAction)
         binding.imgGroupRadar.setOnClickListener { if (binding.btnRadar.isEnabled) checkLocationPermissionsAndScan() }

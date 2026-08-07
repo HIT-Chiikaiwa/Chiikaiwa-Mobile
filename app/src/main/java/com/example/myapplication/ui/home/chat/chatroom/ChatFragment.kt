@@ -172,7 +172,6 @@ class ChatFragment : Fragment() {
             openPartnerProfile()
         }
         binding.tvChatTitle.setOnClickListener(profileClickListener)
-        binding.btnAddOption.setOnClickListener(profileClickListener)
 
         binding.btnSend.setOnClickListener {
             sendMessage()
@@ -190,6 +189,18 @@ class ChatFragment : Fragment() {
                 putExtra("target_user_name", userName)
             }
             startActivity(intent)
+        }
+
+        binding.btnSticker.setOnClickListener {
+            Toast.makeText(requireContext(), "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnMic.setOnClickListener {
+            Toast.makeText(requireContext(), "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnFolder.setOnClickListener {
+            Toast.makeText(requireContext(), "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show()
         }
     }
 

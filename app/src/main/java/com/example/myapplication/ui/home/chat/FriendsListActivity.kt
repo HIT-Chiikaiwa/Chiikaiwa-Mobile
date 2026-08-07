@@ -100,12 +100,12 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
 
         binding.tvOptionPin.setOnClickListener {
-            showToast("Đã ghim cuộc hội thoại")
+            showToast("Tính năng đang được phát triển")
             dialog.dismiss()
         }
 
         binding.tvOptionCreateGroup.setOnClickListener {
-            showToast("Tính năng tạo nhóm đang phát triển")
+            showToast("Tính năng đang được phát triển")
             dialog.dismiss()
         }
 
@@ -116,12 +116,12 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
 
         binding.tvOptionBlock.setOnClickListener {
-            showToast("Đã chặn $name")
+            showToast("Tính năng đang được phát triển")
             dialog.dismiss()
         }
 
         binding.tvOptionDelete.setOnClickListener {
-            showToast("Đã xóa cuộc trò chuyện")
+            showToast("Tính năng đang được phát triển")
             dialog.dismiss()
         }
 

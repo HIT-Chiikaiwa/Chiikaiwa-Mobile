@@ -40,15 +40,6 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/btnAddOption"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:layout_gravity="center_vertical"
-            android:contentDescription="@string/desc_options"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/ic_plus"
-            app:tint="@color/brown" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
