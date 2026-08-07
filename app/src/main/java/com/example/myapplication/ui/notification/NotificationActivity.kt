@@ -132,7 +132,9 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
                 startActivity(intent)
             }
             "BOOKING", "APPOINTMENT" -> {
-                val intent = Intent(this, ScheduleActivity::class.java)
+                val intent = Intent(this, ScheduleActivity::class.java).apply {
+                    putExtra("booking_id", notification.targetId)
+                }
                 startActivity(intent)
             }
             "CHAT", "MESSAGE", "CONVERSATION" -> {

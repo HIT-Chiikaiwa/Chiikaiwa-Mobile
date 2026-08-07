@@ -176,7 +176,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     }
 
     private fun addOrReplaceMessage(msg: Message) {
-        if (msg.type == MessageType.SYSTEM) {
+        if (msg.type == MessageType.SYSTEM || msg.type == MessageType.TEXT) {
             val isBookingNotification = BookingMessageHelper.extractStatusFromSystemMessage(msg.content) != null
             if (isBookingNotification) return
         }

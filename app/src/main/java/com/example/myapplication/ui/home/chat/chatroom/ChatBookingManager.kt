@@ -106,7 +106,7 @@ class ChatBookingManager {
 
     fun processMessageList(rawList: List<Message>): List<Message> {
         return rawList
-            .filterNot { it.type == MessageType.SYSTEM && BookingMessageHelper.extractStatusFromSystemMessage(it.content) != null }
+            .filterNot { (it.type == MessageType.SYSTEM || it.type == MessageType.TEXT) && BookingMessageHelper.extractStatusFromSystemMessage(it.content) != null }
             .map { msg -> applyOverrides(msg) }
     }
 

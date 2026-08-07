@@ -127,6 +127,9 @@ object BookingTextFormatter {
             lower.contains("hoàn thành") -> {
                 Pair("COMPLETED", null)
             }
+            lower.contains("mời bạn tham gia") || lower.contains("đặt lịch hẹn") || lower.contains("invited you") || lower.contains("lời mời") -> {
+                Pair("PENDING", null)
+            }
             else -> null
         }
     }

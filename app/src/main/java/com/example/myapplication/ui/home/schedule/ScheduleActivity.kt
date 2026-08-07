@@ -30,8 +30,9 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
     }
 
     private val currentCalendar = Calendar.getInstance()
-    private var selectedDayOfWeek = Calendar.MONDAY
+    private var selectedDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
     private var currentWeekStart: String = ""
+    private var isBookingDateLoaded = false
 
     override fun inflateBinding() = FragmentScheduleBinding.inflate(layoutInflater)
 
@@ -47,6 +48,11 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
         setupDayTabs()
 
         loadDataForCurrentWeek()
+
+        val bookingId = intent.getStringExtra("booking_id")
+        if (!bookingId.isNullOrEmpty()) {
+            viewModel.getBookingDetail(bookingId)
+        }
     }
 
     private fun setupWeekNavigation() {
@@ -141,35 +147,20 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
         targetCal.set(Calendar.DAY_OF_WEEK, selectedDayOfWeek)
         val targetDateStr = sdf.format(targetCal.time)
 
-        val dayKeyList = mutableListOf(targetDateStr)
-        when (selectedDayOfWeek) {
-            Calendar.MONDAY -> dayKeyList.addAll(listOf("MONDAY", "Monday", "0", "1"))
-            Calendar.TUESDAY -> dayKeyList.addAll(listOf("TUESDAY", "Tuesday", "1", "2"))
-            Calendar.WEDNESDAY -> dayKeyList.addAll(listOf("WEDNESDAY", "Wednesday", "2", "3"))
-            Calendar.THURSDAY -> dayKeyList.addAll(listOf("THURSDAY", "Thursday", "3", "4"))
-            Calendar.FRIDAY -> dayKeyList.addAll(listOf("FRIDAY", "Friday", "4", "5"))
-            Calendar.SATURDAY -> dayKeyList.addAll(listOf("SATURDAY", "Saturday", "5", "6"))
-            Calendar.SUNDAY -> dayKeyList.addAll(listOf("SUNDAY", "Sunday", "6", "7"))
-        }
-
-        var filteredFromWeekly: List<BookingDto>? = null
+        val allWeeklyBookings = mutableListOf<BookingDto>()
         if (weeklyData?.daySchedules != null) {
-            for (key in dayKeyList) {
-                if (weeklyData.daySchedules.containsKey(key)) {
-                    filteredFromWeekly = weeklyData.daySchedules[key]
-                    break
-                }
+            for (list in weeklyData.daySchedules.values) {
+                allWeeklyBookings.addAll(list)
             }
         }
 
-        val filteredFromAll = allMyBookings.filter { booking ->
-            val utcTime = booking.scheduledAt ?: return@filter false
-            val vnDate = com.example.myapplication.utils.TimeUtils.utcToVnDate(utcTime)
-            vnDate == targetDateStr
-        }
-
-        val combinedList = (filteredFromWeekly.orEmpty() + filteredFromAll)
+        val combinedList = (allWeeklyBookings + allMyBookings)
             .distinctBy { if (!it.id.isNullOrEmpty()) it.id else "${it.subject}_${it.scheduledAt}" }
+            .filter { booking ->
+                val utcTime = booking.scheduledAt ?: return@filter false
+                val vnDate = com.example.myapplication.utils.TimeUtils.utcToVnDate(utcTime)
+                vnDate == targetDateStr
+            }
             .filter { booking -> isBookingValidForSchedule(booking) }
 
         combinedList.forEach { booking ->
@@ -202,6 +193,24 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
 
         viewModel.uiState.observeState { state ->
             when (state) {
+                is UiState.Success -> {
+                    val booking = state.data
+                    val bookingId = intent.getStringExtra("booking_id")
+                    if (!bookingId.isNullOrEmpty() && booking.id == bookingId && !isBookingDateLoaded) {
+                        isBookingDateLoaded = true
+                        val scheduledAt = booking.scheduledAt
+                        if (!scheduledAt.isNullOrEmpty()) {
+                            val date = com.example.myapplication.utils.TimeUtils.parseUtcDate(scheduledAt)
+                            if (date != null) {
+                                val cal = Calendar.getInstance().apply { time = date }
+                                currentCalendar.time = date
+                                selectedDayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+                                loadDataForCurrentWeek()
+                                filterAndDisplayBookings()
+                            }
+                        }
+                    }
+                }
                 is UiState.Error -> showToast(state.message)
                 else -> {}
             }
