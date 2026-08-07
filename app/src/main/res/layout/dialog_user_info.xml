@@ -103,7 +103,7 @@
             android:layout_width="@dimen/_15sdp"
             android:layout_height="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_15sdp"
-            android:src="@drawable/ic_schedule"
+            android:src="@drawable/ic_locate"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutUserInfo" />
 

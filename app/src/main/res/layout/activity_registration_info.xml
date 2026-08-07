@@ -249,10 +249,22 @@
                             android:layout_marginEnd="@dimen/_8sdp"
                             android:contentDescription="@null"
                             android:padding="@dimen/_2sdp"
-                            android:src="@drawable/ic_calendar" />
+                            android:src="@drawable/ic_edit_calendar" />
                     </FrameLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_42sdp"
+                android:layout_marginTop="@dimen/_24sdp"
+                android:background="@drawable/bg_button"
+                android:gravity="center"
+                android:text="@string/save_changes"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_13ssp"
+                android:textStyle="bold" />
 
         </LinearLayout>
     </ScrollView>

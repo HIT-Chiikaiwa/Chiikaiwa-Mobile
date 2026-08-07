@@ -114,21 +114,25 @@ class BookingDetailDialog(
         binding.btnAccept.setOnClickListener {
             viewModel.acceptBooking(bookingId)
             dialog.dismiss()
+            onStatusChanged("ACCEPTED", null, null)
         }
 
         binding.btnReject.setOnClickListener {
             viewModel.rejectBooking(bookingId)
             dialog.dismiss()
+            onStatusChanged("REJECTED", null, null)
         }
 
         binding.btnComplete.setOnClickListener {
             viewModel.completeBooking(bookingId)
             dialog.dismiss()
+            onStatusChanged("COMPLETED", null, null)
         }
 
         binding.btnCancel.setOnClickListener {
-            BookingDialogHelper.showCancelReasonDialog(context, bookingId, viewModel) { _ ->
+            BookingDialogHelper.showCancelReasonDialog(context, bookingId, viewModel) { reason ->
                 dialog.dismiss()
+                onStatusChanged("CANCELLED", reason, null)
             }
         }
 

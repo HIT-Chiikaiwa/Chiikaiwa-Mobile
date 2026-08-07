@@ -87,7 +87,7 @@
     <string name="option_mute_notifications">Tắt thông báo</string>
     <string name="option_delete_friend">Xóa bạn</string>
     <string name="title_schedule">Thời gian biểu</string>
-    <string name="schedule_mascot_speech">Hãy tạo thời gian biểu\ncủa mình!</string>
+    <string name="schedule_mascot_speech">Thời gian biểu của\ncậu nè!</string>
     <string name="title_create_appointment">Tạo cuộc hẹn</string>
     <string name="title_create_appointment_with">Tạo cuộc hẹn với %1$s</string>
     <string name="label_select_date">Chọn ngày hẹn</string>
@@ -126,4 +126,24 @@
     <string name="booking_cancel_reason">Lí do: %1$s</string>
     <string name="booking_accept">Đồng ý</string>
     <string name="booking_reject">Từ chối</string>
+    <string name="mark_all_read">Đánh dấu tất cả đã đọc</string>
+    <string name="empty_notification">Bạn chưa có thông báo nào</string>
+    <string name="reminder_dialog_header">Nhắc nhở cuộc hẹn sắp diễn ra!</string>
+    <string name="reminder_dialog_subtext">Cuộc hẹn của bạn sẽ diễn ra sau 30 phút nữa</string>
+    <string name="reminder_dialog_view_schedule">Xem thời gian biểu</string>
+    <string name="reminder_push_title">Nhắc nhở cuộc hẹn (Sau 30 phút)</string>
+    <string name="reminder_push_content_format">Cuộc hẹn \'%1$s\' của bạn sẽ diễn ra sau 30 phút nữa (%2$s)!</string>
+    <string name="reminder_push_content_short_format">Cuộc hẹn \'%1$s\' của bạn sẽ diễn ra sau 30 phút nữa!</string>
+    <string name="dialog_notification_options_title">Tùy chọn thông báo</string>
+    <string name="delete_this_notification">Xóa thông báo này</string>
+    <string name="cancel">Hủy</string>
+    <string name="mark_all_read_success">Đã đánh dấu tất cả là đã đọc</string>
+    <string name="delete_notification_success">Đã xóa thông báo</string>
+    <string name="delete_all_notifications_success">Đã xóa tất cả thông báo</string>
+    <string name="toast_system_notif_on">Đã bật thông báo hệ thống</string>
+    <string name="toast_system_notif_off">Đã tắt thông báo hệ thống</string>
+    <string name="toast_appointment_notif_on">Đã bật thông báo Lịch hẹn</string>
+    <string name="toast_appointment_notif_off">Đã tắt thông báo Lịch hẹn</string>
+    <string name="toast_schedule_notif_on">Đã bật thông báo thời gian biểu</string>
+    <string name="toast_schedule_notif_off">Đã tắt thông báo thời gian biểu</string>
 </resources>

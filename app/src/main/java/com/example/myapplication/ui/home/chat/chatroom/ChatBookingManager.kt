@@ -79,9 +79,30 @@ class ChatBookingManager {
         val statusPair = BookingMessageHelper.extractStatusFromSystemMessage(incomingMsg.content) ?: return
         val (newStatus, reason) = statusPair
 
-        for (i in messages.indices) {
-            val m = messages[i]
-            if (m.type == MessageType.BOOKING || BookingMessageHelper.isBookingMessage(m.content)) {
+        var targetBookingId: String? = null
+        try {
+            val sysJson = gson.fromJson(incomingMsg.content, JsonObject::class.java)
+            targetBookingId = sysJson.get("bookingId")?.takeIf { !it.isJsonNull }?.asString
+        } catch (e: Exception) {
+            targetBookingId = null
+        }
+
+        if (!targetBookingId.isNullOrEmpty()) {
+            updateBookingMessageStatus(messages, targetBookingId, newStatus, reason)
+        } else {
+            val activeBookingIndices = messages.indices.filter { i ->
+                val msg = messages[i]
+                if (msg.type == MessageType.BOOKING || BookingMessageHelper.isBookingMessage(msg.content)) {
+                    val status = try {
+                        gson.fromJson(msg.content, JsonObject::class.java)?.get("status")?.takeIf { !it.isJsonNull }?.asString
+                    } catch (e: Exception) { null }
+                    status != "CANCELLED" && status != "REJECTED" && status != "COMPLETED"
+                } else false
+            }
+
+            if (activeBookingIndices.size == 1) {
+                val targetIndex = activeBookingIndices[0]
+                val m = messages[targetIndex]
                 try {
                     val jsonObj = gson.fromJson(m.content, JsonObject::class.java)
                     jsonObj.addProperty("status", newStatus)
@@ -92,7 +113,7 @@ class ChatBookingManager {
                     if (!bId.isNullOrEmpty()) {
                         bookingStatusOverrides[bId] = Pair(newStatus, reason)
                     }
-                    messages[i] = m.copy(content = gson.toJson(jsonObj))
+                    messages[targetIndex] = m.copy(content = gson.toJson(jsonObj))
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -110,7 +131,7 @@ class ChatBookingManager {
                 try {
                     val jsonObj = gson.fromJson(msg.content, JsonObject::class.java)
                     val bId = jsonObj.get("bookingId")?.takeIf { !it.isJsonNull }?.asString
-                    
+
                     val override = if (!bId.isNullOrEmpty() && bookingStatusOverrides.containsKey(bId)) {
                         bookingStatusOverrides[bId]
                     } else null

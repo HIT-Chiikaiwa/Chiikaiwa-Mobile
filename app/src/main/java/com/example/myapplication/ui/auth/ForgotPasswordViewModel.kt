@@ -38,11 +38,13 @@ class ForgotPasswordViewModel(application: Application) : BaseViewModel<String>(
             _uiState.value = UiState.Loading
             when (val result = repository.resetPassword(email, pass, confirmPass)) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Tạo mật khẩu mới thành công!")) }
+                    val msg = result.data?.message ?: result.data?.data?.message ?: "Tạo mật khẩu mới thành công!"
+                    _uiState.value = UiState.Success(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val errorMessage = result.message ?: "Đặt lại mật khẩu thất bại"
+                    _uiState.value = UiState.Error(errorMessage)
                 }
             }
         }

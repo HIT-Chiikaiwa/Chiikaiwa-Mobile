@@ -503,8 +503,8 @@
                     android:layout_width="@dimen/_40sdp"
                     android:layout_height="@dimen/_40sdp"
                     android:contentDescription="@string/setting"
-                    android:padding="@dimen/_12sdp"
-                    android:src="@drawable/icon" />
+                    android:padding="@dimen/_5sdp"
+                    android:src="@drawable/ic_setting" />
 
                 <TextView
                     android:id="@+id/tvSettingsTitle"
@@ -513,7 +513,7 @@
                     android:layout_marginStart="@dimen/_5sdp"
                     android:text="@string/setting"
                     android:textColor="@color/brown"
-                    android:textSize="@dimen/_12ssp"
+                    android:textSize="@dimen/_15ssp"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

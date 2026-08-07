@@ -169,29 +169,19 @@ class ScheduleActivity : BaseActivity<FragmentScheduleBinding>() {
         }
 
         val combinedList = (filteredFromWeekly.orEmpty() + filteredFromAll)
-            .distinctBy { it.id ?: it.toString() }
+            .distinctBy { if (!it.id.isNullOrEmpty()) it.id else "${it.subject}_${it.scheduledAt}" }
             .filter { booking -> isBookingValidForSchedule(booking) }
+
+        combinedList.forEach { booking ->
+            com.example.myapplication.utils.notification.AppointmentReminderScheduler.schedule30MinReminder(this, booking)
+        }
 
         adapter.submitList(combinedList)
     }
 
     private fun isBookingValidForSchedule(booking: BookingDto): Boolean {
-        val status = booking.status?.uppercase(Locale.getDefault())
-        if (status == "CANCELLED" || status == "REJECTED" || status == "EXPIRED") {
-            return false
-        }
-
-        val scheduledAt = booking.scheduledAt ?: return true
-        return try {
-            val date = com.example.myapplication.utils.TimeUtils.parseUtcDate(scheduledAt)
-            if (date != null && status == "PENDING" && date.time < System.currentTimeMillis()) {
-                false
-            } else {
-                true
-            }
-        } catch (e: Exception) {
-            true
-        }
+        val status = booking.status?.uppercase(Locale.getDefault()) ?: return false
+        return status == "ACCEPTED" || status == "CONFIRMED" || status == "COMPLETED"
     }
 
     override fun observeData() {

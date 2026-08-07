@@ -20,12 +20,12 @@
 
     <ImageView
         android:id="@+id/btnDeleteSubject"
-        android:layout_width="@dimen/_28sdp"
-        android:layout_height="@dimen/_28sdp"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Xóa"
         android:padding="@dimen/_6sdp"
-        android:src="@android:drawable/ic_menu_delete"
+        android:src="@drawable/ic_delete"
         app:tint="@color/error" />
 
 </LinearLayout>

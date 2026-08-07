@@ -51,7 +51,6 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
         setupDatePicker()
         setupTimePickers()
         setupDurationSpinner()
-        setupModeSpinner()
         setupCreateButton()
     }
 
@@ -116,26 +115,6 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
         binding.spDuration.setSelection(0)
     }
 
-    private fun setupModeSpinner() {
-        val modes = arrayOf("Offline", "Online")
-        val adapter = ArrayAdapter(this, R.layout.item_spinner_selected, modes)
-        adapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
-        binding.spMode.adapter = adapter
-
-        binding.spMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position == 0) {
-                    binding.layoutLocationSection.visibility = View.VISIBLE
-                } else {
-                    binding.layoutLocationSection.visibility = View.GONE
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
-    }
-
     private fun setupCreateButton() {
         binding.btnCreate.setOnClickListener {
             binding.tvErrorMessage.visibility = View.GONE
@@ -146,14 +125,11 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                 return@setOnClickListener
             }
 
-            val isOffline = binding.spMode.selectedItemPosition == 0
-            if (isOffline) {
-                val locationName = binding.etLocationName.text.toString().trim()
-                if (locationName.isEmpty()) {
-                    binding.tvErrorMessage.text = "Vui lòng nhập tên địa điểm"
-                    binding.tvErrorMessage.visibility = View.VISIBLE
-                    return@setOnClickListener
-                }
+            val locationName = binding.etLocationName.text.toString().trim()
+            if (locationName.isEmpty()) {
+                binding.tvErrorMessage.text = "Vui lòng nhập tên địa điểm"
+                binding.tvErrorMessage.visibility = View.VISIBLE
+                return@setOnClickListener
             }
 
             val cal = Calendar.getInstance().apply {
@@ -176,10 +152,10 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
 
             val selectedDuration = durationValues.getOrElse(binding.spDuration.selectedItemPosition) { 30 }
 
-            val locationNameStr = if (isOffline) binding.etLocationName.text.toString().trim().ifEmpty { "Offline" } else "Online"
-            val locationAddressStr = if (isOffline) binding.etStreet.text.toString().trim().ifEmpty { "Offline" } else "Online"
-            val locationDistrictStr = if (isOffline) binding.etDistrict.text.toString().trim().ifEmpty { "Offline" } else "Online"
-            val locationCityStr = if (isOffline) binding.etProvince.text.toString().trim().ifEmpty { "Offline" } else "Online"
+            val locationNameStr = binding.etLocationName.text.toString().trim().ifEmpty { "Offline" }
+            val locationAddressStr = binding.etStreet.text.toString().trim().ifEmpty { "Offline" }
+            val locationDistrictStr = binding.etDistrict.text.toString().trim().ifEmpty { "Offline" }
+            val locationCityStr = binding.etProvince.text.toString().trim().ifEmpty { "Offline" }
 
             val request = CreateBookingRequest(
                 subject = binding.tvScreenTitle.text.toString(),

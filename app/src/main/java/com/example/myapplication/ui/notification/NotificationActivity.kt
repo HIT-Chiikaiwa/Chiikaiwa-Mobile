@@ -3,10 +3,13 @@ package com.example.myapplication.ui.notification
 import android.content.Intent
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
+import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.NotificationDto
 import com.example.myapplication.databinding.ActivityNotificationBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiState
+import com.example.myapplication.ui.home.chat.FriendsListActivity
 import com.example.myapplication.ui.home.schedule.ScheduleActivity
 import com.example.myapplication.ui.profile.ProfileActivity
 
@@ -17,15 +20,17 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
     private val viewModel: NotificationViewModel by viewModels()
 
     private val recentAdapter by lazy {
-        NotificationAdapter { notification ->
-            handleNotificationClick(notification)
-        }
+        NotificationAdapter(
+            onItemClick = { notification -> handleNotificationClick(notification) },
+            onItemLongClick = { notification -> showNotificationOptionsDialog(notification) }
+        )
     }
 
     private val earlierAdapter by lazy {
-        NotificationAdapter { notification ->
-            handleNotificationClick(notification)
-        }
+        NotificationAdapter(
+            onItemClick = { notification -> handleNotificationClick(notification) },
+            onItemLongClick = { notification -> showNotificationOptionsDialog(notification) }
+        )
     }
 
     override fun initView() {
@@ -33,8 +38,22 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
             finish()
         }
 
+        binding.tvMarkAllRead.setOnClickListener {
+            viewModel.markAllNotificationsAsRead()
+        }
+
         binding.rvRecentNotifications.adapter = recentAdapter
         binding.rvEarlierNotifications.adapter = earlierAdapter
+
+        checkAndShowReminderDialog(intent)
+    }
+
+    private fun checkAndShowReminderDialog(intent: Intent?) {
+        if (intent?.getBooleanExtra("show_reminder_dialog", false) == true) {
+            val title = intent.getStringExtra("reminder_title") ?: "Cuộc hẹn"
+            val scheduledAt = intent.getStringExtra("reminder_scheduled_at") ?: ""
+            com.example.myapplication.ui.home.schedule.AppointmentReminderDialog(this, title, scheduledAt).show()
+        }
     }
 
     override fun onResume() {
@@ -48,11 +67,14 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
                 is UiState.Success -> {
                     val list = state.data
                     if (list.isEmpty()) {
-                        binding.tvRecentHeader.visibility = View.GONE
-                        binding.tvEarlierHeader.visibility = View.GONE
+                        binding.layoutEmptyState.visibility = View.VISIBLE
+                        binding.scrollViewContent.visibility = View.GONE
                         recentAdapter.submitList(emptyList())
                         earlierAdapter.submitList(emptyList())
                     } else {
+                        binding.layoutEmptyState.visibility = View.GONE
+                        binding.scrollViewContent.visibility = View.VISIBLE
+
                         val recentList = if (list.size > 5) list.subList(0, 5) else list
                         val earlierList = if (list.size > 5) list.subList(5, list.size) else emptyList()
 
@@ -69,12 +91,39 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
                 else -> {}
             }
         }
+
+        viewModel.actionState.observeState { state ->
+            when (state) {
+                is UiState.Success -> {
+                    showToast(state.data)
+                }
+                is UiState.Error -> {
+                    showToast(state.message)
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun showNotificationOptionsDialog(notification: NotificationDto) {
+        val notificationId = notification.id ?: return
+        val options = arrayOf(getString(R.string.delete_this_notification))
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_notification_options_title))
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> viewModel.deleteNotification(notificationId)
+                }
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 
     private fun handleNotificationClick(notification: NotificationDto) {
         notification.id?.let { viewModel.markNotificationAsRead(it) }
 
-        when (notification.targetType?.uppercase()) {
+        val type = notification.targetType?.uppercase() ?: notification.type?.uppercase()
+        when (type) {
             "FRIEND", "FRIEND_REQUEST", "USER" -> {
                 val targetId = notification.targetId ?: notification.actorId
                 val intent = Intent(this, ProfileActivity::class.java).apply {
@@ -84,6 +133,10 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
             }
             "BOOKING", "APPOINTMENT" -> {
                 val intent = Intent(this, ScheduleActivity::class.java)
+                startActivity(intent)
+            }
+            "CHAT", "MESSAGE", "CONVERSATION" -> {
+                val intent = Intent(this, FriendsListActivity::class.java)
                 startActivity(intent)
             }
             else -> {

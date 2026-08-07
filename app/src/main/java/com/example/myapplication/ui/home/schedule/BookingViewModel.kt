@@ -78,16 +78,43 @@ class BookingViewModel(application: Application) : BaseViewModel<BookingDto>(app
         }
     }
 
+    private fun updateLocalBooking(updatedBooking: BookingDto) {
+        val bookingId = updatedBooking.id
+        if (bookingId.isNullOrEmpty()) return
+
+        val currentList = _myBookings.value.toMutableList()
+        val index = currentList.indexOfFirst { !it.id.isNullOrEmpty() && it.id == bookingId }
+        if (index != -1) {
+            currentList[index] = updatedBooking
+            _myBookings.value = currentList
+        }
+
+        val currentWeekly = _weeklyBookings.value
+        if (currentWeekly?.daySchedules != null) {
+            val updatedMap = currentWeekly.daySchedules.mapValues { entry ->
+                entry.value.map { item ->
+                    if (!item.id.isNullOrEmpty() && item.id == bookingId) updatedBooking else item
+                }
+            }
+            _weeklyBookings.value = currentWeekly.copy(daySchedules = updatedMap)
+        }
+    }
+
     fun acceptBooking(bookingId: String) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             when (val result = repository.acceptBooking(bookingId)) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data.data)
+                    val booking = result.data.data
+                    com.example.myapplication.utils.notification.AppointmentReminderScheduler.schedule30MinReminder(getApplication(), booking)
+                    updateLocalBooking(booking)
+                    _uiState.value = UiState.Success(booking)
                     _event.emit(UiEvent.ShowToast("Đã chấp nhận cuộc hẹn"))
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val msg = result.message ?: "Không thể chấp nhận cuộc hẹn"
+                    _uiState.value = UiState.Error(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
             }
         }
@@ -98,11 +125,16 @@ class BookingViewModel(application: Application) : BaseViewModel<BookingDto>(app
             _uiState.value = UiState.Loading
             when (val result = repository.rejectBooking(bookingId)) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data.data)
+                    com.example.myapplication.utils.notification.AppointmentReminderScheduler.cancelReminder(getApplication(), bookingId)
+                    val booking = result.data.data
+                    updateLocalBooking(booking)
+                    _uiState.value = UiState.Success(booking)
                     _event.emit(UiEvent.ShowToast("Đã từ chối cuộc hẹn"))
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val msg = result.message ?: "Không thể từ chối cuộc hẹn"
+                    _uiState.value = UiState.Error(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
             }
         }
@@ -113,11 +145,16 @@ class BookingViewModel(application: Application) : BaseViewModel<BookingDto>(app
             _uiState.value = UiState.Loading
             when (val result = repository.cancelBooking(bookingId, cancelReason)) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data.data)
+                    com.example.myapplication.utils.notification.AppointmentReminderScheduler.cancelReminder(getApplication(), bookingId)
+                    val booking = result.data.data
+                    updateLocalBooking(booking)
+                    _uiState.value = UiState.Success(booking)
                     _event.emit(UiEvent.ShowToast("Đã hủy cuộc hẹn"))
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val msg = result.message ?: "Không thể hủy cuộc hẹn"
+                    _uiState.value = UiState.Error(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
             }
         }
@@ -144,7 +181,9 @@ class BookingViewModel(application: Application) : BaseViewModel<BookingDto>(app
             when (val result = repository.completeBooking(bookingId)) {
                 is Resource.Success -> {
                     android.util.Log.d("CHAT_BOOKING_DEBUG", "[COMPLETE_API_SUCCESS] Booking $bookingId completed successfully on server: ${result.data.data.status}")
-                    _uiState.value = UiState.Success(result.data.data)
+                    val booking = result.data.data
+                    updateLocalBooking(booking)
+                    _uiState.value = UiState.Success(booking)
                     _event.emit(UiEvent.ShowToast("Đã hoàn thành cuộc hẹn"))
                 }
                 is Resource.Error -> {

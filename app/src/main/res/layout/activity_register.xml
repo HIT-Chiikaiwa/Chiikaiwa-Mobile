@@ -204,7 +204,7 @@
                             android:layout_gravity="end|center_vertical"
                             android:layout_marginEnd="@dimen/_5sdp"
                             android:padding="@dimen/_10sdp"
-                            android:src="@drawable/ic_schedule"
+                            android:src="@drawable/ic_edit_calendar"
                             app:tint="@color/brown" />
                     </FrameLayout>
                 </LinearLayout>
@@ -267,7 +267,7 @@
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginEnd="@dimen/_5sdp"
                     android:contentDescription="@string/toggle_password"
-                    android:padding="@dimen/_12sdp"
+                    android:padding="@dimen/_10sdp"
                     android:src="@drawable/ic_visibility"
                     app:tint="@color/brown" />
             </FrameLayout>
@@ -306,7 +306,7 @@
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginEnd="@dimen/_5sdp"
                     android:contentDescription="@string/toggle_password"
-                    android:padding="@dimen/_12sdp"
+                    android:padding="@dimen/_10sdp"
                     android:src="@drawable/ic_visibility"
                     app:tint="@color/brown" />
             </FrameLayout>

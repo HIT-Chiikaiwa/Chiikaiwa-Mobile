@@ -48,12 +48,14 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
 
             when (val result = apiCall) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Xác thực OTP thành công")
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Xác thực OTP thành công")) }
+                    val msg = result.data?.message ?: result.data?.data?.message ?: "Xác thực OTP thành công"
+                    _uiState.value = UiState.Success(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
 
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val errorMessage = result.message ?: "Xác thực OTP thất bại"
+                    _uiState.value = UiState.Error(errorMessage)
                 }
             }
         }
@@ -75,13 +77,15 @@ class VerifyOtpViewModel(application: Application) : BaseViewModel<String>(appli
 
             when (val result = apiCall) {
                 is Resource.Success -> {
+                    val msg = result.data?.message ?: result.data?.data?.message ?: "Đã gửi lại mã OTP"
                     _uiState.value = UiState.Idle
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Đã gửi lại mã OTP")) }
+                    _event.emit(UiEvent.ShowToast(msg))
                     startResendTimer()
                 }
 
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val errorMessage = result.message ?: "Gửi lại mã OTP thất bại"
+                    _uiState.value = UiState.Error(errorMessage)
                 }
             }
         }

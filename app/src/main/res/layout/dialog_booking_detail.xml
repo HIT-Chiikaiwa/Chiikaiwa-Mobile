@@ -31,6 +31,21 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:background="@color/brown" />
+
+    <TextView
+        android:id="@+id/tvTimeAndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/error"
+        android:textSize="@dimen/_11ssp"
+        android:textStyle="bold"
+        tools:text="Thời gian: 16:00 05/08/2026 (60 phút)" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -83,21 +98,6 @@
             android:textStyle="bold"
             tools:text="PENDING" />
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="@dimen/_10sdp"
-        android:background="@color/brown" />
-
-    <TextView
-        android:id="@+id/tvTimeAndDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/error"
-        android:textSize="@dimen/_11ssp"
-        android:textStyle="bold"
-        tools:text="Thời gian: 16:00 05/08/2026 (60 phút)" />
 
     <TextView
         android:id="@+id/tvLocation"

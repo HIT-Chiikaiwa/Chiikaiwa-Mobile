@@ -83,7 +83,7 @@
                     android:layout_height="@dimen/_18sdp"
                     android:layout_gravity="end|center_vertical"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_schedule" />
+                    android:src="@drawable/ic_edit_calendar" />
             </FrameLayout>
 
             <TextView
@@ -142,22 +142,7 @@
                 android:background="@drawable/bg_edittext"
                 android:paddingHorizontal="@dimen/_10sdp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:text="@string/label_mode"
-                android:textColor="@color/brown"
-                android:textSize="@dimen/_15ssp"
-                android:textStyle="bold" />
 
-            <Spinner
-                android:id="@+id/spMode"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_45sdp"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/bg_edittext"
-                android:paddingHorizontal="@dimen/_10sdp" />
 
             <LinearLayout
                 android:id="@+id/layoutLocationSection"

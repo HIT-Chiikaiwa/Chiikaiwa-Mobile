@@ -10,7 +10,6 @@
         android:orientation="vertical"
         android:padding="@dimen/_16sdp">
 
-        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -20,7 +19,6 @@
             android:textSize="@dimen/_16ssp"
             android:textStyle="bold" />
 
-        <!-- Name Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,12 +54,11 @@
                 android:textSize="@dimen/_12ssp" />
         </LinearLayout>
 
-        <!-- Date of Birth -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
-            android:text="Ngày sinh (YYYY-MM-DD):"
+            android:text="Ngày sinh:"
             android:textColor="@color/brown"
             android:textSize="@dimen/_11ssp"
             android:textStyle="bold" />
@@ -79,7 +76,6 @@
             android:textColorHint="@color/hint"
             android:textSize="@dimen/_12ssp" />
 
-        <!-- Gender Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -123,7 +119,6 @@
                 android:textSize="@dimen/_11ssp" />
         </RadioGroup>
 
-        <!-- Academic Info -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -168,7 +163,6 @@
             android:textColorHint="@color/hint"
             android:textSize="@dimen/_12ssp" />
 
-        <!-- Phone & Email -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -191,7 +185,6 @@
             android:textColorHint="@color/hint"
             android:textSize="@dimen/_12ssp" />
 
-        <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

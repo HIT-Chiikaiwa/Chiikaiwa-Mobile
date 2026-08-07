@@ -192,13 +192,13 @@ class MapManager(
 
         val features = users.filter { it.userId != viewModel.currentUserId }.map { user ->
             val feature = Feature.fromGeometry(Point.fromLngLat(user.longitude, user.latitude))
-            feature.addStringProperty("id", user.userId)
+            feature.addStringProperty("id", user.userId ?: "")
             feature.addStringProperty("name", "${user.lastName ?: ""} ${user.firstName ?: ""}".trim())
-            feature.addStringProperty("avatar", user.avatar)
-            feature.addStringProperty("university", user.university)
-            feature.addStringProperty("major", user.majorName)
-            feature.addStringProperty("statusTag", user.statusTag)
-            feature.addNumberProperty("distance", user.distanceKm)
+            feature.addStringProperty("avatar", user.avatar ?: "")
+            feature.addStringProperty("university", user.university ?: "")
+            feature.addStringProperty("major", user.majorName ?: "")
+            feature.addStringProperty("statusTag", user.statusTag ?: "")
+            feature.addNumberProperty("distance", user.distanceKm ?: 0.0)
 
             val avatarId = "avatar_${user.userId}"
             feature.addStringProperty("avatar_id", if (style.getImage(avatarId) != null) avatarId else "my_marker")

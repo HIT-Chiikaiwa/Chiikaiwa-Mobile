@@ -3,9 +3,12 @@ package com.example.myapplication.ui.profile
 import android.app.DatePickerDialog
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
+import com.example.myapplication.data.local.PreferenceManager
+import com.example.myapplication.data.remote.dto.request.UpdatePersonalInfoRequest
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.ActivityRegistrationInfoBinding
 import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import java.util.Calendar
 import java.util.Locale
@@ -15,6 +18,7 @@ class RegistrationInfoActivity : BaseActivity<ActivityRegistrationInfoBinding>()
     override fun inflateBinding() = ActivityRegistrationInfoBinding.inflate(layoutInflater)
 
     private val viewModel: ProfileViewModel by viewModels()
+    private var currentUserDto: UserDto? = null
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
@@ -35,7 +39,7 @@ class RegistrationInfoActivity : BaseActivity<ActivityRegistrationInfoBinding>()
             isCursorVisible = false
         }
 
-        val savedEmail = com.example.myapplication.data.local.PreferenceManager(this).getEmail()
+        val savedEmail = PreferenceManager(this).getEmail()
         if (!savedEmail.isNullOrEmpty()) {
             binding.etEmail.setText(savedEmail)
         }
@@ -47,6 +51,10 @@ class RegistrationInfoActivity : BaseActivity<ActivityRegistrationInfoBinding>()
         }
         binding.etDateOfBirth.setOnClickListener { datePickerAction() }
         binding.btnPickDate.setOnClickListener { datePickerAction() }
+
+        binding.btnSave.setOnClickListener {
+            saveRegistrationInfo()
+        }
     }
 
     private fun setupGenderSpinner() {
@@ -77,15 +85,25 @@ class RegistrationInfoActivity : BaseActivity<ActivityRegistrationInfoBinding>()
     override fun observeData() {
         viewModel.uiState.observeState { state ->
             when (state) {
-                is UiState.Success -> bindUserData(state.data)
+                is UiState.Success -> {
+                    currentUserDto = state.data
+                    bindUserData(state.data)
+                }
                 is UiState.Error -> showToast(state.message)
+                else -> {}
+            }
+        }
+
+        viewModel.event.observeEvent { event ->
+            when (event) {
+                is UiEvent.ShowToast -> showToast(event.message)
                 else -> {}
             }
         }
     }
 
     private fun bindUserData(user: UserDto) {
-        val savedEmail = com.example.myapplication.data.local.PreferenceManager(this).getEmail()
+        val savedEmail = PreferenceManager(this).getEmail()
         val emailToDisplay = user.email.takeIf { !it.isNullOrEmpty() } ?: savedEmail ?: ""
         binding.etEmail.setText(emailToDisplay)
         binding.etId.setText(user.id)
@@ -117,6 +135,43 @@ class RegistrationInfoActivity : BaseActivity<ActivityRegistrationInfoBinding>()
             }
         } catch (e: Exception) {
             rawDob
+        }
+    }
+
+    private fun saveRegistrationInfo() {
+        val lastName = binding.etLastName.text.toString().trim()
+        val firstName = binding.etFirstName.text.toString().trim()
+        val gender = when (binding.spinnerGender.selectedItemPosition) {
+            0 -> "MALE"
+            1 -> "FEMALE"
+            else -> "OTHER"
+        }
+        val rawDob = binding.etDateOfBirth.text.toString().trim()
+        val formattedDob = convertDobToIso(rawDob)
+
+        val phone = currentUserDto?.phone ?: ""
+        val savedEmail = PreferenceManager(this).getEmail()
+        val email = currentUserDto?.email.takeIf { !it.isNullOrEmpty() } ?: savedEmail ?: ""
+
+        val request = UpdatePersonalInfoRequest(
+            firstName = firstName,
+            lastName = lastName,
+            gender = gender,
+            dateOfBirth = formattedDob,
+            phone = phone,
+            email = email
+        )
+
+        viewModel.updatePersonalInfo(request)
+    }
+
+    private fun convertDobToIso(dobStr: String): String {
+        if (dobStr.isEmpty()) return ""
+        val parts = dobStr.split("/")
+        return if (parts.size == 3) {
+            "${parts[2]}-${parts[1]}-${parts[0]}"
+        } else {
+            dobStr
         }
     }
 }
