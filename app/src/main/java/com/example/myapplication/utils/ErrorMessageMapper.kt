@@ -1,9 +1,5 @@
 package com.example.myapplication.utils
 
-/**
- * Singleton Mapper giúp chuyển đổi tất cả thông báo lỗi từ Backend (BE) dạng tiếng Anh
- * cũng như các thông báo từ Frontend (FE) sang tiếng Việt thống nhất và thân thiện.
- */
 object ErrorMessageMapper {
 
     fun map(rawError: String?, httpStatusCode: Int? = null): String {
@@ -13,7 +9,6 @@ object ErrorMessageMapper {
 
         val trimmed = rawError.trim()
 
-        // 1. General & Invalid (Lỗi hệ thống & Kiểm tra định dạng)
         when {
             trimmed.contains("Something went wrong, please try again later", ignoreCase = true) ->
                 return "Đã có lỗi xảy ra, vui lòng thử lại sau"
@@ -51,7 +46,6 @@ object ErrorMessageMapper {
                 return "Chỉ cho phép hình ảnh PNG, JPG, JPEG, WEBP hoặc GIF"
         }
 
-        // 2. Auth & Register (Xác thực & Tài khoản)
         when {
             trimmed.contains("Username is incorrect", ignoreCase = true) ->
                 return "Tên đăng nhập không chính xác"
@@ -93,7 +87,6 @@ object ErrorMessageMapper {
                 return "Lỗi hệ thống khi xử lý dữ liệu. Vui lòng thử lại sau."
         }
 
-        // 3. Google Auth (Đăng nhập bằng Google)
         when {
             trimmed.contains("Invalid or expired Firebase token", ignoreCase = true) ->
                 return "Token Firebase không hợp lệ hoặc đã hết hạn"
@@ -108,7 +101,6 @@ object ErrorMessageMapper {
                 return "Tài khoản đăng nhập bằng Google không hỗ trợ thay đổi mật khẩu"
         }
 
-        // 4. Chat (Nhắn tin & Nhóm)
         when {
             trimmed.contains("Conversation not found", ignoreCase = true) ->
                 return "Không tìm thấy cuộc trò chuyện"
@@ -162,7 +154,6 @@ object ErrorMessageMapper {
                 return "Tập tin vượt quá kích thước cho phép"
         }
 
-        // 5. Friendship (Kết bạn)
         when {
             trimmed.contains("You cannot send a friend request to yourself", ignoreCase = true) ->
                 return "Bạn không thể tự gửi lời mời kết bạn cho chính mình"
@@ -182,7 +173,6 @@ object ErrorMessageMapper {
                 return "Không tìm thấy người dùng với từ khóa này"
         }
 
-        // 6. Booking (Đặt lịch hẹn)
         when {
             trimmed.contains("Booking can only be created in 1-1 conversations for now", ignoreCase = true) ||
             trimmed.contains("Cannot book in a group chat, direct messages only", ignoreCase = true) ->
@@ -242,7 +232,6 @@ object ErrorMessageMapper {
                 return "Không thể hẹn với người dùng đã bị chặn"
         }
 
-        // 7. File (Tải lên tập tin)
         when {
             trimmed.contains("File size exceeds limit", ignoreCase = true) ->
                 return "Kích thước file vượt quá giới hạn 10MB"
@@ -256,7 +245,6 @@ object ErrorMessageMapper {
                 return "Tải lên file thất bại"
         }
 
-        // 8. Location (Vị trí)
         when {
             trimmed.contains("User status is inactive", ignoreCase = true) ->
                 return "Trạng thái người dùng không hoạt động"
@@ -268,7 +256,6 @@ object ErrorMessageMapper {
                 return "Tọa độ không hợp lệ"
         }
 
-        // 9. Notification (Thông báo)
         when {
             trimmed.contains("Notification not found", ignoreCase = true) ->
                 return "Không tìm thấy thông báo"
@@ -278,7 +265,6 @@ object ErrorMessageMapper {
                 return "Danh sách ID thông báo không được rỗng"
         }
 
-        // 10. User & Role Search (Người dùng & Quyền)
         when {
             trimmed.contains("User not found with this username:", ignoreCase = true) ||
             trimmed.contains("User not found with username:", ignoreCase = true) -> {
@@ -294,7 +280,6 @@ object ErrorMessageMapper {
                 return "Chưa có quyền USER trong hệ thống!"
         }
 
-        // Catch network exception messages
         if (trimmed.contains("Unable to resolve host", ignoreCase = true) ||
             trimmed.contains("Failed to connect", ignoreCase = true) ||
             trimmed.contains("timeout", ignoreCase = true) ||
@@ -303,7 +288,6 @@ object ErrorMessageMapper {
             return "Không thể kết nối tới server. Vui lòng kiểm tra lại kết nối mạng!"
         }
 
-        // Return original if already in Vietnamese
         if (isVietnamese(trimmed)) {
             return trimmed
         }

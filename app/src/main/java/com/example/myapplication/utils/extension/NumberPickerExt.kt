@@ -25,6 +25,5 @@ fun NumberPicker.setBrownTextColor() {
         (selectorWheelPaintField.get(this) as? Paint)?.color = color
         invalidate()
     } catch (e: Exception) {
-        // Ignore reflection errors
     }
 }

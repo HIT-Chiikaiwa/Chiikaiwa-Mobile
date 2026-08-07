@@ -29,6 +29,7 @@ class AuthInterceptor(
 
         val token = preferenceManager.getAccessToken()
         val requestBuilder = originalRequest.newBuilder()
+            .header("Accept-Language", "vi")
 
         if (!token.isNullOrEmpty() && !isAuthEndpoint) {
             requestBuilder.addHeader(

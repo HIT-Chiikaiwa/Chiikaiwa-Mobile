@@ -167,7 +167,7 @@ interface ApiService {
     suspend fun uploadImage(
         @Path("id") conversationId: String,
         @Part file: MultipartBody.Part
-    ): Response<BaseResponse<String>>
+    ): Response<BaseResponse<Any>>
 
     @POST("api/v1/chat/conversations/{id}/schedule-invite")
     suspend fun scheduleInvite(

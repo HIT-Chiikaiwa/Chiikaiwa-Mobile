@@ -25,7 +25,6 @@ class RegistrationInfoActivity : BaseActivity<ActivityRegistrationInfoBinding>()
             finish()
         }
 
-        // Lock email and ID fields from being edited
         binding.etEmail.apply {
             keyListener = null
             isFocusable = false

@@ -35,6 +35,7 @@ class MapManager(
     private val avatarBitmapCache = HashMap<String, Bitmap>()
     private val radarRenderer = RadarRenderer(map)
     private val markerSize by lazy { context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._24sdp) }
+    private val friendRepository by lazy { com.example.myapplication.data.repository.FriendRepository(context) }
 
     fun setup() {
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
@@ -228,7 +229,7 @@ class MapManager(
         binding.tvDistance.text = context.getString(R.string.distance_format, distance)
 
         if (!avatarUrl.isNullOrEmpty()) {
-            com.bumptech.glide.Glide.with(context)
+            com.bumptech.glide.Glide.with(binding.ivAvatar.context)
                 .load(avatarUrl)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .error(R.drawable.ic_launcher_foreground)
@@ -246,8 +247,6 @@ class MapManager(
             binding.btnAddFriend.text = "Thêm bạn"
             binding.btnAddFriend.isEnabled = true
             binding.btnAddFriend.alpha = 1.0f
-
-            val friendRepository = com.example.myapplication.data.repository.FriendRepository(context)
 
             fragment.lifecycleScope.launch {
                 val friendsRes = friendRepository.getFriends(0, 100)
@@ -274,6 +273,11 @@ class MapManager(
             }
 
             binding.btnAddFriend.setOnClickListener {
+                if (userId.isEmpty()) {
+                    Toast.makeText(context, "Lỗi: ID người dùng không hợp lệ", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
                 binding.btnAddFriend.text = "Đã gửi yêu cầu"
                 binding.btnAddFriend.isEnabled = false
                 binding.btnAddFriend.alpha = 0.6f

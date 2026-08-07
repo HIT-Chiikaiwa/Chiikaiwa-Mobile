@@ -38,6 +38,7 @@ class IncomingImageViewHolder(
             Glide.with(binding.ivImageContent.context)
                 .load(message.content)
                 .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
                 .into(binding.ivImageContent)
         }
 

@@ -198,13 +198,28 @@ class ChatFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val tempFile = File(context.cacheDir, "upload_${System.currentTimeMillis()}.jpg")
-                context.contentResolver.openInputStream(uri)?.use { input ->
+                val bitmap = android.graphics.BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+                if (bitmap != null) {
+                    val maxDimension = 1280
+                    val scaledBitmap = if (bitmap.width > maxDimension || bitmap.height > maxDimension) {
+                        val ratio = Math.min(maxDimension.toFloat() / bitmap.width, maxDimension.toFloat() / bitmap.height)
+                        val width = Math.round(ratio * bitmap.width)
+                        val height = Math.round(ratio * bitmap.height)
+                        android.graphics.Bitmap.createScaledBitmap(bitmap, width, height, true)
+                    } else bitmap
+
                     tempFile.outputStream().use { output ->
-                        input.copyTo(output)
+                        scaledBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, output)
+                    }
+                } else {
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        tempFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
                     }
                 }
 
-                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+                val mimeType = "image/jpeg"
                 val requestBody = tempFile.asRequestBody(mimeType.toMediaTypeOrNull())
                 val part = MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
 

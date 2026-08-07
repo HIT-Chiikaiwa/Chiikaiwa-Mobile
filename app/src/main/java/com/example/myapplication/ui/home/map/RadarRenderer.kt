@@ -12,6 +12,7 @@ import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 import org.maplibre.geojson.Polygon
 
@@ -43,8 +44,11 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
                 )
             )
 
+            val strokeSource = GeoJsonSource("radar-circle-stroke-source", FeatureCollection.fromFeatures(emptyList()))
+            style.addSource(strokeSource)
+
             style.addLayer(
-                LineLayer("radar-circle-stroke-layer", "radar-circle-source").withProperties(
+                LineLayer("radar-circle-stroke-layer", "radar-circle-stroke-source").withProperties(
                     PropertyFactory.lineColor(Color.parseColor("#4DFFFFFF")),
                     PropertyFactory.lineWidth(2f),
                     PropertyFactory.visibility(Property.NONE)
@@ -66,6 +70,9 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
     }
 
     fun startRadar(center: LatLng) {
+        if (center.latitude.isNaN() || center.longitude.isNaN() || (center.latitude == 0.0 && center.longitude == 0.0)) {
+            return
+        }
         centerLatLng = center
         showRadarLayers(true)
         updateRadarCircle(center)
@@ -104,8 +111,14 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         val style = mapLibreMap.style ?: return
         if (!style.isFullyLoaded) return
         val source = style.getSourceAs<GeoJsonSource>("radar-circle-source") ?: return
+        val strokeSource = style.getSourceAs<GeoJsonSource>("radar-circle-stroke-source") ?: return
+        
         val circlePoly = getCirclePolygon(center.latitude, center.longitude)
         source.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circlePoly))))
+        
+        val points = circlePoly.coordinates()[0]
+        val circleLine = LineString.fromLngLats(points)
+        strokeSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circleLine))))
     }
 
     private fun updateRadarBeamRotation(startAngleDeg: Double) {
@@ -143,6 +156,9 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         }
 
         points.add(Point.fromLngLat(centerLng, centerLat))
+        if (points.isNotEmpty()) {
+            points[points.size - 1] = points[0]
+        }
         return Polygon.fromLngLats(listOf(points))
     }
 
@@ -169,6 +185,9 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
             points.add(Point.fromLngLat(Math.toDegrees(pointLngRad), Math.toDegrees(pointLatRad)))
         }
 
+        if (points.isNotEmpty()) {
+            points[points.size - 1] = points[0]
+        }
         return Polygon.fromLngLats(listOf(points))
     }
 }

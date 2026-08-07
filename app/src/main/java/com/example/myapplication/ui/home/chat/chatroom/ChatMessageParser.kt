@@ -2,6 +2,9 @@ package com.example.myapplication.ui.home.chat.chatroom
 
 import android.util.Log
 import com.example.myapplication.data.model.Message
+import com.example.myapplication.data.model.MessageStatus
+import com.example.myapplication.data.model.MessageType
+import com.example.myapplication.data.model.User
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -27,46 +30,53 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
 
         val senderObj = if (data.has("sender") && data.get("sender")?.isJsonObject == true) data.getAsJsonObject("sender") else null
         val senderId = data.get("senderId").asStringOrNull()
-            ?: senderObj?.get("id").asStringOrNull() ?: ""
+            ?: senderObj?.get("id").asStringOrNull()
+            ?: data.get("userId").asStringOrNull()
+            ?: ""
         val senderName = data.get("senderName").asStringOrNull()
             ?: senderObj?.get("fullName").asStringOrNull() ?: "Hệ thống"
+        val senderAvatar = data.get("senderAvatar").asStringOrNull()
+            ?: senderObj?.get("avatar").asStringOrNull()
         val convId = data.get("conversationId").asStringOrNull() ?: activeConversationId
 
         val rawCreatedDate = data.get("createdDate").asStringOrNull()
             ?: data.get("createdAt").asStringOrNull()
             ?: data.get("timestamp").asStringOrNull()
             ?: ""
-        Log.d("CHAT_REALTIME_LOG", "[SERVER_TIME_LOG] Raw createdDate from server: '$rawCreatedDate' | Full JSON: $data")
 
         val rawType = data.get("messageType").asStringOrNull()
             ?: data.get("type").asStringOrNull()
             ?: "TEXT"
 
         val messageType = try {
-            com.example.myapplication.data.model.MessageType.valueOf(rawType.uppercase())
+            MessageType.valueOf(rawType.uppercase())
         } catch (e: Exception) {
-            com.example.myapplication.data.model.MessageType.TEXT
+            MessageType.TEXT
         }
+
+        val cleanContent = if (messageType == MessageType.IMAGE) {
+            content.trimEnd(',', ';', ' ', '"', '\'')
+        } else content
 
         return Message(
             id = msgId,
             conversationId = convId,
-            sender = com.example.myapplication.data.model.User(id = senderId, fullName = senderName, avatar = null),
-            content = content,
+            sender = User(id = senderId, fullName = senderName, avatar = senderAvatar),
+            content = cleanContent,
             type = messageType,
-            status = com.example.myapplication.data.model.MessageStatus.SENT,
+            status = MessageStatus.SENT,
             createdAt = if (rawCreatedDate.isNotEmpty()) rawCreatedDate else "Vừa xong",
             updatedAt = "",
             isRecalled = false
         )
     }
 
-    fun extractImageUrl(data: Any?): String {
-        return when (data) {
-            is String -> data
-            is Map<*, *> -> data["url"]?.toString() ?: data["fileUrl"]?.toString() ?: data["path"]?.toString() ?: ""
-            is JsonObject -> data.get("url").asStringOrNull() ?: data.get("fileUrl").asStringOrNull() ?: data.get("path").asStringOrNull() ?: ""
-            else -> data?.toString() ?: ""
+    fun isImageUrl(url: String): Boolean {
+        if (url.startsWith("content://") || url.startsWith("file://") || url.contains("/cache/") || url.contains("upload_")) {
+            return true
         }
+        val lower = url.lowercase()
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") ||
+                lower.endsWith(".gif") || lower.endsWith(".webp") || lower.contains("cloudinary")
     }
 }

@@ -155,7 +155,9 @@ class MapFragment : Fragment() {
 
         location?.let {
             currentUserLatLng = LatLng(it.latitude, it.longitude)
-            mapLibreMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 15.0))
+            currentUserLatLng?.let { latLng ->
+                mapLibreMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
+            }
             mapManager?.updateMyLocationMarker(it.latitude, it.longitude)
         }
     }
@@ -201,7 +203,9 @@ class MapFragment : Fragment() {
 
     private fun scanNearby(latitude: Double, longitude: Double) {
         currentUserLatLng = LatLng(latitude, longitude)
-        mapLibreMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 12.0))
+        currentUserLatLng?.let { latLng ->
+            mapLibreMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0))
+        }
         mapManager?.updateMyLocationMarker(latitude, longitude)
         viewModel.getNearbyUsers(latitude, longitude)
     }

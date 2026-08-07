@@ -33,8 +33,8 @@ object WebSocketManager : SocketListener {
         }
     }
 
-    fun sendMessage(conversationId: String, content: String, type: String = "TEXT") {
-        val jsonPayload = """{"conversationId":"$conversationId","content":"$content","type":"$type"}"""
+    fun sendMessage(conversationId: String, content: String, type: String = "TEXT", senderId: String = activeUserId) {
+        val jsonPayload = """{"conversationId":"$conversationId","senderId":"$senderId","content":"$content","type":"$type","messageType":"$type"}"""
         stompManager.send("/app/chat.send", jsonPayload)
     }
 

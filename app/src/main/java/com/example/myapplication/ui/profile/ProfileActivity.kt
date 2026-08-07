@@ -83,7 +83,6 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
         viewModel.uiState.observeState { state ->
             when (state) {
                 is UiState.Idle -> {
-                    // Do nothing
                 }
                 is UiState.Loading -> {
                     binding.btnUpdateProfile.isEnabled = false
