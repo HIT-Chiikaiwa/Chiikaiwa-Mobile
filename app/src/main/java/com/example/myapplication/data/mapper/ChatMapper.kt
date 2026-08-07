@@ -42,8 +42,8 @@ object ChatMapper {
             content = dto.content ?: "",
             type = msgType,
             status = MessageStatus.SENT,
-            createdAt = com.example.myapplication.utils.TimeUtils.formatChatTime(dto.createdDate),
-            updatedAt = com.example.myapplication.utils.TimeUtils.formatChatTime(dto.createdDate),
+            createdAt = dto.createdDate ?: "",
+            updatedAt = dto.createdDate ?: "",
             isRecalled = dto.isRecalled
         )
     }

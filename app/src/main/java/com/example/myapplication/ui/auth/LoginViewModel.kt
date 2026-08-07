@@ -42,7 +42,8 @@ class LoginViewModel(application: Application) : BaseViewModel<Unit>(application
                         preferenceManager.saveLogin(
                             accessToken = loginData.accessToken,
                             refreshToken = loginData.refreshToken,
-                            userId = loginData.id
+                            userId = loginData.id,
+                            email = email
                         )
 
                         _uiState.value = UiState.Success(Unit)

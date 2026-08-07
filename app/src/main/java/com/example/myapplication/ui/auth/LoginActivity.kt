@@ -64,12 +64,9 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                 }
 
                 is UiState.Error -> {
-
                     binding.tvLogin.isEnabled = true
-
                     binding.tvPasswordError.visibility = View.VISIBLE
                     binding.tvPasswordError.text = state.message
-
                     binding.ivPic.setImageResource(R.drawable.frame2)
                 }
             }

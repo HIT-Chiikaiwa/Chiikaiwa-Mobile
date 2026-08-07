@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
 
 class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResponse>>(application) {
 
@@ -36,7 +36,7 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
     private val _currentUserAvatar = MutableStateFlow<String?>(null)
     val currentUserAvatar: StateFlow<String?> get() = _currentUserAvatar
 
-    private val fetchingUserIds = HashSet<String>()
+    private val fetchingUserIds = ConcurrentHashMap.newKeySet<String>()
 
     fun loadCurrentUserAvatar() {
         val userId = preferenceManager.getUserId() ?: return
@@ -55,7 +55,6 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
             val startTime = System.currentTimeMillis()
             _uiState.value = UiState.Loading
 
-            // Cập nhật vị trí GPS của chính mình lên Server trước khi quét radar
             mapRepository.updateLocation(lat, lng)
 
             when (val result = mapRepository.getNearbyUsers(lat, lng, radiusKm)) {
@@ -103,7 +102,7 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
         val newUsersToFetch = users.filter { user ->
             !user.avatar.isNullOrEmpty() &&
             !currentMap.containsKey(user.userId) &&
-            synchronized(fetchingUserIds) { fetchingUserIds.add(user.userId) }
+            fetchingUserIds.add(user.userId)
         }
 
         if (newUsersToFetch.isEmpty()) return
@@ -112,9 +111,13 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
             val newlyLoaded = mutableMapOf<String, Bitmap>()
             for (user in newUsersToFetch) {
                 try {
-                    val url = user.avatar!!
+                    val url = user.avatar ?: continue
                     val bitmap = if (url.startsWith("http://") || url.startsWith("https://")) {
-                        URL(url).openStream().use { BitmapFactory.decodeStream(it) }
+                        com.bumptech.glide.Glide.with(context)
+                            .asBitmap()
+                            .load(url)
+                            .submit()
+                            .get()
                     } else {
                         val resId = context.resources.getIdentifier(url, "drawable", context.packageName)
                         if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
@@ -125,7 +128,7 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {
-                    synchronized(fetchingUserIds) { fetchingUserIds.remove(user.userId) }
+                    fetchingUserIds.remove(user.userId)
                 }
             }
 

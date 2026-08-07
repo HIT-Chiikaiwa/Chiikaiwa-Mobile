@@ -30,37 +30,59 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
     override fun inflateBinding() = ActivityProfileBinding.inflate(layoutInflater)
 
     private val viewModel: ProfileViewModel by viewModels()
+    private var targetUserId: String? = null
     private var currentProfile: UserDto? = null
 
     override fun initView() {
+        targetUserId = intent.getStringExtra("target_user_id")
+            ?: intent.getStringExtra("targetUserId")
+            ?: intent.getStringExtra("userId")
+            ?: intent.getStringExtra("id")
+        val isOtherUser = !targetUserId.isNullOrEmpty() && targetUserId != viewModel.getUserId()
+
         binding.ivBack.setOnClickListener {
             finish()
         }
 
-        binding.btnUpdateProfile.visibility = View.VISIBLE
-        binding.btnUpdateProfile.setOnClickListener {
-            startActivity(Intent(this, EditProfileActivity::class.java))
+        binding.cvHonor.setOnClickListener {
+            showSubjectManagementDialog(isOtherUser)
         }
 
-        binding.cvSettings.setOnClickListener {
-            startActivity(Intent(this, AccountSettingsActivity::class.java))
-        }
+        if (isOtherUser) {
+            binding.btnUpdateProfile.visibility = View.GONE
+            binding.cvSettings.visibility = View.GONE
+            binding.ivWoodBottomLeft.visibility = View.GONE
+            binding.ivWoodBottomRight.visibility = View.GONE
+        } else {
+            binding.btnUpdateProfile.visibility = View.VISIBLE
+            binding.cvSettings.visibility = View.VISIBLE
+            binding.ivWoodBottomLeft.visibility = View.VISIBLE
+            binding.ivWoodBottomRight.visibility = View.VISIBLE
 
-        binding.cvFavorite.setOnClickListener {
-            showSubjectManagementDialog()
+            binding.btnUpdateProfile.setOnClickListener {
+                startActivity(Intent(this, EditProfileActivity::class.java))
+            }
+            binding.cvSettings.setOnClickListener {
+                startActivity(Intent(this, AccountSettingsActivity::class.java))
+            }
+            val openScheduleAction = View.OnClickListener {
+                startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
+            }
+            binding.cvAppointment.setOnClickListener(openScheduleAction)
+            binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)
+            binding.tvAppointment.setOnClickListener(openScheduleAction)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadProfile()
+        viewModel.loadProfile(targetUserId)
     }
 
     override fun observeData() {
         viewModel.uiState.observeState { state ->
             when (state) {
                 is UiState.Idle -> {
-                    // Do nothing
                 }
                 is UiState.Loading -> {
                     binding.btnUpdateProfile.isEnabled = false
@@ -75,6 +97,14 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
                     showToast(state.message)
                 }
             }
+        }
+
+        viewModel.appointmentCount.observeState { count ->
+            binding.tvAppointmentCount.text = "$count"
+        }
+
+        viewModel.subjects.observeState { subjectsList ->
+            binding.tvSubjectCount.text = "${subjectsList.size}"
         }
 
         viewModel.event.observeEvent { event ->
@@ -96,7 +126,8 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
     private fun bindProfile(user: UserDto) {
         val fullName = "${user.lastName ?: ""} ${user.firstName ?: ""}".trim()
         binding.tvUsername.text = fullName.ifEmpty { "Chưa cập nhật" }
-        binding.tvFriendsCount.text = "Điểm tin cậy: ${user.trustScore ?: 100.0}"
+        val trustScore = user.trustScore ?: 100.0
+        binding.tvFavoriteRating.text = String.format(Locale.US, "%.1f", trustScore)
         binding.tvBuddyStatus.text = "Trạng thái quét: ${if (user.buddyActive == true) "Bật" else "Tắt"}"
         binding.tvIntroduction.text = user.statusTag ?: "Chưa có giới thiệu"
 
@@ -112,7 +143,6 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
 
         binding.tvSchool.text = "Trường học: ${user.university ?: "Chưa cập nhật"}"
         binding.tvMajor.text = "Ngành học: ${user.majorName ?: "Chưa cập nhật"}"
-        binding.tvCountry.text = "Quê quán: ${user.location ?: "Chưa cập nhật"}"
 
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(this)
@@ -142,238 +172,74 @@ class ProfileActivity : BaseActivity<ActivityProfileBinding>() {
         }
     }
 
-    private fun showSubjectManagementDialog() {
-        val context = this
-        val layout = ScrollView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        }
+    private fun showSubjectManagementDialog(isOtherUser: Boolean = false) {
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
+        val binding = com.example.myapplication.databinding.DialogSubjectManagementBinding.inflate(layoutInflater)
+        dialog.setView(binding.root)
 
-        val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 48, 48, 48)
-            setBackgroundColor(android.graphics.Color.parseColor("#FFFCE2"))
-        }
-        layout.addView(container)
-
-        val title = TextView(context).apply {
-            text = "Quản Lý Môn Học"
-            textSize = 18f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            gravity = android.view.Gravity.CENTER
-            setPadding(0, 0, 0, 24)
-        }
-        container.addView(title)
-
-        val strengthLabel = TextView(context).apply {
-            text = "Môn học thế mạnh (STRENGTH)"
-            textSize = 14f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setPadding(0, 0, 0, 16)
-        }
-        container.addView(strengthLabel)
-
-        val layoutStrengthSubjects = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-        }
-        container.addView(layoutStrengthSubjects, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 24 })
-
-        val reviewLabel = TextView(context).apply {
-            text = "Môn học cần ôn tập (NEED_REVIEW)"
-            textSize = 14f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setPadding(0, 0, 0, 16)
-        }
-        container.addView(reviewLabel)
-
-        val layoutReviewSubjects = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-        }
-        container.addView(layoutReviewSubjects, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 24 })
-
-        val buttonsLayout = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.END
-        }
-
-        val btnCancel = Button(context).apply {
-            text = "Đóng"
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#F4F0CA"))
-        }
-        buttonsLayout.addView(btnCancel, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { rightMargin = 16 })
-
-        val btnAddSubject = Button(context).apply {
-            text = "Thêm môn học"
-            setTextColor(android.graphics.Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(context, R.color.brown))
-        }
-        buttonsLayout.addView(btnAddSubject)
-
-        container.addView(buttonsLayout)
-
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(context)
-            .setView(layout)
-            .create()
-
-        btnCancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             dialog.dismiss()
         }
 
-        btnAddSubject.setOnClickListener {
-            showAddSubjectDialog {
-                viewModel.loadSubjects()
+        if (isOtherUser) {
+            binding.tvTitle.text = "Danh Sách Môn Học"
+            binding.btnAddSubject.visibility = View.GONE
+        } else {
+            binding.tvTitle.text = "Quản Lý Môn Học"
+            binding.btnAddSubject.visibility = View.VISIBLE
+            binding.btnAddSubject.setOnClickListener {
+                showAddSubjectDialog {
+                    viewModel.loadSubjects()
+                }
             }
         }
 
         viewModel.subjects.observeState { subjectsList ->
-            layoutStrengthSubjects.removeAllViews()
-            layoutReviewSubjects.removeAllViews()
+            binding.layoutStrengthSubjects.removeAllViews()
+            binding.layoutReviewSubjects.removeAllViews()
 
             for (sub in subjectsList) {
-                val itemView = LinearLayout(context).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    gravity = android.view.Gravity.CENTER_VERTICAL
-                    setPadding(36, 24, 36, 24)
-                    setBackgroundResource(R.drawable.bg_edittext)
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        bottomMargin = 12
-                    }
-                }
-
-                val tvSubjectName = TextView(context).apply {
-                    text = sub.name
-                    setTextColor(ContextCompat.getColor(context, R.color.brown))
-                    textSize = 15f
-                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                }
-                itemView.addView(tvSubjectName)
-
-                val ivDeleteSubject = ImageView(context).apply {
-                    setImageResource(android.R.drawable.ic_menu_delete)
-                    contentDescription = "Xóa"
-                    setPadding(18, 18, 18, 18)
-                    setBackgroundResource(android.R.color.transparent)
-                    imageTintList = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(context, R.color.error))
-                    setOnClickListener {
+                val parent = if (sub.type == "STRENGTH") binding.layoutStrengthSubjects else binding.layoutReviewSubjects
+                val itemBinding = com.example.myapplication.databinding.ItemDialogSubjectBinding.inflate(layoutInflater, parent, false)
+                itemBinding.tvSubjectName.text = sub.name
+                if (isOtherUser) {
+                    itemBinding.btnDeleteSubject.visibility = View.GONE
+                } else {
+                    itemBinding.btnDeleteSubject.visibility = View.VISIBLE
+                    itemBinding.btnDeleteSubject.setOnClickListener {
                         viewModel.deleteSubject(sub.id)
                     }
                 }
-                itemView.addView(ivDeleteSubject)
-
-                if (sub.type == "STRENGTH") {
-                    layoutStrengthSubjects.addView(itemView)
-                } else {
-                    layoutReviewSubjects.addView(itemView)
-                }
+                parent.addView(itemBinding.root)
             }
         }
 
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun showAddSubjectDialog(onSubjectAdded: () -> Unit) {
-        val context = this
-        val layout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(48, 48, 48, 48)
-            setBackgroundColor(android.graphics.Color.parseColor("#FFFCE2"))
-        }
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
+        val binding = com.example.myapplication.databinding.DialogAddSubjectBinding.inflate(layoutInflater)
+        dialog.setView(binding.root)
 
-        val title = TextView(context).apply {
-            text = "Thêm Môn Học"
-            textSize = 18f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            gravity = android.view.Gravity.CENTER
-            setPadding(0, 0, 0, 24)
-        }
-        layout.addView(title)
-
-        val edtSubjectName = EditText(context).apply {
-            hint = "Tên môn học"
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setHintTextColor(ContextCompat.getColor(context, R.color.hint))
-            setBackgroundResource(R.drawable.bg_edittext)
-            setPadding(24, 24, 24, 24)
-        }
-        layout.addView(edtSubjectName, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 16 })
-
-        val typeLabel = TextView(context).apply {
-            text = "Loại môn học:"
-            textSize = 14f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            setPadding(0, 0, 0, 16)
-        }
-        layout.addView(typeLabel)
-
-        val rgSubjectType = RadioGroup(context).apply {
-            orientation = RadioGroup.HORIZONTAL
-        }
-        val rbStrength = android.widget.RadioButton(context).apply {
-            id = View.generateViewId()
-            text = "Thế mạnh"
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            isChecked = true
-        }
-        rgSubjectType.addView(rbStrength, RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT).apply { rightMargin = 24 })
-
-        val rbReview = android.widget.RadioButton(context).apply {
-            id = View.generateViewId()
-            text = "Cần ôn tập"
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-        }
-        rgSubjectType.addView(rbReview)
-
-        layout.addView(rgSubjectType, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 24 })
-
-        val buttonsLayout = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.END
-        }
-
-        val btnCancelAdd = Button(context).apply {
-            text = "Hủy"
-            setTextColor(ContextCompat.getColor(context, R.color.brown))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#F4F0CA"))
-        }
-        buttonsLayout.addView(btnCancelAdd, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { rightMargin = 16 })
-
-        val btnConfirmAdd = Button(context).apply {
-            text = "Xác nhận"
-            setTextColor(android.graphics.Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(context, R.color.brown))
-        }
-        buttonsLayout.addView(btnConfirmAdd)
-
-        layout.addView(buttonsLayout)
-
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(context)
-            .setView(layout)
-            .create()
-
-        btnCancelAdd.setOnClickListener {
+        binding.btnCancelAdd.setOnClickListener {
             dialog.dismiss()
         }
 
-        btnConfirmAdd.setOnClickListener {
-            val name = edtSubjectName.text.toString().trim()
+        binding.btnConfirmAdd.setOnClickListener {
+            val name = binding.etSubjectName.text.toString().trim()
             if (name.isEmpty()) {
                 showToast("Vui lòng nhập tên môn học")
                 return@setOnClickListener
             }
 
-            val type = if (rgSubjectType.checkedRadioButtonId == rbStrength.id) "STRENGTH" else "NEED_REVIEW"
+            val type = if (binding.rgSubjectType.checkedRadioButtonId == binding.rbStrength.id) "STRENGTH" else "NEED_REVIEW"
             viewModel.addSubject(name, type)
             dialog.dismiss()
         }
 
         dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 }

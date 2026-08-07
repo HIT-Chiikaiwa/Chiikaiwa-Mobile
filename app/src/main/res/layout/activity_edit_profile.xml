@@ -45,16 +45,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/ivTogglePassword1"
-            android:layout_width="@dimen/_24sdp"
-            android:layout_height="@dimen/_24sdp"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_marginEnd="@dimen/_4sdp"
-            android:src="@drawable/edit_profile"
-            app:layout_constraintTop_toBottomOf="@+id/layoutHeader"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <ImageView
             android:id="@+id/ivWoodLeft1"
             android:layout_width="@dimen/_16sdp"
             android:layout_height="@dimen/_40sdp"
@@ -291,13 +281,6 @@
                         android:textColor="@color/brown"
                         android:textSize="@dimen/_11ssp" />
 
-                    <TextView
-                        android:id="@+id/tvCountry"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/country"
-                        android:textColor="@color/brown"
-                        android:textSize="@dimen/_11ssp" />
 
                     <View
                         android:layout_width="match_parent"

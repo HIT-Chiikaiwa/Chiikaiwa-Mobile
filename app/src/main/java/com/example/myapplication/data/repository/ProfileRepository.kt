@@ -16,6 +16,10 @@ import com.example.myapplication.data.remote.api.ApiService
 class ProfileRepository(context: Context) : BaseRepository() {
     private val api = RetrofitClient.create(context)
 
+    suspend fun getCurrentUser(): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.getCurrentUser() }
+    }
+
     suspend fun getProfile(userId: String): Resource<BaseResponse<UserDto>> {
         return safeApiCall { api.getProfile(userId) }
     }
@@ -48,5 +52,17 @@ class ProfileRepository(context: Context) : BaseRepository() {
 
     suspend fun deleteAccount(userId: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.deleteAccount(userId) }
+    }
+
+    suspend fun updateStatusTag(userId: String, request: UpdateStatusTagRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updateStatusTag(userId, request) }
+    }
+
+    suspend fun updatePersonalInfo(userId: String, request: UpdatePersonalInfoRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updatePersonalInfo(userId, request) }
+    }
+
+    suspend fun updateAcademicInfo(userId: String, request: UpdateAcademicInfoRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updateAcademicInfo(userId, request) }
     }
 }

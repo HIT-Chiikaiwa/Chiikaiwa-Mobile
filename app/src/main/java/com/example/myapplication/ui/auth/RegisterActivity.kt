@@ -29,7 +29,7 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
 
     override fun initView() {
 
-        binding.ivBack.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             finish()
         }
 
@@ -40,11 +40,11 @@ class RegisterActivity : BaseActivity<ActivityRegisterBinding>() {
         val genders = arrayOf("Nam", "Nữ", "Khác")
         val adapter = ArrayAdapter(
             this,
-            R.layout.item_spinner_gender,
+            R.layout.item_spinner_selected,
             genders
         )
 
-        adapter.setDropDownViewResource(R.layout.item_spinner_gender_dropdown)
+        adapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
 
         binding.spGender.adapter = adapter
 

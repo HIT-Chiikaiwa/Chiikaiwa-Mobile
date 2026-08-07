@@ -6,13 +6,17 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.data.model.Message
 import com.example.myapplication.databinding.ItemChatImageIncomingBinding
+import com.example.myapplication.utils.TimeUtils
 
 class IncomingImageViewHolder(
     private val binding: ItemChatImageIncomingBinding,
-    private val onMessageLongClick: (View, Message) -> Unit
+    private val onMessageLongClick: (View, Message) -> Unit,
+    private val onAvatarClick: ((String) -> Unit)? = null
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
+        binding.tvTime.text = TimeUtils.formatRelativeTime(message.createdAt)
+
         val avatar = message.sender.avatar
         if (!avatar.isNullOrEmpty()) {
             Glide.with(binding.ivSenderAvatar.context)
@@ -24,10 +28,17 @@ class IncomingImageViewHolder(
             binding.ivSenderAvatar.setImageResource(R.drawable.ic_launcher_foreground)
         }
 
+        binding.ivSenderAvatar.setOnClickListener {
+            if (message.sender.id.isNotEmpty()) {
+                onAvatarClick?.invoke(message.sender.id)
+            }
+        }
+
         if (message.content.isNotEmpty()) {
             Glide.with(binding.ivImageContent.context)
                 .load(message.content)
                 .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
                 .into(binding.ivImageContent)
         }
 

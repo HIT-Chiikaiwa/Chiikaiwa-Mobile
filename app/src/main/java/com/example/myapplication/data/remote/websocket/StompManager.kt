@@ -3,8 +3,10 @@ package com.example.myapplication.data.remote.websocket
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -32,16 +34,43 @@ class StompManager {
     private var isConnected = false
 
     private var savedUrl: String = ""
-    private var savedToken: String = ""
+    private var tokenProvider: (() -> String)? = null
+    private var refreshTokenProvider: (() -> String)? = null
+    private var tokenSaver: ((String, String) -> Unit)? = null
     private val pendingSubscriptions = ConcurrentHashMap.newKeySet<String>()
 
     @Synchronized
     fun connect(url: String, accessToken: String) {
-        if (url.isNotEmpty()) savedUrl = url
-        if (accessToken.isNotEmpty()) savedToken = accessToken
-        if (savedUrl.isEmpty() || savedToken.isEmpty()) return
+        connect(
+            url = url,
+            tokenProvider = { accessToken },
+            refreshTokenProvider = { "" },
+            tokenSaver = { _, _ -> }
+        )
+    }
 
-        Log.d(TAG, "[CONNECT_START] URL: $savedUrl")
+    @Synchronized
+    fun connect(
+        url: String,
+        tokenProvider: () -> String,
+        refreshTokenProvider: () -> String,
+        tokenSaver: (accessToken: String, refreshToken: String) -> Unit
+    ) {
+        if (url.isNotEmpty()) savedUrl = url
+        this.tokenProvider = tokenProvider
+        this.refreshTokenProvider = refreshTokenProvider
+        this.tokenSaver = tokenSaver
+
+        if (savedUrl.isEmpty()) return
+
+        val currentToken = tokenProvider()
+        val wsUrl = if (savedUrl.contains("?token=")) {
+            savedUrl.substringBefore("?token=") + "?token=$currentToken"
+        } else {
+            savedUrl + "?token=$currentToken"
+        }
+
+        Log.d(TAG, "[CONNECT_START] URL: $wsUrl")
 
         webSocket?.cancel()
         webSocket = null
@@ -49,14 +78,14 @@ class StompManager {
         heartbeatManager.stop()
 
         val request = Request.Builder()
-            .url(savedUrl)
-            .addHeader("Authorization", "Bearer $savedToken")
+            .url(wsUrl)
+            .addHeader("Authorization", "Bearer $currentToken")
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.d(TAG, "[WS_OPEN] Sending CONNECT frame...")
-                webSocket.send(parser.buildConnectFrame(savedToken))
+                webSocket.send(parser.buildConnectFrame(currentToken))
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
@@ -75,9 +104,75 @@ class StompManager {
                 heartbeatManager.stop()
                 isConnected = false
                 listener?.onDisconnected()
+
+                val isUnauthorized = response?.code == 401 || t.message?.contains("401") == true
+                if (isUnauthorized) {
+                    Log.w(TAG, "[WS_FAILURE] Unauthorized (401). Attempting token refresh...")
+                    val refreshed = performTokenRefreshSync()
+                    if (refreshed) {
+                        Log.d(TAG, "[WS_FAILURE] Token refreshed successfully. Reconnecting...")
+                        connect(savedUrl, tokenProvider, refreshTokenProvider, tokenSaver)
+                        return
+                    } else {
+                        Log.e(TAG, "[WS_FAILURE] Token refresh failed. Cannot reconnect.")
+                    }
+                }
+
                 scheduleReconnect()
             }
         })
+    }
+
+    private fun performTokenRefreshSync(): Boolean {
+        val refreshTok = refreshTokenProvider?.invoke() ?: return false
+        if (refreshTok.isEmpty()) return false
+
+        return try {
+            val jsonBody = com.google.gson.JsonObject().apply {
+                addProperty("refreshToken", refreshTok)
+            }.toString()
+
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+            val requestBody = jsonBody.toRequestBody(mediaType)
+
+            val refreshRequest = Request.Builder()
+                .url(com.example.myapplication.data.remote.network.NetworkConstants.BASE_URL + "api/v1/auth/refresh")
+                .post(requestBody)
+                .build()
+
+            val tempClient = OkHttpClient()
+            val refreshResponse = tempClient.newCall(refreshRequest).execute()
+
+            if (refreshResponse.isSuccessful) {
+                val responseBodyStr = refreshResponse.body?.string()
+                refreshResponse.close()
+                if (!responseBodyStr.isNullOrEmpty()) {
+                    val jsonObject = com.google.gson.JsonParser.parseString(responseBodyStr).asJsonObject
+                    if (jsonObject.has("data") && !jsonObject.get("data").isJsonNull) {
+                        val dataObj = jsonObject.getAsJsonObject("data")
+                        val newAccessToken = if (dataObj.has("accessToken") && !dataObj.get("accessToken").isJsonNull) dataObj.get("accessToken").asString else null
+                        val newRefreshToken = if (dataObj.has("refreshToken") && !dataObj.get("refreshToken").isJsonNull) dataObj.get("refreshToken").asString else refreshTok
+
+                        if (!newAccessToken.isNullOrEmpty()) {
+                            tokenSaver?.invoke(newAccessToken, newRefreshToken)
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            } else {
+                refreshResponse.close()
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error refreshing token inside StompManagerSync", e)
+            false
+        }
     }
 
     private fun handleIncomingText(text: String) {
@@ -108,11 +203,11 @@ class StompManager {
 
     private fun scheduleReconnect() {
         reconnectHandler.removeCallbacksAndMessages(null)
-        if (savedUrl.isNotEmpty() && savedToken.isNotEmpty()) {
+        if (savedUrl.isNotEmpty() && tokenProvider != null && refreshTokenProvider != null && tokenSaver != null) {
             Log.d(TAG, "[RECONNECT_SCHEDULED] Will reconnect in 3s...")
             reconnectHandler.postDelayed({
                 if (!isConnected) {
-                    connect(savedUrl, savedToken)
+                    connect(savedUrl, tokenProvider!!, refreshTokenProvider!!, tokenSaver!!)
                 }
             }, 3000)
         }
@@ -134,7 +229,11 @@ class StompManager {
         val sent = isConnected && webSocket?.send(sendFrame) == true
         if (!sent) {
             Log.w(TAG, "[SEND_FAILED] WebSocket not connected or send failed. Retrying connect...")
-            connect(savedUrl, savedToken)
+            if (tokenProvider != null && refreshTokenProvider != null && tokenSaver != null) {
+                connect(savedUrl, tokenProvider!!, refreshTokenProvider!!, tokenSaver!!)
+            } else {
+                connect(savedUrl, "")
+            }
             reconnectHandler.postDelayed({
                 webSocket?.send(sendFrame)
             }, 1000)

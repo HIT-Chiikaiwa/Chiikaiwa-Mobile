@@ -30,11 +30,13 @@ class VerifyEmailViewModel(application: Application) : BaseViewModel<String>(app
 
             when (val result = apiCall) {
                 is Resource.Success -> {
-                    _uiState.value = UiState.Success(result.data?.data?.message ?: "Gửi mã OTP thành công")
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast(result.data?.data?.message ?: "Gửi mã OTP thành công")) }
+                    val msg = result.data?.message ?: result.data?.data?.message ?: "Gửi mã OTP thành công"
+                    _uiState.value = UiState.Success(msg)
+                    _event.emit(UiEvent.ShowToast(msg))
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    val errorMessage = result.message ?: "Gửi mã OTP thất bại"
+                    _uiState.value = UiState.Error(errorMessage)
                 }
             }
         }

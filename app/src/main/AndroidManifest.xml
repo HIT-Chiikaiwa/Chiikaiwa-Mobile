@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
 
     <application
@@ -65,13 +68,60 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
+            android:name=".ui.profile.RegistrationInfoActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.ChangePasswordActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.NotificationSettingsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.notification.NotificationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
             android:name=".ui.home.chat.FriendsListActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
+            android:name=".ui.home.chat.PendingRequestsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+        <activity
+            android:name=".ui.home.chat.SearchUserActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.home.chat.chatroom.ChatActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.home.schedule.ScheduleActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.home.schedule.CreateAppointmentActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
+        <receiver
+            android:name=".utils.notification.AppointmentReminderReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".utils.notification.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

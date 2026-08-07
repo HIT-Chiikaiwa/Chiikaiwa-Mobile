@@ -81,8 +81,12 @@ class MapFragment : Fragment() {
         binding.imgAvatar.setOnClickListener { navigateTo(ProfileActivity::class.java) }
         binding.btnProfile.setOnClickListener { navigateTo(ProfileActivity::class.java) }
         binding.btnFriend.setOnClickListener { navigateTo(FriendsListActivity::class.java) }
-        binding.btnNotification.setOnClickListener { showToast("Tính năng Thông báo đang phát triển") }
-        binding.btnCalendar.setOnClickListener { showToast("Tính năng Lịch hẹn đang phát triển") }
+        binding.btnNotification.setOnClickListener { navigateTo(com.example.myapplication.ui.notification.NotificationActivity::class.java) }
+        binding.btnCalendar.setOnClickListener { navigateTo(com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java) }
+
+        binding.imgCrown.setOnClickListener {
+            showToast("Tính năng đang được phát triển")
+        }
 
         val scanAction = View.OnClickListener { checkLocationPermissionsAndScan() }
         binding.btnRadar.setOnClickListener(scanAction)
@@ -111,7 +115,8 @@ class MapFragment : Fragment() {
 
             if (isLoading) {
                 currentUserLatLng?.let { location ->
-                    mapManager?.startRadar(location)
+                    val radiusKm = getSelectedRadiusKm()
+                    mapManager?.startRadar(location, radiusKm)
                 }
             } else {
                 mapManager?.stopRadar()
@@ -155,7 +160,9 @@ class MapFragment : Fragment() {
 
         location?.let {
             currentUserLatLng = LatLng(it.latitude, it.longitude)
-            mapLibreMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 15.0))
+            currentUserLatLng?.let { latLng ->
+                mapLibreMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0))
+            }
             mapManager?.updateMyLocationMarker(it.latitude, it.longitude)
         }
     }
@@ -199,11 +206,29 @@ class MapFragment : Fragment() {
         }
     }
 
+    private fun getSelectedRadiusKm(): Double {
+        val distanceStr = binding.etDistance.text.toString().trim()
+        var radiusKm = distanceStr.toDoubleOrNull() ?: 3.0
+        if (radiusKm < 1.0) {
+            radiusKm = 1.0
+            binding.etDistance.setText("1.0")
+            Toast.makeText(requireContext(), "Khoảng cách tối thiểu là 1km", Toast.LENGTH_SHORT).show()
+        } else if (radiusKm > 5.0) {
+            radiusKm = 5.0
+            binding.etDistance.setText("5.0")
+            Toast.makeText(requireContext(), "Khoảng cách tối đa là 5km", Toast.LENGTH_SHORT).show()
+        }
+        return radiusKm
+    }
+
     private fun scanNearby(latitude: Double, longitude: Double) {
         currentUserLatLng = LatLng(latitude, longitude)
-        mapLibreMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUserLatLng!!, 12.0))
+        currentUserLatLng?.let { latLng ->
+            mapLibreMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0))
+        }
         mapManager?.updateMyLocationMarker(latitude, longitude)
-        viewModel.getNearbyUsers(latitude, longitude)
+        val radiusKm = getSelectedRadiusKm()
+        viewModel.getNearbyUsers(latitude, longitude, radiusKm)
     }
 
     private fun navigateTo(clazz: Class<*>) = startActivity(Intent(requireContext(), clazz))

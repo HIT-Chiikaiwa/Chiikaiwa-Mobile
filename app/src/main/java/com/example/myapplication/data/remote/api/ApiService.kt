@@ -28,8 +28,35 @@ interface ApiService {
     @POST("api/v1/auth/forgot-password/reset")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<BaseResponse<CommonResponse>>
 
+    @POST("api/v1/auth/refresh")
+    suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<LoginResponse>
+
+    @POST("api/v1/auth/logout")
+    suspend fun logout(@Body request: LogoutRequest): Response<BaseResponse<Any>>
+
+    @GET("api/v1/user/current")
+    suspend fun getCurrentUser(): Response<BaseResponse<UserDto>>
+
     @GET("api/v1/profile/{userId}")
     suspend fun getProfile(@Path("userId") userId: String): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/status-tag")
+    suspend fun updateStatusTag(
+        @Path("userId") userId: String,
+        @Body request: UpdateStatusTagRequest
+    ): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/personal-info")
+    suspend fun updatePersonalInfo(
+        @Path("userId") userId: String,
+        @Body request: UpdatePersonalInfoRequest
+    ): Response<BaseResponse<UserDto>>
+
+    @PUT("api/v1/profile/{userId}/academic-info")
+    suspend fun updateAcademicInfo(
+        @Path("userId") userId: String,
+        @Body request: UpdateAcademicInfoRequest
+    ): Response<BaseResponse<UserDto>>
 
     @Multipart
     @POST("api/v1/profile/{userId}/avatar")
@@ -108,40 +135,6 @@ interface ApiService {
         @Body request: DirectChatRequest
     ): Response<BaseResponse<ConversationResponse>>
 
-    @POST("api/v1/chat/conversations/group")
-    suspend fun createGroup(
-        @Body request: CreateGroupRequest
-    ): Response<BaseResponse<ConversationResponse>>
-
-    @PUT("api/v1/chat/conversations/{id}")
-    suspend fun updateGroup(
-        @Path("id") id: String,
-        @Body request: UpdateGroupRequest
-    ): Response<BaseResponse<ConversationResponse>>
-
-    @POST("api/v1/chat/conversations/{id}/members")
-    suspend fun addMembers(
-        @Path("id") id: String,
-        @Body request: AddMemberRequest
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @DELETE("api/v1/chat/conversations/{id}/members/{userId}")
-    suspend fun removeMember(
-        @Path("id") id: String,
-        @Path("userId") userId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @PUT("api/v1/chat/conversations/{id}/transfer-ownership")
-    suspend fun transferOwnership(
-        @Path("id") id: String,
-        @Query("newOwnerId") newOwnerId: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
-    @DELETE("api/v1/chat/conversations/{id}/dissolve")
-    suspend fun dissolveGroup(
-        @Path("id") id: String
-    ): Response<BaseResponse<ActionStatusDto>>
-
     @GET("api/v1/chat/conversations/{id}/messages")
     suspend fun getMessages(
         @Path("id") id: String,
@@ -174,7 +167,13 @@ interface ApiService {
     suspend fun uploadImage(
         @Path("id") conversationId: String,
         @Part file: MultipartBody.Part
-    ): Response<BaseResponse<String>>
+    ): Response<BaseResponse<Any>>
+
+    @POST("api/v1/chat/conversations/{id}/schedule-invite")
+    suspend fun scheduleInvite(
+        @Path("id") conversationId: String,
+        @Body request: ScheduleInviteRequest
+    ): Response<BaseResponse<Any>>
 
     @GET("api/v1/users/search")
     suspend fun searchUsers(
@@ -222,4 +221,91 @@ interface ApiService {
     suspend fun unfriend(
         @Path("friendId") friendId: String
     ): Response<BaseResponse<FriendActionResponse>>
+
+    @POST("api/v1/bookings/conversation/{conversationId}")
+    suspend fun createBookingInConversation(
+        @Path("conversationId") conversationId: String,
+        @Body request: CreateBookingRequest
+    ): Response<BaseResponse<BookingDto>>
+
+    @GET("api/v1/bookings")
+    suspend fun getMyBookings(): Response<BaseResponse<List<BookingDto>>>
+
+    @GET("api/v1/bookings/weekly")
+    suspend fun getWeeklyBookings(
+        @Query("weekStart") weekStart: String
+    ): Response<BaseResponse<WeeklyBookingResponse>>
+
+    @GET("api/v1/bookings/{bookingId}")
+    suspend fun getBookingDetail(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PUT("api/v1/bookings/{bookingId}/accept")
+    suspend fun acceptBooking(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PUT("api/v1/bookings/{bookingId}/reject")
+    suspend fun rejectBooking(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PATCH("api/v1/bookings/{bookingId}/complete")
+    suspend fun completeBooking(
+        @Path("bookingId") bookingId: String
+    ): Response<BaseResponse<BookingDto>>
+
+    @PATCH("api/v1/bookings/{bookingId}/cancel")
+    suspend fun cancelBooking(
+        @Path("bookingId") bookingId: String,
+        @Body request: CancelBookingRequest
+    ): Response<BaseResponse<BookingDto>>
+
+    @POST("api/v1/bookings/{bookingId}/rate")
+    suspend fun rateBooking(
+        @Path("bookingId") bookingId: String,
+        @Body request: RateBookingRequest
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @GET("api/v1/notifications")
+    suspend fun getNotifications(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20,
+        @Query("sort") sort: String? = null
+    ): Response<BaseResponse<PageResponse<NotificationDto>>>
+
+    @GET("api/v1/notifications/unread-count")
+    suspend fun getUnreadNotificationCount(): Response<BaseResponse<Int>>
+
+    @PATCH("api/v1/notifications/{notificationId}/read")
+    suspend fun markNotificationAsRead(
+        @Path("notificationId") notificationId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @PATCH("api/v1/notifications/read-all")
+    suspend fun markAllNotificationsAsRead(): Response<BaseResponse<ActionStatusDto>>
+
+    @POST("api/v1/devices")
+    suspend fun registerDevice(
+        @Body request: RegisterDeviceRequest
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/devices")
+    suspend fun unregisterDevice(
+        @Query("fcmToken") fcmToken: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/notifications/{notificationId}")
+    suspend fun deleteNotification(
+        @Path("notificationId") notificationId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @HTTP(method = "DELETE", path = "api/v1/notifications/batch", hasBody = true)
+    suspend fun deleteNotificationsBatch(
+        @Body request: DeleteNotificationsBatchRequest
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/notifications/all")
+    suspend fun deleteAllNotifications(): Response<BaseResponse<ActionStatusDto>>
 }

@@ -20,23 +20,83 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     private val repository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
+    private val bookingRepository = com.example.myapplication.data.repository.BookingRepository(application)
     private val _subjects = MutableStateFlow<List<SubjectDto>>(emptyList())
     val subjects: StateFlow<List<SubjectDto>> get() = _subjects
 
+    private val _appointmentCount = MutableStateFlow<Int>(0)
+    val appointmentCount: StateFlow<Int> get() = _appointmentCount
+
     fun getUserId(): String? = preferenceManager.getUserId()
 
-    fun loadProfile() {
-        val userId = getUserId() ?: return
+    fun loadProfile(targetUserId: String? = null) {
+        val currentUserId = getUserId()
+        val userId = targetUserId ?: currentUserId ?: return
+        val isSelf = targetUserId == null || targetUserId == currentUserId
+        if (isSelf) {
+            loadAppointmentCount()
+        }
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            when (val result = repository.getProfile(userId)) {
+            if (isSelf) {
+                val currentUserRes = repository.getCurrentUser()
+                var currentUserDto: UserDto? = null
+                if (currentUserRes is Resource.Success) {
+                    currentUserDto = currentUserRes.data.data
+                    currentUserDto?.email?.let { email ->
+                        if (email.isNotEmpty()) preferenceManager.saveEmail(email)
+                    }
+                }
+
+                when (val profileRes = repository.getProfile(userId)) {
+                    is Resource.Success -> {
+                        val profileUser = profileRes.data.data
+                        val mergedUser = if (currentUserDto != null) {
+                            profileUser.copy(
+                                email = currentUserDto.email ?: profileUser.email
+                            )
+                        } else {
+                            profileUser
+                        }
+                        _uiState.value = UiState.Success(mergedUser)
+                        _subjects.value = mergedUser.subjects ?: emptyList()
+                    }
+                    is Resource.Error -> {
+                        if (currentUserDto != null) {
+                            _uiState.value = UiState.Success(currentUserDto)
+                        } else {
+                            _uiState.value = UiState.Error(profileRes.message)
+                        }
+                    }
+                }
+            } else {
+                when (val profileRes = repository.getProfile(userId)) {
+                    is Resource.Success -> {
+                        val profileUser = profileRes.data.data
+                        _uiState.value = UiState.Success(profileUser)
+                        _subjects.value = profileUser.subjects ?: emptyList()
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = UiState.Error(profileRes.message)
+                    }
+                }
+            }
+        }
+    }
+
+    fun loadAppointmentCount() {
+        viewModelScope.launch {
+            when (val result = bookingRepository.getMyBookings()) {
                 is Resource.Success -> {
-                    val user = result.data.data
-                    _uiState.value = UiState.Success(user)
-                    _subjects.value = user.subjects ?: emptyList()
+                    val list = result.data.data ?: emptyList()
+                    val validCount = list.count { booking ->
+                        val status = booking.status?.uppercase(java.util.Locale.getDefault())
+                        status != "CANCELLED" && status != "REJECTED" && status != "EXPIRED"
+                    }
+                    _appointmentCount.value = validCount
                 }
                 is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
+                    _appointmentCount.value = 0
                 }
             }
         }
@@ -169,8 +229,89 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         }
     }
 
+    private val authRepository = com.example.myapplication.data.repository.AuthRepository(application)
+
     fun logout() {
-        preferenceManager.logout()
-        viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
+        val refreshToken = preferenceManager.getRefreshToken()
+        viewModelScope.launch {
+            if (!refreshToken.isNullOrEmpty()) {
+                authRepository.logout(refreshToken)
+            }
+            preferenceManager.logout()
+            _event.emit(UiEvent.NavigateHome)
+        }
+    }
+
+    fun updateStatusTag(statusTag: String) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updateStatusTag(userId, UpdateStatusTagRequest(statusTag))) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật trạng thái thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun updatePersonalInfo(request: UpdatePersonalInfoRequest) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updatePersonalInfo(userId, request)) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật thông tin cá nhân thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun updateAcademicInfo(request: UpdateAcademicInfoRequest) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updateAcademicInfo(userId, request)) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật thông tin học vấn thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
+    fun updateFullProfileInfo(personalRequest: UpdatePersonalInfoRequest, academicRequest: UpdateAcademicInfoRequest) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            val personalResult = repository.updatePersonalInfo(userId, personalRequest)
+            if (personalResult is Resource.Error) {
+                _uiState.value = UiState.Error(personalResult.message)
+                _event.emit(UiEvent.ShowToast("Lỗi cập nhật thông tin cá nhân: ${personalResult.message}"))
+                return@launch
+            }
+
+            val academicResult = repository.updateAcademicInfo(userId, academicRequest)
+            if (academicResult is Resource.Error) {
+                _uiState.value = UiState.Error(academicResult.message)
+                _event.emit(UiEvent.ShowToast("Lỗi cập nhật học vấn: ${academicResult.message}"))
+                return@launch
+            }
+
+            if (academicResult is Resource.Success) {
+                _uiState.value = UiState.Success(academicResult.data.data)
+                _event.emit(UiEvent.ShowToast("Cập nhật thông tin thành công"))
+            }
+        }
     }
 }

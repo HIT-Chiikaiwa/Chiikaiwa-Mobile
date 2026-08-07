@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_2"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="@dimen/_15sdp">
 
     <RelativeLayout
         android:id="@+id/headerBar"
@@ -36,24 +37,15 @@
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/btnPendingRequests"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:layout_toStartOf="@id/btnNewChat"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:padding="@dimen/_10sdp"
-            android:src="@drawable/ic_notification"
-            app:tint="@color/brown" />
-
-        <ImageView
-            android:id="@+id/btnNewChat"
+            android:id="@+id/btnHeaderMenu"
             android:layout_width="@dimen/_40sdp"
             android:layout_height="@dimen/_40sdp"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_marginEnd="@dimen/_1sdp"
+            android:contentDescription="@string/desc_options"
             android:padding="@dimen/_10sdp"
-            android:src="@drawable/ic_plus"
+            android:src="@drawable/ic_more_vert"
             app:tint="@color/brown" />
     </RelativeLayout>
 
@@ -61,7 +53,6 @@
         android:id="@+id/layoutSearch"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_45sdp"
-        android:layout_marginHorizontal="@dimen/_15sdp"
         android:layout_marginTop="@dimen/_12sdp"
         android:layout_marginBottom="@dimen/_8sdp"
         android:background="@drawable/bg_edittext"

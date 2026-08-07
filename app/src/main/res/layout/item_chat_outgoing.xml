@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_30sdp"
         android:layout_marginEnd="@dimen/_8sdp"
-        android:background="@drawable/bg_chat_bubble_sent"
+        android:background="@drawable/bg_date_tag"
         android:padding="@dimen/_12sdp"
         android:textColor="@color/white"
         android:textSize="@dimen/_12ssp"
@@ -47,5 +47,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Xin chào." />
+
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:textColor="@color/hint"
+        android:textSize="@dimen/_9ssp"
+        app:layout_constraintEnd_toStartOf="@id/layoutAvatar"
+        app:layout_constraintTop_toBottomOf="@id/tvMessageContent"
+        tools:text="Vừa xong" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

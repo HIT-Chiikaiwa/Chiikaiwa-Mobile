@@ -30,9 +30,42 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             )
         }
 
+        checkNotificationPermission()
+        fetchAndSyncFcmToken()
+
         supportFragmentManager.beginTransaction()
             .replace(binding.fragmentContainer.id, MapFragment())
             .commit()
+    }
+
+    private fun fetchAndSyncFcmToken() {
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful && task.result != null) {
+                        val token = task.result
+                        com.example.myapplication.utils.notification.FcmTokenManager.registerDeviceToken(this, token)
+                    }
+                }
+        } catch (e: Exception) {
+            android.util.Log.e("MAIN_ACTIVITY", "Could not fetch FCM token", e)
+        }
+    }
+
+    private fun checkNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            }
+        }
     }
 
     override fun observeData() {

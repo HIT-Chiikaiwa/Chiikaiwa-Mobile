@@ -4,19 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
     android:orientation="vertical"
-    android:padding="@dimen/_15sdp">
-
-    <include
-        android:id="@+id/layoutFriendItemPreview"
-        layout="@layout/item_friend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="0dp"
-        android:layout_marginBottom="@dimen/_10sdp" />
+    android:padding="@dimen/_10sdp">
 
     <LinearLayout
-        android:layout_width="@dimen/_180sdp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_edittext"
         android:orientation="vertical"

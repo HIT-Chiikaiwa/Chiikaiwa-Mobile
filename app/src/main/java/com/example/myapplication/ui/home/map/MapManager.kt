@@ -35,6 +35,7 @@ class MapManager(
     private val avatarBitmapCache = HashMap<String, Bitmap>()
     private val radarRenderer = RadarRenderer(map)
     private val markerSize by lazy { context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._24sdp) }
+    private val friendRepository by lazy { com.example.myapplication.data.repository.FriendRepository(context) }
 
     fun setup() {
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
@@ -130,7 +131,7 @@ class MapManager(
         }
     }
 
-    fun startRadar(center: LatLng) = radarRenderer.startRadar(center)
+    fun startRadar(center: LatLng, radiusKm: Double) = radarRenderer.startRadar(center, radiusKm)
 
     fun stopRadar() = radarRenderer.stopRadar()
 
@@ -192,13 +193,13 @@ class MapManager(
 
         val features = users.filter { it.userId != viewModel.currentUserId }.map { user ->
             val feature = Feature.fromGeometry(Point.fromLngLat(user.longitude, user.latitude))
-            feature.addStringProperty("id", user.userId)
+            feature.addStringProperty("id", user.userId ?: "")
             feature.addStringProperty("name", "${user.lastName ?: ""} ${user.firstName ?: ""}".trim())
-            feature.addStringProperty("avatar", user.avatar)
-            feature.addStringProperty("university", user.university)
-            feature.addStringProperty("major", user.majorName)
-            feature.addStringProperty("statusTag", user.statusTag)
-            feature.addNumberProperty("distance", user.distanceKm)
+            feature.addStringProperty("avatar", user.avatar ?: "")
+            feature.addStringProperty("university", user.university ?: "")
+            feature.addStringProperty("major", user.majorName ?: "")
+            feature.addStringProperty("statusTag", user.statusTag ?: "")
+            feature.addNumberProperty("distance", user.distanceKm ?: 0.0)
 
             val avatarId = "avatar_${user.userId}"
             feature.addStringProperty("avatar_id", if (style.getImage(avatarId) != null) avatarId else "my_marker")
@@ -228,7 +229,7 @@ class MapManager(
         binding.tvDistance.text = context.getString(R.string.distance_format, distance)
 
         if (!avatarUrl.isNullOrEmpty()) {
-            com.bumptech.glide.Glide.with(context)
+            com.bumptech.glide.Glide.with(binding.ivAvatar.context)
                 .load(avatarUrl)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .error(R.drawable.ic_launcher_foreground)
@@ -240,14 +241,66 @@ class MapManager(
         }
 
         if (userId == viewModel.currentUserId) {
-            binding.btnSendMessage.visibility = View.GONE
+            binding.layoutActionButtons.visibility = View.GONE
         } else {
-            binding.btnSendMessage.visibility = View.VISIBLE
-            binding.btnSendMessage.setOnClickListener {
+            binding.layoutActionButtons.visibility = View.VISIBLE
+            binding.btnAddFriend.text = "Thêm bạn"
+            binding.btnAddFriend.isEnabled = true
+            binding.btnAddFriend.alpha = 1.0f
+
+            fragment.lifecycleScope.launch {
+                val friendsRes = friendRepository.getFriends(0, 100)
+                if (friendsRes is com.example.myapplication.utils.resource.Resource.Success) {
+                    val friends = friendsRes.data.data.content
+                    if (friends.any { it.userId == userId }) {
+                        binding.btnAddFriend.text = "Bạn bè"
+                        binding.btnAddFriend.isEnabled = false
+                        binding.btnAddFriend.alpha = 0.7f
+                        return@launch
+                    }
+                }
+
+                val pendingRes = friendRepository.getPendingFriendRequests(0, 100)
+                if (pendingRes is com.example.myapplication.utils.resource.Resource.Success) {
+                    val pending = pendingRes.data.data.content
+                    if (pending.any { it.userId == userId }) {
+                        binding.btnAddFriend.text = "Đã gửi yêu cầu"
+                        binding.btnAddFriend.isEnabled = false
+                        binding.btnAddFriend.alpha = 0.6f
+                        return@launch
+                    }
+                }
+            }
+
+            binding.btnAddFriend.setOnClickListener {
+                if (userId.isEmpty()) {
+                    Toast.makeText(context, "Lỗi: ID người dùng không hợp lệ", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                binding.btnAddFriend.text = "Đã gửi yêu cầu"
+                binding.btnAddFriend.isEnabled = false
+                binding.btnAddFriend.alpha = 0.6f
+
+                fragment.lifecycleScope.launch {
+                    when (val result = friendRepository.sendFriendRequest(userId)) {
+                        is com.example.myapplication.utils.resource.Resource.Success -> {
+                            Toast.makeText(context, "Đã gửi lời mời kết bạn thành công", Toast.LENGTH_SHORT).show()
+                        }
+                        is com.example.myapplication.utils.resource.Resource.Error -> {
+                            binding.btnAddFriend.text = "Thêm bạn"
+                            binding.btnAddFriend.isEnabled = true
+                            binding.btnAddFriend.alpha = 1.0f
+                            Toast.makeText(context, result.message ?: "Gửi lời mời kết bạn thất bại", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
+            binding.btnViewProfile.setOnClickListener {
                 dialog.dismiss()
-                val intent = Intent(context, ChatActivity::class.java).apply {
+                val intent = Intent(context, com.example.myapplication.ui.profile.ProfileActivity::class.java).apply {
                     putExtra("target_user_id", userId)
-                    putExtra("user_name", name)
                 }
                 context.startActivity(intent)
             }

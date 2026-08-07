@@ -1,19 +1,21 @@
 package com.example.myapplication.data.remote.dto.response
 
+import com.google.gson.annotations.SerializedName
+
 data class UserDto(
-    val id: String,
-    val firstName: String?,
-    val lastName: String?,
-    val avatar: String?,
-    val university: String?,
-    val majorName: String?,
-    val gender: String?,
-    val dateOfBirth: String?,
-    val location: String?,
-    val trustScore: Double?,
-    val buddyActive: Boolean?,
-    val statusTag: String?,
-    val subjects: List<SubjectDto>?,
-    val email: String?,
-    val phone: String?
+    @SerializedName("id") val id: String,
+    @SerializedName("firstName") val firstName: String?,
+    @SerializedName("lastName") val lastName: String?,
+    @SerializedName("avatar") val avatar: String?,
+    @SerializedName("university") val university: String?,
+    @SerializedName("majorName") val majorName: String?,
+    @SerializedName("gender") val gender: String?,
+    @SerializedName("dateOfBirth") val dateOfBirth: String?,
+    @SerializedName("location") val location: String?,
+    @SerializedName("trustScore") val trustScore: Double?,
+    @SerializedName("buddyActive") val buddyActive: Boolean?,
+    @SerializedName("statusTag") val statusTag: String?,
+    @SerializedName("subjects") val subjects: List<SubjectDto>?,
+    @SerializedName("email") val email: String?,
+    @SerializedName("phone") val phone: String?
 )

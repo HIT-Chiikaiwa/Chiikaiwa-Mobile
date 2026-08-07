@@ -6,12 +6,17 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
+import com.example.myapplication.data.remote.dto.request.UpdateAcademicInfoRequest
+import com.example.myapplication.data.remote.dto.request.UpdatePersonalInfoRequest
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.ActivityEditProfileBinding
+import com.example.myapplication.databinding.DialogEditIntroductionBinding
+import com.example.myapplication.databinding.DialogEditPersonalInfoBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
@@ -31,6 +36,7 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
     override fun inflateBinding() = ActivityEditProfileBinding.inflate(layoutInflater)
 
     private val viewModel: ProfileViewModel by viewModels()
+    private var currentUserDto: UserDto? = null
 
     private val pickAvatarLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { handleAvatarSelected(it) }
@@ -54,9 +60,16 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
             finish()
         }
 
-        binding.tvAddInfo.setOnClickListener {
-            showSubjectManagementDialog()
+        val openEditInfoListener = {
+            showEditPersonalInfoDialog()
         }
+        binding.tvAddInfo.setOnClickListener { openEditInfoListener() }
+
+        val openEditIntroListener = {
+            showEditIntroductionDialog()
+        }
+        binding.tvIntroduction.setOnClickListener { openEditIntroListener() }
+        binding.ivTogglePassword.setOnClickListener { openEditIntroListener() }
     }
 
     private fun openImagePicker() {
@@ -118,6 +131,7 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
         viewModel.uiState.observeState { state ->
             when (state) {
                 is UiState.Success -> {
+                    currentUserDto = state.data
                     bindProfile(state.data)
                 }
                 is UiState.Error -> {
@@ -154,7 +168,6 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
 
         binding.tvSchool.text = "Trường học: ${user.university ?: "Chưa cập nhật"}"
         binding.tvMajor.text = "Ngành học: ${user.majorName ?: "Chưa cập nhật"}"
-        binding.tvCountry.text = "Quê quán: ${user.location ?: "Chưa cập nhật"}"
 
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(this)
@@ -184,7 +197,117 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>() {
         }
     }
 
-    private fun showSubjectManagementDialog() {
-        showToast("Quản lý thông tin môn học bổ sung")
+    private fun showEditIntroductionDialog() {
+        val dialog = AlertDialog.Builder(this).create()
+        val dialogBinding = DialogEditIntroductionBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        dialogBinding.etStatusTag.setText(currentUserDto?.statusTag ?: "")
+
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnSave.setOnClickListener {
+            val newStatus = dialogBinding.etStatusTag.text.toString().trim()
+            viewModel.updateStatusTag(newStatus)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    }
+
+    private fun showEditPersonalInfoDialog() {
+        val dialog = AlertDialog.Builder(this).create()
+        val dialogBinding = DialogEditPersonalInfoBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        dialogBinding.etLastName.setText(currentUserDto?.lastName ?: "")
+        dialogBinding.etFirstName.setText(currentUserDto?.firstName ?: "")
+        dialogBinding.etDateOfBirth.setText(currentUserDto?.dateOfBirth ?: "")
+        dialogBinding.etUniversity.setText(currentUserDto?.university ?: "")
+        dialogBinding.etMajorName.setText(currentUserDto?.majorName ?: "")
+        dialogBinding.etPhone.setText(currentUserDto?.phone ?: "")
+
+        when (currentUserDto?.gender) {
+            "MALE" -> dialogBinding.rbMale.isChecked = true
+            "FEMALE" -> dialogBinding.rbFemale.isChecked = true
+            else -> dialogBinding.rbOther.isChecked = true
+        }
+
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnSave.setOnClickListener {
+            val lastName = dialogBinding.etLastName.text.toString().trim()
+            val firstName = dialogBinding.etFirstName.text.toString().trim()
+            val dob = dialogBinding.etDateOfBirth.text.toString().trim()
+            val gender = when (dialogBinding.rgGender.checkedRadioButtonId) {
+                dialogBinding.rbMale.id -> "MALE"
+                dialogBinding.rbFemale.id -> "FEMALE"
+                else -> "OTHER"
+            }
+            val university = dialogBinding.etUniversity.text.toString().trim()
+            val majorName = dialogBinding.etMajorName.text.toString().trim()
+            val phone = dialogBinding.etPhone.text.toString().trim()
+            val email = currentUserDto?.email ?: ""
+
+            dialogBinding.tvErrorLastName.visibility = android.view.View.GONE
+            dialogBinding.tvErrorFirstName.visibility = android.view.View.GONE
+            dialogBinding.tvErrorDateOfBirth.visibility = android.view.View.GONE
+            dialogBinding.tvErrorUniversity.visibility = android.view.View.GONE
+            dialogBinding.tvErrorMajorName.visibility = android.view.View.GONE
+
+            var isValid = true
+            if (lastName.isEmpty()) {
+                dialogBinding.tvErrorLastName.text = "Họ không được để trống"
+                dialogBinding.tvErrorLastName.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (firstName.isEmpty()) {
+                dialogBinding.tvErrorFirstName.text = "Tên không được để trống"
+                dialogBinding.tvErrorFirstName.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (dob.isEmpty()) {
+                dialogBinding.tvErrorDateOfBirth.text = "Ngày sinh không được để trống"
+                dialogBinding.tvErrorDateOfBirth.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (university.isEmpty()) {
+                dialogBinding.tvErrorUniversity.text = "Trường học không được để trống"
+                dialogBinding.tvErrorUniversity.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+            if (majorName.isEmpty()) {
+                dialogBinding.tvErrorMajorName.text = "Ngành học không được để trống"
+                dialogBinding.tvErrorMajorName.visibility = android.view.View.VISIBLE
+                isValid = false
+            }
+
+            if (!isValid) return@setOnClickListener
+
+            viewModel.updateFullProfileInfo(
+                personalRequest = UpdatePersonalInfoRequest(
+                    firstName = firstName,
+                    lastName = lastName,
+                    gender = gender,
+                    dateOfBirth = dob,
+                    phone = phone,
+                    email = email
+                ),
+                academicRequest = UpdateAcademicInfoRequest(
+                    university = university,
+                    majorName = majorName
+                )
+            )
+
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 }

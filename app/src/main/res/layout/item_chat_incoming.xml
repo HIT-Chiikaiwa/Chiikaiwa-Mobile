@@ -48,4 +48,16 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Xin chào." />
 
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:textColor="@color/hint"
+        android:textSize="@dimen/_9ssp"
+        app:layout_constraintStart_toEndOf="@id/layoutAvatar"
+        app:layout_constraintTop_toBottomOf="@id/tvMessageContent"
+        tools:text="Vừa xong" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

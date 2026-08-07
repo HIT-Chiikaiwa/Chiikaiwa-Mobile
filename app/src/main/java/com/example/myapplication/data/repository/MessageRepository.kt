@@ -33,7 +33,7 @@ class MessageRepository(context: Context) : BaseRepository() {
     suspend fun uploadImage(
         conversationId: String,
         file: MultipartBody.Part
-    ): Resource<BaseResponse<String>> = safeApiCall {
+    ): Resource<BaseResponse<Any>> = safeApiCall {
         api.uploadImage(conversationId, file)
     }
 

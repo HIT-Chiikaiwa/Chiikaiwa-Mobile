@@ -37,15 +37,15 @@ class AccountSettingsActivity : BaseActivity<ActivityAccountSettingsBinding>() {
         }
 
         binding.cardPersonalInfo.setOnClickListener {
-            startActivity(Intent(this, EditProfileActivity::class.java))
+            startActivity(Intent(this, RegistrationInfoActivity::class.java))
         }
 
         binding.cardChangePassword.setOnClickListener {
-            showChangePasswordDialog()
+            startActivity(Intent(this, ChangePasswordActivity::class.java))
         }
 
         binding.cardNotificationSettings.setOnClickListener {
-            showToast("Cài đặt thông báo: Tất cả thông báo đã được bật")
+            startActivity(Intent(this, NotificationSettingsActivity::class.java))
         }
 
         binding.cardHelp.setOnClickListener {

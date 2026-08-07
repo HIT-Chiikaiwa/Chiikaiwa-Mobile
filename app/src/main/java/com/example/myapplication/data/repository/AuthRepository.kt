@@ -42,4 +42,12 @@ class AuthRepository(context: Context) : BaseRepository() {
     suspend fun resetPassword(email: String, pass: String, confirmPass: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.resetPassword(ResetPasswordRequest(email, pass, confirmPass)) }
     }
+
+    suspend fun refreshToken(refreshToken: String): Resource<LoginResponse> {
+        return safeApiCall { api.refreshToken(RefreshTokenRequest(refreshToken)) }
+    }
+
+    suspend fun logout(refreshToken: String): Resource<BaseResponse<Any>> {
+        return safeApiCall { api.logout(LogoutRequest(refreshToken)) }
+    }
 }

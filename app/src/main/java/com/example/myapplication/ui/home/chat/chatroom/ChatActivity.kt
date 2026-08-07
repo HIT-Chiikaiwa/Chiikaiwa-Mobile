@@ -26,7 +26,9 @@ class ChatActivity : BaseActivity<ActivityMainBinding>() {
             ?: intent.getStringExtra("name")
             ?: ""
 
-        val fragment = ChatFragment.newInstance(conversationId, targetUserId, userName)
+        val isDisabled = intent.getBooleanExtra("is_disabled", false)
+
+        val fragment = ChatFragment.newInstance(conversationId, targetUserId, userName, isDisabled)
         supportFragmentManager.beginTransaction()
             .replace(binding.fragmentContainer.id, fragment)
             .commit()

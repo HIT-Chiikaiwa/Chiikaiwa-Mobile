@@ -12,18 +12,20 @@ import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.LineString
 import org.maplibre.geojson.Point
 import org.maplibre.geojson.Polygon
 
 class RadarRenderer(private val mapLibreMap: MapLibreMap) {
 
     companion object {
-        private const val RADAR_RADIUS_KM = 6.0
         private const val R_EARTH_KM = 6371.0
         private const val CIRCLE_STEPS = 48
         private const val SECTOR_STEPS = 20
         private const val SWEEP_ANGLE = 40.0
     }
+
+    private var radarRadiusKm: Double = 3.0
 
     private var radarBeamAnimator: ValueAnimator? = null
     private var centerLatLng: LatLng? = null
@@ -43,8 +45,11 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
                 )
             )
 
+            val strokeSource = GeoJsonSource("radar-circle-stroke-source", FeatureCollection.fromFeatures(emptyList()))
+            style.addSource(strokeSource)
+
             style.addLayer(
-                LineLayer("radar-circle-stroke-layer", "radar-circle-source").withProperties(
+                LineLayer("radar-circle-stroke-layer", "radar-circle-stroke-source").withProperties(
                     PropertyFactory.lineColor(Color.parseColor("#4DFFFFFF")),
                     PropertyFactory.lineWidth(2f),
                     PropertyFactory.visibility(Property.NONE)
@@ -65,7 +70,11 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         }
     }
 
-    fun startRadar(center: LatLng) {
+    fun startRadar(center: LatLng, radiusKm: Double = 3.0) {
+        if (center.latitude.isNaN() || center.longitude.isNaN() || (center.latitude == 0.0 && center.longitude == 0.0)) {
+            return
+        }
+        radarRadiusKm = radiusKm
         centerLatLng = center
         showRadarLayers(true)
         updateRadarCircle(center)
@@ -104,8 +113,14 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         val style = mapLibreMap.style ?: return
         if (!style.isFullyLoaded) return
         val source = style.getSourceAs<GeoJsonSource>("radar-circle-source") ?: return
+        val strokeSource = style.getSourceAs<GeoJsonSource>("radar-circle-stroke-source") ?: return
+        
         val circlePoly = getCirclePolygon(center.latitude, center.longitude)
         source.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circlePoly))))
+        
+        val points = circlePoly.coordinates()[0]
+        val circleLine = LineString.fromLngLats(points)
+        strokeSource.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(circleLine))))
     }
 
     private fun updateRadarBeamRotation(startAngleDeg: Double) {
@@ -123,7 +138,7 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
 
         val latRad = Math.toRadians(centerLat)
         val lngRad = Math.toRadians(centerLng)
-        val dDivR = RADAR_RADIUS_KM / R_EARTH_KM
+        val dDivR = radarRadiusKm / R_EARTH_KM
         val sinD = Math.sin(dDivR)
         val cosD = Math.cos(dDivR)
         val cosLat = Math.cos(latRad)
@@ -143,6 +158,9 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         }
 
         points.add(Point.fromLngLat(centerLng, centerLat))
+        if (points.isNotEmpty()) {
+            points[points.size - 1] = points[0]
+        }
         return Polygon.fromLngLats(listOf(points))
     }
 
@@ -150,7 +168,7 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
         val points = ArrayList<Point>(CIRCLE_STEPS + 1)
         val latRad = Math.toRadians(centerLat)
         val lngRad = Math.toRadians(centerLng)
-        val dDivR = RADAR_RADIUS_KM / R_EARTH_KM
+        val dDivR = radarRadiusKm / R_EARTH_KM
         val sinD = Math.sin(dDivR)
         val cosD = Math.cos(dDivR)
         val cosLat = Math.cos(latRad)
@@ -169,6 +187,9 @@ class RadarRenderer(private val mapLibreMap: MapLibreMap) {
             points.add(Point.fromLngLat(Math.toDegrees(pointLngRad), Math.toDegrees(pointLatRad)))
         }
 
+        if (points.isNotEmpty()) {
+            points[points.size - 1] = points[0]
+        }
         return Polygon.fromLngLats(listOf(points))
     }
 }
