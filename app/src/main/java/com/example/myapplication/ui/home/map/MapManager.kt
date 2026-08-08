@@ -3,6 +3,7 @@ package com.example.myapplication.ui.home.map
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
@@ -14,6 +15,7 @@ import com.example.myapplication.utils.extension.observeState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.SymbolLayer
@@ -38,6 +40,13 @@ class MapManager(
     private val friendRepository by lazy { com.example.myapplication.data.repository.FriendRepository(context) }
 
     fun setup() {
+        val vietnamBounds = LatLngBounds.Builder()
+            .include(LatLng(8.0, 102.0))
+            .include(LatLng(24.0, 109.460833))
+            .build()
+        map.setLatLngBoundsForCameraTarget(vietnamBounds)
+        map.setMinZoomPreference(5.0)
+
         map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { bitmap ->
@@ -67,6 +76,7 @@ class MapManager(
                     PropertyFactory.iconAllowOverlap(true)
                 )
             )
+
 
             fragment.observeState(viewModel.nearbyUsers) { users ->
                 updateUserMarkers(users)
