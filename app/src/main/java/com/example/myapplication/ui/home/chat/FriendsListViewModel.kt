@@ -155,6 +155,20 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
+    fun unfriend(friendId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = friendRepository.unfriend(friendId)) {
+                is Resource.Success -> {
+                    onSuccess()
+                    fetchConversations()
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
     fun searchConversations(keyword: String) {
         if (keyword.isBlank()) {
             fetchConversations()

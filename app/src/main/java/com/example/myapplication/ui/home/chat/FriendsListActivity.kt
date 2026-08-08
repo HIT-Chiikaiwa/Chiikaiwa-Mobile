@@ -115,12 +115,8 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
 
         binding.tvOptionViewProfile.setOnClickListener {
             dialog.dismiss()
-            val currentUserId = com.example.myapplication.data.local.PreferenceManager(this@FriendsListActivity).getUserId()
-            val lastSenderId = conversation.lastMessage?.senderId
-            if (!lastSenderId.isNullOrEmpty() && lastSenderId != currentUserId) {
-                showUserInfoDialog(name, lastSenderId)
-            } else {
-                fetchPartnerIdFromMessages(conversation.id, name)
+            fetchPartnerId(conversation) { partnerId ->
+                showUserInfoDialog(name, partnerId)
             }
         }
 
@@ -130,28 +126,35 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
 
         binding.tvOptionDelete.setOnClickListener {
-            showToast("Tính năng đang được phát triển")
             dialog.dismiss()
+            fetchPartnerId(conversation) { partnerId ->
+                showUnfriendConfirmDialog(partnerId, name)
+            }
         }
 
         dialog.show()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
-    private fun fetchPartnerIdFromMessages(conversationId: String, name: String) {
+    private fun fetchPartnerId(conversation: com.example.myapplication.data.remote.dto.response.ConversationResponse, callback: (partnerId: String) -> Unit) {
         val currentUserId = com.example.myapplication.data.local.PreferenceManager(this).getUserId() ?: ""
+        val lastSenderId = conversation.lastMessage?.senderId
+        if (!lastSenderId.isNullOrEmpty() && lastSenderId != currentUserId) {
+            callback(lastSenderId)
+            return
+        }
+
         val messageRepository = com.example.myapplication.data.repository.MessageRepository(this)
-        
         lifecycleScope.launch {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    messageRepository.getMessages(conversationId, page = 0, size = 20)
+                    messageRepository.getMessages(conversation.id, page = 0, size = 20)
                 }
                 if (result is com.example.myapplication.utils.resource.Resource.Success) {
                     val messages = result.data.data.content
                     val partnerId = messages.firstOrNull { it.senderId != currentUserId }?.senderId
                     if (!partnerId.isNullOrEmpty()) {
-                        showUserInfoDialog(name, partnerId)
+                        callback(partnerId)
                     } else {
                         showToast("Không tìm thấy thông tin đối phương")
                     }
@@ -162,6 +165,28 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
                 showToast("Lỗi kết nối: ${e.message}")
             }
         }
+    }
+
+    private fun showUnfriendConfirmDialog(friendId: String, friendName: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        val dialogBinding = com.example.myapplication.databinding.DialogConfirmDeleteBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        dialogBinding.tvTitle.text = "Hủy kết bạn"
+        dialogBinding.tvMessage.text = "Bạn có chắc chắn muốn hủy kết bạn với $friendName không?"
+        dialogBinding.btnConfirm.text = "Hủy kết bạn"
+        dialogBinding.btnConfirm.setOnClickListener {
+            viewModel.unfriend(friendId) {
+                showToast("Hủy kết bạn thành công")
+            }
+            dialog.dismiss()
+        }
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun showUserInfoDialog(userName: String, userId: String? = null) {

@@ -107,16 +107,23 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
 
     private fun showNotificationOptionsDialog(notification: NotificationDto) {
         val notificationId = notification.id ?: return
-        val options = arrayOf(getString(R.string.delete_this_notification))
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.dialog_notification_options_title))
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> viewModel.deleteNotification(notificationId)
-                }
-            }
-            .setNegativeButton(getString(R.string.cancel), null)
-            .show()
+        val dialog = AlertDialog.Builder(this).create()
+        val dialogBinding = com.example.myapplication.databinding.DialogConfirmDeleteBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        dialogBinding.tvTitle.text = getString(R.string.dialog_notification_options_title)
+        dialogBinding.tvMessage.text = "Bạn có chắc chắn muốn xóa thông báo này không?"
+        dialogBinding.btnConfirm.text = "Xóa"
+        dialogBinding.btnConfirm.setOnClickListener {
+            viewModel.deleteNotification(notificationId)
+            dialog.dismiss()
+        }
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun handleNotificationClick(notification: NotificationDto) {
