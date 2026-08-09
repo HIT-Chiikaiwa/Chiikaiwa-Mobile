@@ -308,4 +308,9 @@ interface ApiService {
 
     @DELETE("api/v1/notifications/all")
     suspend fun deleteAllNotifications(): Response<BaseResponse<ActionStatusDto>>
+
+    @GET("api/v1/user/{userId}/online-status")
+    suspend fun getUserOnlineStatus(
+        @Path("userId") userId: String
+    ): Response<BaseResponse<OnlineStatusDto>>
 }

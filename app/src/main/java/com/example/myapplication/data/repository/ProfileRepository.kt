@@ -6,6 +6,7 @@ import com.example.myapplication.data.remote.dto.response.BaseResponse
 import com.example.myapplication.data.remote.dto.response.CommonResponse
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.data.remote.dto.response.SubjectDto
+import com.example.myapplication.data.remote.dto.response.OnlineStatusDto
 import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -64,5 +65,9 @@ class ProfileRepository(context: Context) : BaseRepository() {
 
     suspend fun updateAcademicInfo(userId: String, request: UpdateAcademicInfoRequest): Resource<BaseResponse<UserDto>> {
         return safeApiCall { api.updateAcademicInfo(userId, request) }
+    }
+
+    suspend fun getUserOnlineStatus(userId: String): Resource<BaseResponse<OnlineStatusDto>> {
+        return safeApiCall { api.getUserOnlineStatus(userId) }
     }
 }

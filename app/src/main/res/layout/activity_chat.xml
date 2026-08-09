@@ -25,15 +25,46 @@
             android:src="@drawable/ic_arrow_back"
             app:tint="@color/brown" />
 
-        <TextView
-            android:id="@+id/tvChatTitle"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:textColor="@color/brown"
-            android:textSize="@dimen/_20ssp"
-            android:textStyle="bold"
-            tools:text="Nam Phong" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvChatTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/brown"
+                android:textSize="@dimen/_16ssp"
+                android:textStyle="bold"
+                tools:text="Nam Phong" />
+
+            <LinearLayout
+                android:id="@+id/layoutOnlineStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <View
+                    android:id="@+id/viewOnlineIndicator"
+                    android:layout_width="@dimen/_6sdp"
+                    android:layout_height="@dimen/_6sdp"
+                    android:layout_marginEnd="@dimen/_4sdp"
+                    android:background="@drawable/bg_online_indicator" />
+
+                <TextView
+                    android:id="@+id/tvOnlineStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/hint"
+                    android:textSize="@dimen/_10ssp"
+                    tools:text="Đang hoạt động" />
+            </LinearLayout>
+        </LinearLayout>
 
         <View
             android:layout_width="0dp"

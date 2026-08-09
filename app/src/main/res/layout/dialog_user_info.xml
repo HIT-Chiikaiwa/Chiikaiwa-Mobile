@@ -47,6 +47,15 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_launcher_foreground" />
                 </androidx.cardview.widget.CardView>
+
+                <View
+                    android:id="@+id/viewOnlineBadge"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_online_indicator"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
             </FrameLayout>
 
             <LinearLayout
@@ -82,6 +91,17 @@
                         android:textStyle="bold"
                         tools:text="1.2 km" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvOnlineStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:textColor="@color/hint"
+                    android:textSize="@dimen/_11ssp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="Đang hoạt động" />
 
                 <TextView
                     android:id="@+id/tvStatusTag"
