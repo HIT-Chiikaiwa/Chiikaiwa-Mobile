@@ -313,4 +313,17 @@ interface ApiService {
     suspend fun getUserOnlineStatus(
         @Path("userId") userId: String
     ): Response<BaseResponse<OnlineStatusDto>>
+
+    @POST("api/v1/users/block/{userId}")
+    suspend fun blockUser(
+        @Path("userId") userId: String
+    ): Response<BaseResponse<CommonResponse>>
+
+    @DELETE("api/v1/users/block/{userId}")
+    suspend fun unblockUser(
+        @Path("userId") userId: String
+    ): Response<BaseResponse<CommonResponse>>
+
+    @GET("api/v1/users/blocked")
+    suspend fun getBlockedUsers(): Response<BaseResponse<List<BlockedUserDto>>>
 }

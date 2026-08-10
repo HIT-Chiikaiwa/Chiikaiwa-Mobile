@@ -122,8 +122,10 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
 
         binding.tvOptionBlock.setOnClickListener {
-            showToast("Tính năng đang được phát triển")
             dialog.dismiss()
+            fetchPartnerId(conversation) { partnerId ->
+                showBlockConfirmDialog(partnerId, name)
+            }
         }
 
         binding.tvOptionDelete.setOnClickListener {
@@ -179,6 +181,28 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         dialogBinding.btnConfirm.setOnClickListener {
             viewModel.unfriend(friendId) {
                 showToast("Hủy kết bạn thành công")
+            }
+            dialog.dismiss()
+        }
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    }
+
+    private fun showBlockConfirmDialog(userId: String, friendName: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        val dialogBinding = com.example.myapplication.databinding.DialogConfirmDeleteBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        dialogBinding.tvTitle.text = "Chặn người dùng"
+        dialogBinding.tvMessage.text = "Bạn có chắc chắn muốn chặn $friendName không? Hai người sẽ không thể liên lạc với nhau."
+        dialogBinding.btnConfirm.text = "Chặn"
+        dialogBinding.btnConfirm.setOnClickListener {
+            viewModel.blockUser(userId) {
+                showToast("Đã chặn $friendName")
             }
             dialog.dismiss()
         }

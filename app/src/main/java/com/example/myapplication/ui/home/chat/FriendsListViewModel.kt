@@ -169,6 +169,22 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
+    private val blockRepository = com.example.myapplication.data.repository.BlockRepository(getApplication())
+
+    fun blockUser(userId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = blockRepository.blockUser(userId)) {
+                is Resource.Success -> {
+                    onSuccess()
+                    fetchConversations()
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                }
+            }
+        }
+    }
+
     fun searchConversations(keyword: String) {
         if (keyword.isBlank()) {
             fetchConversations()
