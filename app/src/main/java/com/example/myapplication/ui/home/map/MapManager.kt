@@ -38,6 +38,7 @@ class MapManager(
     private val radarRenderer = RadarRenderer(map)
     private val markerSize by lazy { context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._24sdp) }
     private val friendRepository by lazy { com.example.myapplication.data.repository.FriendRepository(context) }
+    private val profileRepository by lazy { com.example.myapplication.data.repository.ProfileRepository(context) }
 
     fun setup() {
         val vietnamBounds = LatLngBounds.Builder()
@@ -251,8 +252,43 @@ class MapManager(
         }
 
         if (userId == viewModel.currentUserId) {
+            binding.viewOnlineBadge.visibility = View.VISIBLE
+            binding.tvOnlineStatus.visibility = View.VISIBLE
+            binding.tvOnlineStatus.text = "Đang hoạt động"
             binding.layoutActionButtons.visibility = View.GONE
         } else {
+            binding.viewOnlineBadge.visibility = View.GONE
+            binding.tvOnlineStatus.visibility = View.GONE
+
+            fragment.lifecycleScope.launch {
+                when (val result = profileRepository.getUserOnlineStatus(userId)) {
+                    is com.example.myapplication.utils.resource.Resource.Success -> {
+                        val status = result.data.data
+                        if (status.isOnline) {
+                            binding.viewOnlineBadge.visibility = View.VISIBLE
+                            binding.tvOnlineStatus.visibility = View.VISIBLE
+                            binding.tvOnlineStatus.text = "Đang hoạt động"
+                        } else {
+                            binding.viewOnlineBadge.visibility = View.GONE
+                            binding.tvOnlineStatus.visibility = View.VISIBLE
+                            if (!status.lastSeen.isNullOrBlank()) {
+                                val relativeTime = com.example.myapplication.utils.TimeUtils.formatRelativeTime(status.lastSeen)
+                                if (relativeTime == "Vừa xong" || relativeTime.contains("trước")) {
+                                    binding.tvOnlineStatus.text = "Hoạt động $relativeTime"
+                                } else {
+                                    binding.tvOnlineStatus.text = "Hoạt động từ $relativeTime"
+                                }
+                            } else {
+                                binding.tvOnlineStatus.text = "Ngoại tuyến"
+                            }
+                        }
+                    }
+                    is com.example.myapplication.utils.resource.Resource.Error -> {
+                        // Keep hidden
+                    }
+                }
+            }
+
             binding.layoutActionButtons.visibility = View.VISIBLE
             binding.btnAddFriend.text = "Thêm bạn"
             binding.btnAddFriend.isEnabled = true

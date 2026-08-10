@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.PopupWindow
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import com.example.myapplication.R
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityFriendsListBinding
@@ -199,6 +200,61 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         binding.tvStatusTag.visibility = View.GONE
         binding.tvSchool.text = "Chưa cập nhật"
         binding.tvMajor.text = "Chưa cập nhật"
+        binding.viewOnlineBadge.visibility = View.GONE
+        binding.tvOnlineStatus.visibility = View.GONE
+
+        if (!userId.isNullOrEmpty()) {
+            val profileRepository = com.example.myapplication.data.repository.ProfileRepository(this)
+            
+            lifecycleScope.launch {
+                when (val result = profileRepository.getProfile(userId)) {
+                    is com.example.myapplication.utils.resource.Resource.Success -> {
+                        val user = result.data.data
+                        binding.tvSchool.text = user.university ?: "Chưa cập nhật"
+                        binding.tvMajor.text = user.majorName ?: "Chưa cập nhật"
+                        if (!user.statusTag.isNullOrEmpty()) {
+                            binding.tvStatusTag.visibility = View.VISIBLE
+                            binding.tvStatusTag.text = user.statusTag
+                        }
+                        if (!user.avatar.isNullOrEmpty()) {
+                            com.bumptech.glide.Glide.with(binding.ivAvatar.context)
+                                .load(user.avatar)
+                                .placeholder(R.drawable.ic_launcher_foreground)
+                                .error(R.drawable.ic_launcher_foreground)
+                                .into(binding.ivAvatar)
+                        }
+                    }
+                    is com.example.myapplication.utils.resource.Resource.Error -> {}
+                }
+            }
+
+            lifecycleScope.launch {
+                when (val result = profileRepository.getUserOnlineStatus(userId)) {
+                    is com.example.myapplication.utils.resource.Resource.Success -> {
+                        val status = result.data.data
+                        if (status.isOnline) {
+                            binding.viewOnlineBadge.visibility = View.VISIBLE
+                            binding.tvOnlineStatus.visibility = View.VISIBLE
+                            binding.tvOnlineStatus.text = "Đang hoạt động"
+                        } else {
+                            binding.viewOnlineBadge.visibility = View.GONE
+                            binding.tvOnlineStatus.visibility = View.VISIBLE
+                            if (!status.lastSeen.isNullOrBlank()) {
+                                val relativeTime = com.example.myapplication.utils.TimeUtils.formatRelativeTime(status.lastSeen)
+                                if (relativeTime == "Vừa xong" || relativeTime.contains("trước")) {
+                                    binding.tvOnlineStatus.text = "Hoạt động $relativeTime"
+                                } else {
+                                    binding.tvOnlineStatus.text = "Hoạt động từ $relativeTime"
+                                }
+                            } else {
+                                binding.tvOnlineStatus.text = "Ngoại tuyến"
+                            }
+                        }
+                    }
+                    is com.example.myapplication.utils.resource.Resource.Error -> {}
+                }
+            }
+        }
 
         binding.btnAddFriend.text = "Nhắn tin"
         binding.btnAddFriend.setOnClickListener {

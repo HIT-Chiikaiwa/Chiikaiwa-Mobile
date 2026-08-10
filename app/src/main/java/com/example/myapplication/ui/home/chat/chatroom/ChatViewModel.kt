@@ -29,6 +29,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import com.example.myapplication.data.remote.dto.response.OnlineStatusDto
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(application) {
 
@@ -50,6 +54,8 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private var partnerAvatar: String? = null
     private var isCreatingConversation = false
     private val pendingSendActions = mutableListOf<() -> Unit>()
+    private val _onlineStatus = MutableStateFlow<OnlineStatusDto?>(null)
+    val onlineStatus: StateFlow<OnlineStatusDto?> = _onlineStatus.asStateFlow()
 
     companion object {
         private const val TAG = "ChatViewModel"
@@ -213,6 +219,26 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         }
     }
 
+    fun fetchPartnerOnlineStatus(userId: String) {
+        if (userId.isEmpty()) return
+        viewModelScope.launch {
+            when (val result = profileRepository.getUserOnlineStatus(userId)) {
+                is Resource.Success -> {
+                    _onlineStatus.value = result.data.data
+                }
+                is Resource.Error -> {
+                    Log.e(TAG, "Error fetching online status for $userId: ${result.message}")
+                }
+            }
+        }
+    }
+
+    fun refreshOnlineStatus() {
+        if (currentTargetUserId.isNotEmpty()) {
+            fetchPartnerOnlineStatus(currentTargetUserId)
+        }
+    }
+
     fun initChatSession(convId: String, targetId: String) {
         if (targetId.isNotEmpty()) {
             currentTargetUserId = targetId
@@ -223,6 +249,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                     updateState()
                 }
             }
+            fetchPartnerOnlineStatus(targetId)
         }
         if (convId.isNotEmpty()) {
             activeConversationId = convId
@@ -417,6 +444,15 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
             ?.sender?.avatar?.let { partnerAvatar = it }
         messages.firstOrNull { it.sender.id == currentUserId && !it.sender.avatar.isNullOrEmpty() }
             ?.sender?.avatar?.let { currentUserAvatar = it }
+
+        if (currentTargetUserId.isEmpty()) {
+            messages.firstOrNull { it.sender.id != currentUserId }?.sender?.id?.let { partnerId ->
+                if (partnerId.isNotEmpty()) {
+                    currentTargetUserId = partnerId
+                    fetchPartnerOnlineStatus(partnerId)
+                }
+            }
+        }
     }
 
     private fun mergeServerMessages(serverMessages: List<Message>) {

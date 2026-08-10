@@ -260,6 +260,32 @@ class ChatFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
+                    viewModel.onlineStatus.collect { status ->
+                        if (status != null) {
+                            binding.layoutOnlineStatus.visibility = View.VISIBLE
+                            if (status.isOnline) {
+                                binding.viewOnlineIndicator.visibility = View.VISIBLE
+                                binding.tvOnlineStatus.text = "Đang hoạt động"
+                            } else {
+                                binding.viewOnlineIndicator.visibility = View.GONE
+                                if (!status.lastSeen.isNullOrBlank()) {
+                                    val relativeTime = com.example.myapplication.utils.TimeUtils.formatRelativeTime(status.lastSeen)
+                                    if (relativeTime == "Vừa xong" || relativeTime.contains("trước")) {
+                                        binding.tvOnlineStatus.text = "Hoạt động $relativeTime"
+                                    } else {
+                                        binding.tvOnlineStatus.text = "Hoạt động từ $relativeTime"
+                                    }
+                                } else {
+                                    binding.tvOnlineStatus.text = "Ngoại tuyến"
+                                }
+                            }
+                        } else {
+                            binding.layoutOnlineStatus.visibility = View.GONE
+                        }
+                    }
+                }
+
+                launch {
                     viewModel.uiState.collect { state ->
                         when (state) {
                             is UiState.Success -> {
@@ -317,6 +343,11 @@ class ChatFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshOnlineStatus()
     }
 
     override fun onDestroyView() {
