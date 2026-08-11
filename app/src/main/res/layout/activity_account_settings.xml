@@ -150,6 +150,26 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardBlockedUsers"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:cardCornerRadius="@dimen/_8sdp"
+                app:cardElevation="0dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingStart="@dimen/_12sdp"
+                    android:background="@drawable/bg_card_retro"
+                    android:text="@string/blocked_users_title"
+                    android:textColor="@color/brown"
+                    android:textSize="@dimen/_13ssp"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:id="@+id/cardHelp"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"

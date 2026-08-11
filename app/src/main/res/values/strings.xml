@@ -63,6 +63,7 @@
     <string name="change_password">Đổi mật khẩu</string>
     <string name="enable_radar">Cho phép quét rada</string>
     <string name="notification_settings">Cài đặt thông báo</string>
+    <string name="blocked_users_title">Danh sách chặn</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="who">Bạn muốn tìm ai?</string>
 

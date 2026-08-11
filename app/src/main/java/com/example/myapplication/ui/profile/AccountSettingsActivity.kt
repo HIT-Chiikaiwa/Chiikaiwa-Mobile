@@ -48,6 +48,10 @@ class AccountSettingsActivity : BaseActivity<ActivityAccountSettingsBinding>() {
             startActivity(Intent(this, NotificationSettingsActivity::class.java))
         }
 
+        binding.cardBlockedUsers.setOnClickListener {
+            startActivity(Intent(this, BlockedUsersActivity::class.java))
+        }
+
         binding.cardHelp.setOnClickListener {
             showHelpDialog()
         }
