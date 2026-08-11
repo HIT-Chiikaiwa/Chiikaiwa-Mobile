@@ -131,7 +131,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         binding.tvOptionDelete.setOnClickListener {
             dialog.dismiss()
             fetchPartnerId(conversation) { partnerId ->
-                showUnfriendConfirmDialog(partnerId, name)
+                showUnfriendConfirmDialog(partnerId, name, conversation.id)
             }
         }
 
@@ -170,7 +170,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         }
     }
 
-    private fun showUnfriendConfirmDialog(friendId: String, friendName: String) {
+    private fun showUnfriendConfirmDialog(friendId: String, friendName: String, conversationId: String) {
         val dialog = AlertDialog.Builder(this).create()
         val dialogBinding = com.example.myapplication.databinding.DialogConfirmDeleteBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
@@ -179,7 +179,7 @@ class FriendsListActivity : BaseActivity<ActivityFriendsListBinding>() {
         dialogBinding.tvMessage.text = "Bạn có chắc chắn muốn hủy kết bạn với $friendName không?"
         dialogBinding.btnConfirm.text = "Hủy kết bạn"
         dialogBinding.btnConfirm.setOnClickListener {
-            viewModel.unfriend(friendId) {
+            viewModel.unfriend(friendId, conversationId) {
                 showToast("Hủy kết bạn thành công")
             }
             dialog.dismiss()

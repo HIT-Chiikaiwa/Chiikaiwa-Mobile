@@ -44,7 +44,11 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private val bookingRepository = BookingRepository(application)
     private val bookingManager = ChatBookingManager()
     private val profileRepository = ProfileRepository(application)
+    private val friendRepository = com.example.myapplication.data.repository.FriendRepository(application)
     private val gson = Gson()
+
+    private val _isChatDisabled = MutableStateFlow(false)
+    val isChatDisabled: StateFlow<Boolean> = _isChatDisabled.asStateFlow()
 
     val currentUserId: String = preferenceManager.getUserId() ?: ""
     private var activeConversationId: String = ""
@@ -116,8 +120,12 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         socketService.subscribeToChat(currentUserId, activeConversationId)
 
         viewModelScope.launch {
-            socketService.messageFlow.collect { (_, body) ->
-                parseIncomingWebSocketMessage(body)
+            socketService.messageFlow.collect { (destination, body) ->
+                if (destination == "/user/queue/friendship") {
+                    parseIncomingFriendshipEvent(body)
+                } else {
+                    parseIncomingWebSocketMessage(body)
+                }
             }
         }
     }
@@ -128,6 +136,16 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
             val dataObj = if (rawJsonObj.has("data") && rawJsonObj.get("data")?.isJsonObject == true) {
                 rawJsonObj.getAsJsonObject("data")
             } else rawJsonObj
+
+            val type = dataObj.get("type")?.takeIf { !it.isJsonNull }?.asString
+                ?: dataObj.get("messageType")?.takeIf { !it.isJsonNull }?.asString
+            if (type == "UNFRIEND" || dataObj.get("content")?.takeIf { !it.isJsonNull }?.asString == "UNFRIEND") {
+                _isChatDisabled.value = true
+                viewModelScope.launch {
+                    _event.emit(UiEvent.ShowToast("Đối phương đã hủy kết bạn"))
+                }
+                return
+            }
 
             if (handleBookingStatusUpdate(dataObj)) return
 
@@ -250,6 +268,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 }
             }
             fetchPartnerOnlineStatus(targetId)
+            checkFriendshipAndDisableIfNecessary()
         }
         if (convId.isNotEmpty()) {
             activeConversationId = convId
@@ -286,6 +305,12 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     }
 
     fun sendRealtimeMessage(targetId: String, text: String) {
+        if (_isChatDisabled.value) {
+            viewModelScope.launch {
+                _event.emit(UiEvent.ShowToast("Không thể gửi tin nhắn vì hai người không còn là bạn bè"))
+            }
+            return
+        }
         if (text.isBlank()) return
         val msgText = text.trim()
 
@@ -308,6 +333,12 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     }
 
     fun sendImageMessage(file: MultipartBody.Part, localImagePath: String = "") {
+        if (_isChatDisabled.value) {
+            viewModelScope.launch {
+                _event.emit(UiEvent.ShowToast("Không thể gửi ảnh vì hai người không còn là bạn bè"))
+            }
+            return
+        }
         if (activeConversationId.isEmpty()) {
             if (currentTargetUserId.isNotEmpty()) {
                 pendingSendActions.add {
@@ -450,6 +481,7 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 if (partnerId.isNotEmpty()) {
                     currentTargetUserId = partnerId
                     fetchPartnerOnlineStatus(partnerId)
+                    checkFriendshipAndDisableIfNecessary()
                 }
             }
         }
@@ -559,5 +591,28 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
                 _event.emit(UiEvent.ShowToast("Đã xóa tin nhắn"))
             }
         }
+    }
+
+    fun checkFriendshipAndDisableIfNecessary() {
+        if (currentTargetUserId.isEmpty()) return
+        viewModelScope.launch {
+            when (val result = friendRepository.getFriends(0, 100)) {
+                is Resource.Success -> {
+                    val friends = result.data?.data?.content ?: emptyList()
+                    val isFriend = friends.any { it.userId == currentTargetUserId }
+                    if (!isFriend) {
+                        _isChatDisabled.value = true
+                    }
+                }
+                is Resource.Error -> {
+                    // Ignore transient network errors to avoid false lockouts
+                }
+            }
+        }
+    }
+
+    private fun parseIncomingFriendshipEvent(body: String) {
+        // Upon receiving a friendship update on websocket, check friendship status via API to be safe
+        checkFriendshipAndDisableIfNecessary()
     }
 }

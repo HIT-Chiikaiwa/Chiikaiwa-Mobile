@@ -220,10 +220,15 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
-    fun unfriend(friendId: String, onSuccess: () -> Unit) {
+    fun unfriend(friendId: String, conversationId: String?, onSuccess: () -> Unit) {
         viewModelScope.launch {
             when (val result = friendRepository.unfriend(friendId)) {
                 is Resource.Success -> {
+                    if (!conversationId.isNullOrEmpty()) {
+                        val currentUserId = preferenceManager.getUserId() ?: ""
+                        val jsonPayload = """{"conversationId":"$conversationId","senderId":"$currentUserId","content":"UNFRIEND","type":"UNFRIEND","messageType":"UNFRIEND"}"""
+                        stompManager.send("/app/chat.send", jsonPayload)
+                    }
                     onSuccess()
                     fetchConversations()
                 }

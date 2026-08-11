@@ -95,6 +95,14 @@ class ChatFragment : Fragment() {
         binding.btnSend.alpha = 0.5f
         binding.btnGallery.isEnabled = false
         binding.btnGallery.alpha = 0.5f
+        binding.btnCreateSchedule.isEnabled = false
+        binding.btnCreateSchedule.alpha = 0.5f
+        binding.btnMic.isEnabled = false
+        binding.btnMic.alpha = 0.5f
+        binding.btnFolder.isEnabled = false
+        binding.btnFolder.alpha = 0.5f
+        binding.btnSticker.isEnabled = false
+        binding.btnSticker.alpha = 0.5f
     }
 
     private fun setupHelpers() {
@@ -281,6 +289,14 @@ class ChatFragment : Fragment() {
                             }
                         } else {
                             binding.layoutOnlineStatus.visibility = View.GONE
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.isChatDisabled.collect { isDisabled ->
+                        if (isDisabled) {
+                            disableMessagingInput()
                         }
                     }
                 }
