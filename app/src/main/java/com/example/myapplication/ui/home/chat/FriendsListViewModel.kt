@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.response.ConversationResponse
 import com.example.myapplication.data.remote.network.NetworkConstants
-import com.example.myapplication.data.remote.websocket.ChatSocketService
-import com.example.myapplication.data.remote.websocket.StompManager
+import com.example.myapplication.data.remote.websocket.WebSocketManager
 import com.example.myapplication.data.repository.ConversationRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiState
@@ -19,8 +18,7 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
     private val preferenceManager = PreferenceManager(application)
     private val partnerIdCache = mutableMapOf<String, String>()
 
-    private val stompManager = StompManager()
-    private val socketService = ChatSocketService(stompManager)
+    private val socketService = WebSocketManager
 
     init {
         initWebSocket()
@@ -30,22 +28,6 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
     private fun initWebSocket() {
         val currentUserId = preferenceManager.getUserId() ?: ""
         if (currentUserId.isNotEmpty()) {
-            val wsUrl = NetworkConstants.WS_URL
-            socketService.connect(
-                url = wsUrl,
-                tokenProvider = { preferenceManager.getAccessToken() ?: "" },
-                refreshTokenProvider = { preferenceManager.getRefreshToken() ?: "" },
-                tokenSaver = { newAccess, newRefresh ->
-                    preferenceManager.saveLogin(
-                        accessToken = newAccess,
-                        refreshToken = newRefresh,
-                        userId = currentUserId,
-                        email = preferenceManager.getEmail()
-                    )
-                }
-            )
-            socketService.subscribeToChat(currentUserId)
-
             viewModelScope.launch {
                 socketService.messageFlow.collect {
                     fetchConversations()
@@ -225,9 +207,7 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
             when (val result = friendRepository.unfriend(friendId)) {
                 is Resource.Success -> {
                     if (!conversationId.isNullOrEmpty()) {
-                        val currentUserId = preferenceManager.getUserId() ?: ""
-                        val jsonPayload = """{"conversationId":"$conversationId","senderId":"$currentUserId","content":"UNFRIEND","type":"UNFRIEND","messageType":"UNFRIEND"}"""
-                        stompManager.send("/app/chat.send", jsonPayload)
+                        socketService.sendMessage(conversationId, "UNFRIEND", "UNFRIEND")
                     }
                     onSuccess()
                     fetchConversations()
@@ -301,8 +281,4 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        stompManager.disconnect()
-    }
 }

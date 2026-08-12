@@ -217,7 +217,9 @@ class ChatFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val tempFile = File(context.cacheDir, "upload_${System.currentTimeMillis()}.jpg")
-                val bitmap = android.graphics.BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+                val bitmap = context.contentResolver.openInputStream(uri)?.use { input ->
+                    android.graphics.BitmapFactory.decodeStream(input)
+                }
                 if (bitmap != null) {
                     val maxDimension = 1280
                     val scaledBitmap = if (bitmap.width > maxDimension || bitmap.height > maxDimension) {

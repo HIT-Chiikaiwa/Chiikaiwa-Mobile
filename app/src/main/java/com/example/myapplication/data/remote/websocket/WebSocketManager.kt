@@ -42,6 +42,12 @@ object WebSocketManager : SocketListener {
         }
     }
 
+    fun unsubscribeFromChat(conversationId: String) {
+        if (conversationId.isNotEmpty()) {
+            stompManager.unsubscribe("/topic/conversation.$conversationId")
+        }
+    }
+
     fun sendMessage(conversationId: String, content: String, type: String = "TEXT", senderId: String = activeUserId) {
         val jsonPayload = """{"conversationId":"$conversationId","senderId":"$senderId","content":"$content","type":"$type","messageType":"$type"}"""
         stompManager.send("/app/chat.send", jsonPayload)

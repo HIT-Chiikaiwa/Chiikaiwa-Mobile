@@ -23,10 +23,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         val token = preferenceManager.getAccessToken() ?: ""
-        if (token.isNotEmpty()) {
+        val userId = preferenceManager.getUserId() ?: ""
+        if (token.isNotEmpty() && userId.isNotEmpty()) {
             com.example.myapplication.data.remote.websocket.WebSocketManager.connect(
-                "${com.example.myapplication.data.remote.network.NetworkConstants.WS_URL}?token=$token",
-                token
+                url = com.example.myapplication.data.remote.network.NetworkConstants.WS_URL,
+                tokenProvider = { preferenceManager.getAccessToken() ?: "" },
+                refreshTokenProvider = { preferenceManager.getRefreshToken() ?: "" },
+                tokenSaver = { newAccess, newRefresh ->
+                    preferenceManager.saveLogin(
+                        accessToken = newAccess,
+                        refreshToken = newRefresh,
+                        userId = userId,
+                        email = preferenceManager.getEmail()
+                    )
+                }
             )
         }
 

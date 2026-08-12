@@ -68,4 +68,11 @@ class StompFrameParser {
     fun buildDisconnectFrame(): String {
         return "DISCONNECT\n\n\u0000"
     }
+
+    fun buildUnsubscribeFrame(destination: String): String {
+        return "UNSUBSCRIBE\n" +
+                "id:sub-$destination\n\n" +
+                "\u0000"
+    }
 }
+

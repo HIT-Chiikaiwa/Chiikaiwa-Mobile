@@ -140,8 +140,7 @@ class StompManager {
                 .post(requestBody)
                 .build()
 
-            val tempClient = OkHttpClient()
-            val refreshResponse = tempClient.newCall(refreshRequest).execute()
+            val refreshResponse = client.newCall(refreshRequest).execute()
 
             if (refreshResponse.isSuccessful) {
                 val responseBodyStr = refreshResponse.body?.string()
@@ -207,7 +206,13 @@ class StompManager {
             Log.d(TAG, "[RECONNECT_SCHEDULED] Will reconnect in 3s...")
             reconnectHandler.postDelayed({
                 if (!isConnected) {
-                    connect(savedUrl, tokenProvider!!, refreshTokenProvider!!, tokenSaver!!)
+                    val url = savedUrl
+                    val provider = tokenProvider
+                    val refreshProvider = refreshTokenProvider
+                    val saver = tokenSaver
+                    if (url.isNotEmpty() && provider != null && refreshProvider != null && saver != null) {
+                        connect(url, provider, refreshProvider, saver)
+                    }
                 }
             }, 3000)
         }
@@ -223,14 +228,27 @@ class StompManager {
         }
     }
 
+    fun unsubscribe(destination: String) {
+        pendingSubscriptions.remove(destination)
+        if (isConnected && webSocket != null) {
+            Log.d(TAG, "[UNSUBSCRIBE] -> Destination: $destination")
+            webSocket?.send(parser.buildUnsubscribeFrame(destination))
+        } else {
+            Log.d(TAG, "[UNSUBSCRIBE_QUEUED] -> Destination: $destination (waiting for connection)")
+        }
+    }
+
     fun send(destination: String, body: String) {
         val sendFrame = parser.buildSendFrame(destination, body)
         Log.d(TAG, "[SEND_MESSAGE] -> Destination: $destination | Body: $body")
         val sent = isConnected && webSocket?.send(sendFrame) == true
         if (!sent) {
             Log.w(TAG, "[SEND_FAILED] WebSocket not connected or send failed. Retrying connect...")
-            if (tokenProvider != null && refreshTokenProvider != null && tokenSaver != null) {
-                connect(savedUrl, tokenProvider!!, refreshTokenProvider!!, tokenSaver!!)
+            val provider = tokenProvider
+            val refreshProvider = refreshTokenProvider
+            val saver = tokenSaver
+            if (provider != null && refreshProvider != null && saver != null) {
+                connect(savedUrl, provider, refreshProvider, saver)
             } else {
                 connect(savedUrl, "")
             }

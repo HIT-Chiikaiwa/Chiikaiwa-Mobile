@@ -615,4 +615,11 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         // Upon receiving a friendship update on websocket, check friendship status via API to be safe
         checkFriendshipAndDisableIfNecessary()
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (activeConversationId.isNotEmpty()) {
+            socketService.unsubscribeFromChat(activeConversationId)
+        }
+    }
 }
