@@ -34,7 +34,27 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             ?: remoteMessage.data["message"]
             ?: ""
 
-        if (body.isNotEmpty() || title.isNotEmpty()) {
+        if (body.isEmpty() && title.isEmpty()) return
+
+        val prefs = getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
+        val type = remoteMessage.data["type"]?.uppercase() ?: remoteMessage.data["targetType"]?.uppercase() ?: ""
+
+        val isShowNotification = when (type) {
+            "FRIEND", "FRIEND_REQUEST" -> {
+                prefs.getBoolean("system_notif", true)
+            }
+            "BOOKING", "APPOINTMENT" -> {
+                prefs.getBoolean("schedule_notif", true)
+            }
+            "CHAT", "MESSAGE" -> {
+                prefs.getBoolean("system_notif", true)
+            }
+            else -> {
+                prefs.getBoolean("system_notif", true)
+            }
+        }
+
+        if (isShowNotification) {
             showNotification(title, body, remoteMessage.data)
         }
     }
