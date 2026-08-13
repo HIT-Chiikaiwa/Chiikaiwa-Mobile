@@ -44,7 +44,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 prefs.getBoolean("system_notif", true)
             }
             "BOOKING", "APPOINTMENT" -> {
-                prefs.getBoolean("schedule_notif", true)
+                prefs.getBoolean("appointment_notif", true)
             }
             "CHAT", "MESSAGE" -> {
                 prefs.getBoolean("system_notif", true)
