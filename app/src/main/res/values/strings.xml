@@ -147,4 +147,6 @@
     <string name="toast_appointment_notif_off">Đã tắt thông báo Lịch hẹn</string>
     <string name="toast_schedule_notif_on">Đã bật thông báo thời gian biểu</string>
     <string name="toast_schedule_notif_off">Đã tắt thông báo thời gian biểu</string>
+    <string name="or_login_with">Hoặc đăng nhập bằng</string>
+    <string name="google">Google</string>
 </resources>

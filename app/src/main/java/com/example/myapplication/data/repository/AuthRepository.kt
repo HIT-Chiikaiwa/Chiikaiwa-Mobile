@@ -19,6 +19,12 @@ class AuthRepository(context: Context) : BaseRepository() {
         }
     }
 
+    suspend fun googleLogin(idToken: String): Resource<LoginResponse> {
+        return safeApiCall {
+            api.googleLogin(GoogleLoginRequest(idToken = idToken))
+        }
+    }
+
     suspend fun register(request: RegisterRequest): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.register(request) }
     }
