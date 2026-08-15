@@ -63,6 +63,38 @@ class LoginViewModel(application: Application) : BaseViewModel<Unit>(application
         }
     }
 
+    fun googleLogin(idToken: String, email: String? = null) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+
+            when (val result = repository.googleLogin(idToken)) {
+                is Resource.Success -> {
+                    result.data?.let { loginResponse ->
+                        val loginData = loginResponse.data
+
+                        preferenceManager.saveLogin(
+                            accessToken = loginData.accessToken,
+                            refreshToken = loginData.refreshToken,
+                            userId = loginData.id,
+                            email = email
+                        )
+
+                        _uiState.value = UiState.Success(Unit)
+
+                        viewModelScope.launch { _event.emit(UiEvent.ShowToast("Đăng nhập Google thành công")) }
+                        viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
+                    }
+                }
+
+                is Resource.Error -> {
+                    android.util.Log.d("GOOGLE_LOGIN_ERROR", "Message: ${result.message}")
+                    val errorMessage = result.message ?: "Đăng nhập Google thất bại, vui lòng thử lại"
+                    _uiState.value = UiState.Error(errorMessage)
+                }
+            }
+        }
+    }
+
     fun resetState() {
         _uiState.value = UiState.Idle
     }

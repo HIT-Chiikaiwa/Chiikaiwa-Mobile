@@ -68,4 +68,5 @@ dependencies {
     implementation("com.intuit.ssp:ssp-android:1.1.1")
 
     implementation("com.google.firebase:firebase-messaging-ktx:24.1.0")
+    implementation(libs.play.services.auth)
 }

@@ -1,15 +1,21 @@
 package com.example.myapplication.ui.auth
 
+import android.app.Activity
 import android.content.Intent
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityLoginBinding
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
@@ -19,7 +25,42 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
     private var isPasswordVisible = false
 
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val idToken = account?.idToken
+                val email = account?.email
+                if (idToken != null) {
+                    viewModel.googleLogin(idToken, email)
+                } else {
+                    showToast("Không nhận được token từ Google")
+                }
+            } catch (e: ApiException) {
+                android.util.Log.e("GOOGLE_AUTH", "Google Sign-In failed: ${e.statusCode}")
+                showToast("Đăng nhập Google thất bại (Mã lỗi: ${e.statusCode})")
+            }
+        } else {
+            showToast("Hủy đăng nhập Google")
+        }
+    }
+
+    private fun initGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+    }
+
     override fun initView() {
+        initGoogleSignIn()
+
         binding.tvLogin.setOnClickListener {
             binding.tvPasswordError.visibility = View.GONE
 
@@ -27,6 +68,13 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                 binding.edtEmail.text.toString().trim(),
                 binding.edtPassword.text.toString().trim()
             )
+        }
+
+        binding.btnGoogleLogin.setOnClickListener {
+            googleSignInClient.signOut().addOnCompleteListener {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
+            }
         }
 
         binding.ivTogglePassword.setOnClickListener {
@@ -53,18 +101,22 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
 
                 UiState.Idle -> {
                     binding.tvLogin.isEnabled = true
+                    binding.btnGoogleLogin.isEnabled = true
                 }
 
                 UiState.Loading -> {
                     binding.tvLogin.isEnabled = false
+                    binding.btnGoogleLogin.isEnabled = false
                 }
 
                 is UiState.Success -> {
                     binding.tvLogin.isEnabled = true
+                    binding.btnGoogleLogin.isEnabled = true
                 }
 
                 is UiState.Error -> {
                     binding.tvLogin.isEnabled = true
+                    binding.btnGoogleLogin.isEnabled = true
                     binding.tvPasswordError.visibility = View.VISIBLE
                     binding.tvPasswordError.text = state.message
                     binding.ivPic.setImageResource(R.drawable.frame2)
