@@ -5,15 +5,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityBlockedUsersBinding
+import com.example.myapplication.databinding.DialogConfirmDeleteBinding
 import com.example.myapplication.ui.base.BaseActivity
-import com.example.myapplication.ui.home.chat.FriendsListViewModel
+import com.example.myapplication.ui.base.UiState
+import com.example.myapplication.ui.home.chat.BlockUserViewModel
 import com.example.myapplication.ui.home.chat.adapter.BlockedUsersAdapter
 
 class BlockedUsersActivity : BaseActivity<ActivityBlockedUsersBinding>() {
 
     override fun inflateBinding() = ActivityBlockedUsersBinding.inflate(layoutInflater)
 
-    private val viewModel: FriendsListViewModel by viewModels()
+    private val blockUserViewModel: BlockUserViewModel by viewModels()
     private lateinit var blockedAdapter: BlockedUsersAdapter
 
     override fun initView() {
@@ -37,7 +39,7 @@ class BlockedUsersActivity : BaseActivity<ActivityBlockedUsersBinding>() {
 
     private fun loadData() {
         binding.progressBar.visibility = View.VISIBLE
-        viewModel.getBlockedUsers { list ->
+        blockUserViewModel.getBlockedUsers { list ->
             binding.progressBar.visibility = View.GONE
             if (list.isEmpty()) {
                 binding.tvEmptyState.visibility = View.VISIBLE
@@ -52,14 +54,14 @@ class BlockedUsersActivity : BaseActivity<ActivityBlockedUsersBinding>() {
 
     private fun showUnblockConfirmDialog(userId: String, name: String) {
         val dialog = AlertDialog.Builder(this).create()
-        val dialogBinding = com.example.myapplication.databinding.DialogConfirmDeleteBinding.inflate(layoutInflater)
+        val dialogBinding = DialogConfirmDeleteBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
         dialogBinding.tvTitle.text = "Bỏ chặn người dùng"
         dialogBinding.tvMessage.text = "Bạn có chắc chắn muốn bỏ chặn $name không?"
         dialogBinding.btnConfirm.text = "Bỏ chặn"
         dialogBinding.btnConfirm.setOnClickListener {
-            viewModel.unblockUser(userId) {
+            blockUserViewModel.unblockUser(userId) {
                 showToast("Đã bỏ chặn $name")
                 loadData()
             }
@@ -74,8 +76,8 @@ class BlockedUsersActivity : BaseActivity<ActivityBlockedUsersBinding>() {
     }
 
     override fun observeData() {
-        viewModel.uiState.observeState { state ->
-            if (state is com.example.myapplication.ui.base.UiState.Error) {
+        blockUserViewModel.uiState.observeState { state ->
+            if (state is UiState.Error) {
                 showToast(state.message)
             }
         }

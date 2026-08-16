@@ -5,13 +5,15 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityPendingRequestsBinding
 import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter
 
 class PendingRequestsActivity : BaseActivity<ActivityPendingRequestsBinding>() {
 
     override fun inflateBinding() = ActivityPendingRequestsBinding.inflate(layoutInflater)
 
-    private val viewModel: FriendsListViewModel by viewModels()
+    private val friendRequestViewModel: FriendRequestViewModel by viewModels()
+    private val conversationViewModel: ConversationViewModel by viewModels()
     private lateinit var pendingAdapter: PendingRequestsAdapter
 
     override fun initView() {
@@ -23,11 +25,11 @@ class PendingRequestsActivity : BaseActivity<ActivityPendingRequestsBinding>() {
             onAccept = { item ->
                 val reqId = item.requestId ?: return@PendingRequestsAdapter
                 val targetUserId = item.userId
-                viewModel.acceptFriendRequest(reqId) {
+                friendRequestViewModel.acceptFriendRequest(reqId) {
                     showToast("Đã đồng ý kết bạn với ${item.lastName ?: ""} ${item.firstName ?: ""}")
                     if (!targetUserId.isNullOrEmpty()) {
-                        viewModel.startDirectChat(targetUserId) { _, _ ->
-                            viewModel.fetchConversations()
+                        conversationViewModel.startDirectChat(targetUserId) { _, _ ->
+                            conversationViewModel.fetchConversations()
                         }
                     }
                     loadData()
@@ -35,7 +37,7 @@ class PendingRequestsActivity : BaseActivity<ActivityPendingRequestsBinding>() {
             },
             onReject = { item ->
                 val reqId = item.requestId ?: return@PendingRequestsAdapter
-                viewModel.rejectFriendRequest(reqId) {
+                friendRequestViewModel.rejectFriendRequest(reqId) {
                     showToast("Đã từ chối lời mời kết bạn")
                     loadData()
                 }
@@ -50,7 +52,7 @@ class PendingRequestsActivity : BaseActivity<ActivityPendingRequestsBinding>() {
 
     private fun loadData() {
         binding.progressBar.visibility = View.VISIBLE
-        viewModel.getPendingFriendRequests { list ->
+        friendRequestViewModel.getPendingFriendRequests { list ->
             binding.progressBar.visibility = View.GONE
             if (list.isEmpty()) {
                 binding.tvEmptyState.visibility = View.VISIBLE
@@ -64,5 +66,10 @@ class PendingRequestsActivity : BaseActivity<ActivityPendingRequestsBinding>() {
     }
 
     override fun observeData() {
+        friendRequestViewModel.uiState.observeState { state ->
+            if (state is UiState.Error) {
+                showToast(state.message)
+            }
+        }
     }
 }

@@ -4,25 +4,23 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.response.ConversationResponse
-import com.example.myapplication.data.remote.network.NetworkConstants
 import com.example.myapplication.data.remote.websocket.WebSocketManager
+import com.example.myapplication.data.repository.BlockRepository
 import com.example.myapplication.data.repository.ConversationRepository
+import com.example.myapplication.data.repository.MessageRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.launch
 
-@Deprecated(
-    message = "Replaced by ConversationViewModel, FriendRequestViewModel, and BlockUserViewModel",
-    level = DeprecationLevel.WARNING
-)
-class FriendsListViewModel(application: Application) : BaseViewModel<List<ConversationResponse>>(application) {
+class ConversationViewModel(application: Application) : BaseViewModel<List<ConversationResponse>>(application) {
 
     private val conversationRepository = ConversationRepository(application)
+    private val blockRepository = BlockRepository(application)
     private val preferenceManager = PreferenceManager(application)
-    private val partnerIdCache = mutableMapOf<String, String>()
-
     private val socketService = WebSocketManager
+
+    private val partnerIdCache = mutableMapOf<String, String>()
 
     init {
         initWebSocket()
@@ -59,18 +57,15 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
                     for (conv in rawList) {
                         val lastSenderId = conv.lastMessage?.senderId
 
-                        // 1. If group chat, do not filter based on blocked user
                         if (!conv.groupName.isNullOrEmpty()) {
                             filteredList.add(conv)
                             continue
                         }
 
-                        // 2. If direct chat and the last sender was someone else and they are blocked, filter them out
                         if (!lastSenderId.isNullOrEmpty() && lastSenderId != currentUserId && blockedIds.contains(lastSenderId)) {
                             continue
                         }
 
-                        // 3. If direct chat and the last sender was current user, check cached partner id
                         val cachedPartnerId = partnerIdCache[conv.id]
                         if (cachedPartnerId != null) {
                             if (blockedIds.contains(cachedPartnerId)) {
@@ -103,7 +98,7 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
 
         viewModelScope.launch {
-            val messageRepository = com.example.myapplication.data.repository.MessageRepository(getApplication())
+            val messageRepository = MessageRepository(getApplication())
             val result = messageRepository.getMessages(conv.id, page = 0, size = 20)
             if (result is Resource.Success) {
                 val messages = result.data.data.content
@@ -111,6 +106,7 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
                 if (!partnerId.isNullOrEmpty()) {
                     partnerIdCache[conv.id] = partnerId
                     if (blockedIds.contains(partnerId)) {
+                        // Re-fetch to apply updated filter, but guard against infinite recursion
                         fetchConversations()
                     }
                 }
@@ -138,135 +134,6 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
         }
     }
 
-    private val friendRepository = com.example.myapplication.data.repository.FriendRepository(application)
-
-    fun searchUsers(keyword: String, onResult: (List<com.example.myapplication.data.remote.dto.response.UserSearchDto>) -> Unit) {
-        viewModelScope.launch {
-            when (val result = friendRepository.searchUsers(keyword)) {
-                is Resource.Success -> {
-                    onResult(result.data?.data ?: emptyList())
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                    onResult(emptyList())
-                }
-            }
-        }
-    }
-
-    fun sendFriendRequest(targetUserId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            when (val result = friendRepository.sendFriendRequest(targetUserId)) {
-                is Resource.Success -> {
-                    onSuccess()
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        }
-    }
-
-    fun getPendingFriendRequests(onResult: (List<com.example.myapplication.data.remote.dto.response.FriendDto>) -> Unit) {
-        viewModelScope.launch {
-            when (val result = friendRepository.getPendingFriendRequests()) {
-                is Resource.Success -> {
-                    onResult(result.data?.data?.content ?: emptyList())
-                }
-                is Resource.Error -> {
-                    onResult(emptyList())
-                }
-            }
-        }
-    }
-
-    fun acceptFriendRequest(requestId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            when (val result = friendRepository.acceptFriendRequest(requestId)) {
-                is Resource.Success -> {
-                    onSuccess()
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        }
-    }
-
-    fun rejectFriendRequest(requestId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            when (val result = friendRepository.rejectFriendRequest(requestId)) {
-                is Resource.Success -> {
-                    onSuccess()
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        }
-    }
-
-    fun unfriend(friendId: String, conversationId: String?, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            when (val result = friendRepository.unfriend(friendId)) {
-                is Resource.Success -> {
-                    if (!conversationId.isNullOrEmpty()) {
-                        socketService.sendMessage(conversationId, "UNFRIEND", "UNFRIEND")
-                    }
-                    onSuccess()
-                    fetchConversations()
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        }
-    }
-
-    private val blockRepository = com.example.myapplication.data.repository.BlockRepository(getApplication())
-
-    fun blockUser(userId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            when (val result = blockRepository.blockUser(userId)) {
-                is Resource.Success -> {
-                    onSuccess()
-                    fetchConversations()
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        }
-    }
-
-    fun getBlockedUsers(onResult: (List<com.example.myapplication.data.remote.dto.response.BlockedUserDto>) -> Unit) {
-        viewModelScope.launch {
-            when (val result = blockRepository.getBlockedUsers()) {
-                is Resource.Success -> {
-                    onResult(result.data?.data ?: emptyList())
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                    onResult(emptyList())
-                }
-            }
-        }
-    }
-
-    fun unblockUser(userId: String, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            when (val result = blockRepository.unblockUser(userId)) {
-                is Resource.Success -> {
-                    onSuccess()
-                    fetchConversations()
-                }
-                is Resource.Error -> {
-                    _uiState.value = UiState.Error(result.message)
-                }
-            }
-        }
-    }
-
     fun searchConversations(keyword: String) {
         if (keyword.isBlank()) {
             fetchConversations()
@@ -284,5 +151,4 @@ class FriendsListViewModel(application: Application) : BaseViewModel<List<Conver
             }
         }
     }
-
 }
