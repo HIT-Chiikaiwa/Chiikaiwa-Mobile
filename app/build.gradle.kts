@@ -69,4 +69,7 @@ dependencies {
 
     implementation("com.google.firebase:firebase-messaging-ktx:24.1.0")
     implementation(libs.play.services.auth)
+
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 }
