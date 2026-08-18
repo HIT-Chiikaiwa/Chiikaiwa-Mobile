@@ -19,7 +19,6 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
 
     abstract fun initView()
 
-    
     protected inline fun <T> StateFlow<T>.observeState(crossinline action: (T) -> Unit) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

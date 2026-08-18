@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_auth"
+    app:startDestination="@id/inputEmailFragment">
+
+    <fragment
+        android:id="@+id/inputEmailFragment"
+        android:name="com.example.myapplication.ui.auth.InputEmailFragment"
+        android:label="fragment_input_email"
+        tools:layout="@layout/fragment_input_email" >
+        <action
+            android:id="@+id/action_inputEmailFragment_to_verifyEmailFragment"
+            app:destination="@id/verifyEmailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/verifyEmailFragment"
+        android:name="com.example.myapplication.ui.auth.VerifyEmailFragment"
+        android:label="fragment_verify_email"
+        tools:layout="@layout/fragment_verify_email" >
+        <argument
+            android:name="email"
+            app:argType="string" />
+        <argument
+            android:name="flow"
+            app:argType="string"
+            android:defaultValue="register" />
+    </fragment>
+</navigation>
