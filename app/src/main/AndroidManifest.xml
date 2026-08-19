@@ -37,28 +37,6 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
-            android:name=".ui.auth.LoginActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.VerifyEmailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.VerifyOtpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.InputEmailActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.auth.ForgotPasswordActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
             android:name=".ui.profile.ProfileActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />

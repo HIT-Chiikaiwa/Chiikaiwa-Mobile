@@ -3,7 +3,7 @@ package com.example.myapplication.ui.home
 import android.content.Intent
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.data.local.PreferenceManager
-import com.example.myapplication.ui.auth.LoginActivity
+import com.example.myapplication.ui.auth.AuthActivity
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.home.map.MapFragment
 
@@ -14,7 +14,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun initView() {
         val preferenceManager = PreferenceManager(this)
         if (!preferenceManager.isLogin()) {
-            val intent = Intent(this, LoginActivity::class.java).apply {
+            val intent = Intent(this, AuthActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             startActivity(intent)
