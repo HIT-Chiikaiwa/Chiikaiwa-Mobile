@@ -26,5 +26,35 @@
             android:name="flow"
             app:argType="string"
             android:defaultValue="register" />
+        <action
+            android:id="@+id/action_verifyEmailFragment_to_verifyOtpFragment"
+            app:destination="@id/verifyOtpFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/verifyOtpFragment"
+        android:name="com.example.myapplication.ui.auth.VerifyOtpFragment"
+        android:label="fragment_verify_otp"
+        tools:layout="@layout/fragment_verify_otp" >
+        <argument
+            android:name="email"
+            app:argType="string" />
+        <argument
+            android:name="flow"
+            app:argType="string"
+            android:defaultValue="register" />
+        <action
+            android:id="@+id/action_verifyOtpFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.myapplication.ui.auth.ForgotPasswordFragment"
+        android:label="fragment_forgot_password"
+        tools:layout="@layout/fragment_forgot_password" >
+        <argument
+            android:name="email"
+            app:argType="string" />
     </fragment>
 </navigation>

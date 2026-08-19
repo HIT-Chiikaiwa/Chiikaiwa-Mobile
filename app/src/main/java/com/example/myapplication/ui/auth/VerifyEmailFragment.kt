@@ -35,11 +35,13 @@ class VerifyEmailFragment : BaseFragment<FragmentVerifyEmailBinding>() {
         }
 
         binding.btnSendEmail.setOnClickListener {
-            startActivity(
-                Intent(requireContext(), VerifyOtpActivity::class.java).apply {
-                    putExtra("email", email)
-                    putExtra("flow", flow)
-                }
+            val bundle = Bundle().apply {
+                putString("email", email)
+                putString("flow", flow)
+            }
+            findNavController().navigate(
+                R.id.action_verifyEmailFragment_to_verifyOtpFragment,
+                bundle
             )
         }
     }
@@ -56,11 +58,13 @@ class VerifyEmailFragment : BaseFragment<FragmentVerifyEmailBinding>() {
                 is UiState.Success -> {
                     setLoading(false)
                     viewModel.resetState()
-                    startActivity(
-                        Intent(requireContext(), VerifyOtpActivity::class.java).apply {
-                            putExtra("email", email)
-                            putExtra("flow", flow)
-                        }
+                    val bundle = Bundle().apply {
+                        putString("email", email)
+                        putString("flow", flow)
+                    }
+                    findNavController().navigate(
+                        R.id.action_verifyEmailFragment_to_verifyOtpFragment,
+                        bundle
                     )
                 }
                 is UiState.Error -> {
