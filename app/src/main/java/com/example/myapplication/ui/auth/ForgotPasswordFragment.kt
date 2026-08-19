@@ -64,11 +64,8 @@ class ForgotPasswordFragment : BaseFragment<FragmentForgotPasswordBinding>() {
                 }
                 is UiState.Success -> {
                     setLoading(false)
-                    val intent = Intent(requireContext(), LoginActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                    startActivity(intent)
-                    requireActivity().finish()
+                    showToast(state.data)
+                    findNavController().popBackStack(R.id.loginFragment, false)
                 }
                 is UiState.Error -> {
                     setLoading(false)
