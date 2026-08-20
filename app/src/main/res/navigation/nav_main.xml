@@ -2,7 +2,27 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_main">
+    android:id="@+id/nav_main"
+    app:startDestination="@id/mapFragment">
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.myapplication.ui.home.map.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/action_mapFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_friendsListFragment"
+            app:destination="@id/friendsListFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_notificationFragment"
+            app:destination="@id/notificationFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
@@ -20,6 +40,9 @@
         <action
             android:id="@+id/action_profileFragment_to_accountSettingsFragment"
             app:destination="@id/accountSettingsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
     </fragment>
 
     <fragment
@@ -124,6 +147,63 @@
             android:name="is_disabled"
             app:argType="boolean"
             android:defaultValue="false" />
+        <action
+            android:id="@+id/action_chatFragment_to_createAppointmentFragment"
+            app:destination="@id/createAppointmentFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.example.myapplication.ui.notification.NotificationFragment"
+        android:label="fragment_notification"
+        tools:layout="@layout/fragment_notification">
+        <argument
+            android:name="show_reminder_dialog"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="reminder_title"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="reminder_scheduled_at"
+            app:argType="string"
+            android:defaultValue="" />
+        <action
+            android:id="@+id/action_notificationFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_notificationFragment_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
+        <action
+            android:id="@+id/action_notificationFragment_to_friendsListFragment"
+            app:destination="@id/friendsListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.example.myapplication.ui.home.schedule.ScheduleFragment"
+        android:label="fragment_schedule"
+        tools:layout="@layout/fragment_schedule">
+        <argument
+            android:name="booking_id"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createAppointmentFragment"
+        android:name="com.example.myapplication.ui.home.schedule.CreateAppointmentFragment"
+        android:label="fragment_create_appointment"
+        tools:layout="@layout/fragment_create_appointment">
+        <argument
+            android:name="conversation_id"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="target_user_name"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
 </navigation>

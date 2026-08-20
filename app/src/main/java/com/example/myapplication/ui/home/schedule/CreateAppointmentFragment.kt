@@ -1,22 +1,28 @@
 package com.example.myapplication.ui.home.schedule
 
 import android.app.DatePickerDialog
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.AdapterView
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.request.CreateBookingRequest
-import com.example.myapplication.databinding.ActivityCreateAppointmentBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.databinding.FragmentCreateAppointmentBinding
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.R
+import com.example.myapplication.utils.TimeUtils
+import com.example.myapplication.utils.extension.observeState
 import com.example.myapplication.utils.extension.setBrownTextColor
 import java.util.Calendar
 import java.util.Locale
 
-class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>() {
+class CreateAppointmentFragment : BaseFragment<FragmentCreateAppointmentBinding>() {
+
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentCreateAppointmentBinding.inflate(inflater, container, false)
 
     private val viewModel: BookingViewModel by viewModels()
 
@@ -25,18 +31,18 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
     private var selectedDay = 0
     private var conversationId: String = ""
 
-    override fun inflateBinding() = ActivityCreateAppointmentBinding.inflate(layoutInflater)
-
     private val durationValues = intArrayOf(30, 45, 60, 90, 120, 180, 240)
 
     override fun initView() {
-        conversationId = intent.getStringExtra("conversation_id")
-            ?: intent.getStringExtra("conversationId")
+        conversationId = arguments?.getString("conversation_id")
+            ?: requireActivity().intent.getStringExtra("conversation_id")
+            ?: requireActivity().intent.getStringExtra("conversationId")
             ?: ""
 
-        val userName = intent.getStringExtra("target_user_name")
-            ?: intent.getStringExtra("user_name")
-            ?: intent.getStringExtra("name")
+        val userName = arguments?.getString("target_user_name")
+            ?: requireActivity().intent.getStringExtra("target_user_name")
+            ?: requireActivity().intent.getStringExtra("user_name")
+            ?: requireActivity().intent.getStringExtra("name")
 
         if (!userName.isNullOrEmpty()) {
             binding.tvScreenTitle.text = "Tạo cuộc hẹn với $userName"
@@ -45,7 +51,7 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
         }
 
         binding.ivBack.setOnClickListener {
-            finish()
+            findNavController().navigateUp()
         }
 
         setupDatePicker()
@@ -66,7 +72,7 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
 
         binding.layoutDateField.setOnClickListener {
             val datePickerDialog = DatePickerDialog(
-                this,
+                requireContext(),
                 { _, year, month, dayOfMonth ->
                     selectedYear = year
                     selectedMonth = month
@@ -109,7 +115,7 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
             "180 phút (3 giờ)",
             "240 phút (4 giờ)"
         )
-        val adapter = ArrayAdapter(this, R.layout.item_spinner_selected, durations)
+        val adapter = ArrayAdapter(requireContext(), R.layout.item_spinner_selected, durations)
         adapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
         binding.spDuration.adapter = adapter
         binding.spDuration.setSelection(0)
@@ -148,7 +154,7 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
                 return@setOnClickListener
             }
 
-            val scheduledAt = com.example.myapplication.utils.TimeUtils.formatToUtc(cal.time)
+            val scheduledAt = TimeUtils.formatToUtc(cal.time)
 
             val selectedDuration = durationValues.getOrElse(binding.spDuration.selectedItemPosition) { 30 }
 
@@ -178,7 +184,7 @@ class CreateAppointmentActivity : BaseActivity<ActivityCreateAppointmentBinding>
         viewModel.uiState.observeState { state ->
             when (state) {
                 is UiState.Success -> {
-                    finish()
+                    findNavController().navigateUp()
                 }
                 is UiState.Error -> {
                     binding.tvErrorMessage.text = state.message

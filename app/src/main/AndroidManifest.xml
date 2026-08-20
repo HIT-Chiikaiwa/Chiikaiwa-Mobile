@@ -66,10 +66,6 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
-            android:name=".ui.notification.NotificationActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
             android:name=".ui.home.chat.FriendsListActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
@@ -79,17 +75,6 @@
             android:exported="false" />
         <activity
             android:name=".ui.home.chat.SearchUserActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-
-
-        <activity
-            android:name=".ui.home.schedule.ScheduleActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-
-        <activity
-            android:name=".ui.home.schedule.CreateAppointmentActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 

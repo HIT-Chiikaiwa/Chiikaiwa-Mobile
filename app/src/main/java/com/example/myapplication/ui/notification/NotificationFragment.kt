@@ -1,21 +1,26 @@
 package com.example.myapplication.ui.notification
 
 import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.viewModels
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.NotificationDto
-import com.example.myapplication.databinding.ActivityNotificationBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.databinding.FragmentNotificationBinding
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.ui.home.chat.FriendsListActivity
-import com.example.myapplication.ui.home.schedule.ScheduleActivity
-import com.example.myapplication.ui.profile.ProfileActivity
+import com.example.myapplication.ui.home.schedule.AppointmentReminderDialog
+import com.example.myapplication.utils.extension.observeState
 
-class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
+class NotificationFragment : BaseFragment<FragmentNotificationBinding>() {
 
-    override fun inflateBinding() = ActivityNotificationBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentNotificationBinding.inflate(inflater, container, false)
 
     private val viewModel: NotificationViewModel by viewModels()
 
@@ -35,7 +40,7 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
 
     override fun initView() {
         binding.ivBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.tvMarkAllRead.setOnClickListener {
@@ -45,14 +50,22 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
         binding.rvRecentNotifications.adapter = recentAdapter
         binding.rvEarlierNotifications.adapter = earlierAdapter
 
-        checkAndShowReminderDialog(intent)
+        checkAndShowReminderDialog()
     }
 
-    private fun checkAndShowReminderDialog(intent: Intent?) {
-        if (intent?.getBooleanExtra("show_reminder_dialog", false) == true) {
-            val title = intent.getStringExtra("reminder_title") ?: "Cuộc hẹn"
-            val scheduledAt = intent.getStringExtra("reminder_scheduled_at") ?: ""
-            com.example.myapplication.ui.home.schedule.AppointmentReminderDialog(this, title, scheduledAt).show()
+    private fun checkAndShowReminderDialog() {
+        val showReminder = arguments?.getBoolean("show_reminder_dialog")
+            ?: requireActivity().intent?.getBooleanExtra("show_reminder_dialog", false)
+            ?: false
+
+        if (showReminder) {
+            val title = arguments?.getString("reminder_title")
+                ?: requireActivity().intent?.getStringExtra("reminder_title")
+                ?: "Cuộc hẹn"
+            val scheduledAt = arguments?.getString("reminder_scheduled_at")
+                ?: requireActivity().intent?.getStringExtra("reminder_scheduled_at")
+                ?: ""
+            AppointmentReminderDialog(requireContext(), title, scheduledAt).show()
         }
     }
 
@@ -107,7 +120,7 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
 
     private fun showNotificationOptionsDialog(notification: NotificationDto) {
         val notificationId = notification.id ?: return
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = com.example.myapplication.databinding.DialogConfirmDeleteBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
@@ -133,27 +146,26 @@ class NotificationActivity : BaseActivity<ActivityNotificationBinding>() {
         when (type) {
             "FRIEND", "FRIEND_REQUEST", "USER" -> {
                 val targetId = notification.targetId ?: notification.actorId
-                val intent = Intent(this, ProfileActivity::class.java).apply {
-                    putExtra("target_user_id", targetId)
-                }
-                startActivity(intent)
+                findNavController().navigate(
+                    R.id.action_notificationFragment_to_profileFragment,
+                    bundleOf("target_user_id" to targetId)
+                )
             }
             "BOOKING", "APPOINTMENT" -> {
-                val intent = Intent(this, ScheduleActivity::class.java).apply {
-                    putExtra("booking_id", notification.targetId)
-                }
-                startActivity(intent)
+                findNavController().navigate(
+                    R.id.action_notificationFragment_to_scheduleFragment,
+                    bundleOf("booking_id" to notification.targetId)
+                )
             }
             "CHAT", "MESSAGE", "CONVERSATION" -> {
-                val intent = Intent(this, FriendsListActivity::class.java)
-                startActivity(intent)
+                findNavController().navigate(R.id.action_notificationFragment_to_friendsListFragment)
             }
             else -> {
                 if (!notification.actorId.isNullOrEmpty()) {
-                    val intent = Intent(this, ProfileActivity::class.java).apply {
-                        putExtra("target_user_id", notification.actorId)
-                    }
-                    startActivity(intent)
+                    findNavController().navigate(
+                        R.id.action_notificationFragment_to_profileFragment,
+                        bundleOf("target_user_id" to notification.actorId)
+                    )
                 }
             }
         }

@@ -48,7 +48,11 @@ class AppointmentReminderDialog(
 
         binding.btnViewSchedule.setOnClickListener {
             dismiss()
-            context.startActivity(Intent(context, ScheduleActivity::class.java))
+            val intent = Intent(context, com.example.myapplication.ui.home.MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("type", "BOOKING")
+            }
+            context.startActivity(intent)
         }
     }
 }

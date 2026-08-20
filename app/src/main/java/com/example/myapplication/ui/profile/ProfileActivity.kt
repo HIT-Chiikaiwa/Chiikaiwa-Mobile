@@ -66,7 +66,11 @@ class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
                 startActivity(Intent(this, AccountSettingsActivity::class.java))
             }
             val openScheduleAction = View.OnClickListener {
-                startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
+                val intent = Intent(this, com.example.myapplication.ui.home.MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    putExtra("type", "BOOKING")
+                }
+                startActivity(intent)
             }
             binding.cvAppointment.setOnClickListener(openScheduleAction)
             binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)

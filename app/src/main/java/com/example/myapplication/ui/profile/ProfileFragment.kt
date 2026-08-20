@@ -64,7 +64,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 findNavController().navigate(R.id.action_profileFragment_to_accountSettingsFragment)
             }
             val openScheduleAction = View.OnClickListener {
-                startActivity(Intent(requireContext(), com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
+                findNavController().navigate(R.id.action_profileFragment_to_scheduleFragment)
             }
             binding.cvAppointment.setOnClickListener(openScheduleAction)
             binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)

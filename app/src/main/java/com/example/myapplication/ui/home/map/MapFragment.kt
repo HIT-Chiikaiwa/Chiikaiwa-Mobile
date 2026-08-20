@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
@@ -78,11 +79,11 @@ class MapFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.imgAvatar.setOnClickListener { navigateTo(ProfileActivity::class.java) }
-        binding.btnProfile.setOnClickListener { navigateTo(ProfileActivity::class.java) }
-        binding.btnFriend.setOnClickListener { navigateTo(FriendsListActivity::class.java) }
-        binding.btnNotification.setOnClickListener { navigateTo(com.example.myapplication.ui.notification.NotificationActivity::class.java) }
-        binding.btnCalendar.setOnClickListener { navigateTo(com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java) }
+        binding.imgAvatar.setOnClickListener { findNavController().navigate(R.id.action_mapFragment_to_profileFragment) }
+        binding.btnProfile.setOnClickListener { findNavController().navigate(R.id.action_mapFragment_to_profileFragment) }
+        binding.btnFriend.setOnClickListener { findNavController().navigate(R.id.action_mapFragment_to_friendsListFragment) }
+        binding.btnNotification.setOnClickListener { findNavController().navigate(R.id.action_mapFragment_to_notificationFragment) }
+        binding.btnCalendar.setOnClickListener { findNavController().navigate(R.id.action_mapFragment_to_scheduleFragment) }
 
         binding.imgCrown.setOnClickListener {
             showToast("Tính năng đang được phát triển")

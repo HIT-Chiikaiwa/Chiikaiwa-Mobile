@@ -7,6 +7,10 @@ import com.example.myapplication.ui.auth.AuthActivity
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.home.map.MapFragment
 
+import androidx.navigation.findNavController
+import androidx.core.os.bundleOf
+import com.example.myapplication.R
+
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun inflateBinding() = ActivityMainBinding.inflate(layoutInflater)
@@ -43,9 +47,60 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         checkNotificationPermission()
         fetchAndSyncFcmToken()
 
-        supportFragmentManager.beginTransaction()
-            .replace(binding.fragmentContainer.id, MapFragment())
-            .commit()
+        binding.root.post {
+            handleIntent(intent)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        binding.root.post {
+            handleIntent(intent)
+        }
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent == null) return
+
+        val navController = try {
+            findNavController(R.id.nav_host_fragment_main)
+        } catch (e: Exception) {
+            return
+        }
+
+        val bookingId = intent.getStringExtra("booking_id") ?: intent.getStringExtra("targetId")
+        val type = intent.getStringExtra("type") ?: intent.getStringExtra("targetType")
+
+        if (intent.getBooleanExtra("show_reminder_dialog", false)) {
+            val title = intent.getStringExtra("reminder_title") ?: "Cuộc hẹn"
+            val scheduledAt = intent.getStringExtra("reminder_scheduled_at") ?: ""
+            val bundle = bundleOf(
+                "show_reminder_dialog" to true,
+                "reminder_title" to title,
+                "reminder_scheduled_at" to scheduledAt
+            )
+            navController.navigate(R.id.notificationFragment, bundle)
+            return
+        }
+
+        if (intent.hasExtra("id") || intent.hasExtra("type") || intent.hasExtra("targetType") || intent.hasExtra("show_reminder_dialog")) {
+            when (type?.uppercase()) {
+                "FRIEND", "FRIEND_REQUEST", "USER" -> {
+                    val targetId = intent.getStringExtra("targetId") ?: intent.getStringExtra("actorId")
+                    navController.navigate(R.id.profileFragment, bundleOf("target_user_id" to targetId))
+                }
+                "BOOKING", "APPOINTMENT" -> {
+                    navController.navigate(R.id.scheduleFragment, bundleOf("booking_id" to bookingId))
+                }
+                "CHAT", "MESSAGE", "CONVERSATION" -> {
+                    navController.navigate(R.id.friendsListFragment)
+                }
+                else -> {
+                    navController.navigate(R.id.notificationFragment)
+                }
+            }
+        }
     }
 
     private fun fetchAndSyncFcmToken() {

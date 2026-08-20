@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
 import android.content.Context
+import com.example.myapplication.R
 
 import android.content.Intent
 import android.net.Uri
@@ -201,11 +202,13 @@ class ChatFragment : Fragment() {
         }
 
         binding.btnCreateSchedule.setOnClickListener {
-            val intent = Intent(requireContext(), com.example.myapplication.ui.home.schedule.CreateAppointmentActivity::class.java).apply {
-                putExtra("conversation_id", conversationId)
-                putExtra("target_user_name", userName)
-            }
-            startActivity(intent)
+            findNavController().navigate(
+                R.id.action_chatFragment_to_createAppointmentFragment,
+                androidx.core.os.bundleOf(
+                    "conversation_id" to conversationId,
+                    "target_user_name" to userName
+                )
+            )
         }
 
         binding.btnSticker.setOnClickListener {

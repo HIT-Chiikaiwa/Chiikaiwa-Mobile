@@ -9,7 +9,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.myapplication.R
-import com.example.myapplication.ui.notification.NotificationActivity
+import com.example.myapplication.ui.home.MainActivity
 import com.example.myapplication.utils.TimeUtils
 
 class AppointmentReminderReceiver : BroadcastReceiver() {
@@ -41,7 +41,7 @@ class AppointmentReminderReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val activityIntent = Intent(context, NotificationActivity::class.java).apply {
+        val activityIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra("show_reminder_dialog", true)
             putExtra("reminder_title", title)
