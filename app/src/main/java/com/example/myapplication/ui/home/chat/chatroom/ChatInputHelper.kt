@@ -3,10 +3,10 @@ package com.example.myapplication.ui.home.chat.chatroom
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import com.example.myapplication.databinding.ActivityChatBinding
+import com.example.myapplication.databinding.FragmentChatBinding
 
 class ChatInputHelper(
-    private val binding: ActivityChatBinding,
+    private val binding: FragmentChatBinding,
     private val onSendMessage: () -> Unit
 ) {
     fun setup() {

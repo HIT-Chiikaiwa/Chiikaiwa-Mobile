@@ -1,16 +1,19 @@
 package com.example.myapplication.ui.home.chat
 
+import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.viewModels
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.FragmentPendingRequestsBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.PendingRequestsAdapter
 
-class PendingRequestsActivity : BaseActivity<FragmentPendingRequestsBinding>() {
+class PendingRequestsFragment : BaseFragment<FragmentPendingRequestsBinding>() {
 
-    override fun inflateBinding() = FragmentPendingRequestsBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentPendingRequestsBinding.inflate(inflater, container, false)
 
     private val friendRequestViewModel: FriendRequestViewModel by viewModels()
     private val conversationViewModel: ConversationViewModel by viewModels()
@@ -18,7 +21,7 @@ class PendingRequestsActivity : BaseActivity<FragmentPendingRequestsBinding>() {
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         pendingAdapter = PendingRequestsAdapter(
@@ -44,7 +47,7 @@ class PendingRequestsActivity : BaseActivity<FragmentPendingRequestsBinding>() {
             }
         )
 
-        binding.rvPendingRequests.layoutManager = LinearLayoutManager(this)
+        binding.rvPendingRequests.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPendingRequests.adapter = pendingAdapter
 
         loadData()

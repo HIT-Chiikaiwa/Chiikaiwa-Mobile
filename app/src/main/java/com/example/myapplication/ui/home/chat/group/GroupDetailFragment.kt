@@ -10,14 +10,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.myapplication.databinding.ActivityFriendsListBinding
+import com.example.myapplication.databinding.FragmentFriendsListBinding
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import kotlinx.coroutines.launch
 
 class GroupDetailFragment : Fragment() {
 
-    private var _binding: ActivityFriendsListBinding? = null
+    private var _binding: FragmentFriendsListBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: GroupViewModel by lazy {
@@ -36,7 +36,7 @@ class GroupDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ActivityFriendsListBinding.inflate(inflater, container, false)
+        _binding = FragmentFriendsListBinding.inflate(inflater, container, false)
         return binding.root
     }
 

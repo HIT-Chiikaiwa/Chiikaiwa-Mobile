@@ -10,7 +10,6 @@ import android.widget.Toast
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.NearbyUserResponse
 import com.example.myapplication.databinding.DialogUserInfoBinding
-import com.example.myapplication.ui.home.chat.chatroom.ChatActivity
 import com.example.myapplication.utils.extension.observeState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.maplibre.android.camera.CameraUpdateFactory

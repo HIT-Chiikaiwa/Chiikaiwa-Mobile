@@ -1,22 +1,26 @@
 package com.example.myapplication.ui.home.chat.chatroom
 
+import android.content.Context
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.myapplication.databinding.ActivityChatBinding
+import com.example.myapplication.databinding.FragmentChatBinding
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.MessageAdapter
@@ -31,7 +35,7 @@ import java.io.File
 
 class ChatFragment : Fragment() {
 
-    private var _binding: ActivityChatBinding? = null
+    private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: ChatViewModel by lazy {
@@ -53,6 +57,11 @@ class ChatFragment : Fragment() {
         uri?.let { handleImageSelected(it) }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         conversationId = arguments?.getString(ARG_CONVERSATION_ID) ?: ""
@@ -66,7 +75,7 @@ class ChatFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ActivityChatBinding.inflate(inflater, container, false)
+        _binding = FragmentChatBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -173,7 +182,7 @@ class ChatFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
-            requireActivity().finish()
+            findNavController().popBackStack()
         }
 
         val profileClickListener = View.OnClickListener {
@@ -371,6 +380,11 @@ class ChatFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED)
     }
 
     companion object {

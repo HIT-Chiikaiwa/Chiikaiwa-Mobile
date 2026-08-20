@@ -71,4 +71,59 @@
         android:label="fragment_blocked_users"
         tools:layout="@layout/fragment_blocked_users" />
 
+    <fragment
+        android:id="@+id/friendsListFragment"
+        android:name="com.example.myapplication.ui.home.chat.FriendsListFragment"
+        android:label="fragment_friends_list"
+        tools:layout="@layout/fragment_friends_list">
+        <action
+            android:id="@+id/action_friendsListFragment_to_searchUserFragment"
+            app:destination="@id/searchUserFragment" />
+        <action
+            android:id="@+id/action_friendsListFragment_to_pendingRequestsFragment"
+            app:destination="@id/pendingRequestsFragment" />
+        <action
+            android:id="@+id/action_friendsListFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchUserFragment"
+        android:name="com.example.myapplication.ui.home.chat.SearchUserFragment"
+        android:label="fragment_search_user"
+        tools:layout="@layout/fragment_search_user">
+        <action
+            android:id="@+id/action_searchUserFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/pendingRequestsFragment"
+        android:name="com.example.myapplication.ui.home.chat.PendingRequestsFragment"
+        android:label="fragment_pending_requests"
+        tools:layout="@layout/fragment_pending_requests" />
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.myapplication.ui.home.chat.chatroom.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat">
+        <argument
+            android:name="conversation_id"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="target_user_id"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="user_name"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="is_disabled"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+
 </navigation>

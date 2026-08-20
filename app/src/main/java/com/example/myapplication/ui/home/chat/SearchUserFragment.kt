@@ -1,18 +1,22 @@
 package com.example.myapplication.ui.home.chat
 
-import android.content.Intent
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentSearchUserBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.UserSearchAdapter
 
-class SearchUserActivity : BaseActivity<FragmentSearchUserBinding>() {
+class SearchUserFragment : BaseFragment<FragmentSearchUserBinding>() {
 
-    override fun inflateBinding() = FragmentSearchUserBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentSearchUserBinding.inflate(inflater, container, false)
 
     private val friendRequestViewModel: FriendRequestViewModel by viewModels()
     private val conversationViewModel: ConversationViewModel by viewModels()
@@ -20,7 +24,7 @@ class SearchUserActivity : BaseActivity<FragmentSearchUserBinding>() {
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         searchAdapter = UserSearchAdapter(
@@ -33,18 +37,18 @@ class SearchUserActivity : BaseActivity<FragmentSearchUserBinding>() {
             onStartChat = { user ->
                 val targetId = user.id ?: return@UserSearchAdapter
                 conversationViewModel.startDirectChat(targetId) { convId, userName ->
-                    val intent = Intent(this, com.example.myapplication.ui.home.MainActivity::class.java).apply {
-                        putExtra("conversation_id", convId)
-                        putExtra("target_user_id", targetId)
-                        putExtra("user_name", userName)
+                    val bundle = android.os.Bundle().apply {
+                        putString("conversation_id", convId)
+                        putString("target_user_id", targetId)
+                        putString("user_name", userName)
+                        putBoolean("is_disabled", false)
                     }
-                    startActivity(intent)
-                    finish()
+                    findNavController().navigate(R.id.chatFragment, bundle)
                 }
             }
         )
 
-        binding.rvSearchResults.layoutManager = LinearLayoutManager(this)
+        binding.rvSearchResults.layoutManager = LinearLayoutManager(requireContext())
         binding.rvSearchResults.adapter = searchAdapter
 
         val performSearch = {

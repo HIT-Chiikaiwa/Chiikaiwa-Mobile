@@ -3,15 +3,17 @@ package com.example.myapplication.ui.home.chat
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import com.example.myapplication.R
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.myapplication.R
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.response.ConversationResponse
 import com.example.myapplication.data.repository.MessageRepository
@@ -21,7 +23,7 @@ import com.example.myapplication.databinding.DialogConfirmDeleteBinding
 import com.example.myapplication.databinding.DialogFriendOptionsBinding
 import com.example.myapplication.databinding.DialogUserInfoBinding
 import com.example.myapplication.databinding.LayoutFriendsMenuPopupBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.FriendsAdapter
 import com.example.myapplication.ui.profile.ProfileActivity
@@ -31,20 +33,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
+class FriendsListFragment : BaseFragment<FragmentFriendsListBinding>() {
 
-    override fun inflateBinding() = FragmentFriendsListBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentFriendsListBinding.inflate(inflater, container, false)
 
     private val conversationViewModel: ConversationViewModel by viewModels()
     private val friendRequestViewModel: FriendRequestViewModel by viewModels()
     private val blockUserViewModel: BlockUserViewModel by viewModels()
 
     private lateinit var adapter: FriendsAdapter
-    private val preferenceManager by lazy { PreferenceManager(this) }
+    private val preferenceManager by lazy { PreferenceManager(requireContext()) }
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.btnHeaderMenu.setOnClickListener { view ->
@@ -61,19 +64,19 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
                     conversation.lastMessage != null && conversation.lastMessage.senderId != currentUserId && !conversation.lastMessage.senderName.isNullOrEmpty() -> conversation.lastMessage.senderName
                     else -> "Người dùng"
                 }
-                val intent = Intent(this, com.example.myapplication.ui.home.MainActivity::class.java).apply {
-                    putExtra("conversation_id", conversation.id)
-                    putExtra("user_name", name)
-                    putExtra("is_disabled", isUserUnavailable)
+                val bundle = android.os.Bundle().apply {
+                    putString("conversation_id", conversation.id)
+                    putString("user_name", name)
+                    putBoolean("is_disabled", isUserUnavailable)
                 }
-                startActivity(intent)
+                findNavController().navigate(R.id.chatFragment, bundle)
             },
             onMoreClick = { conversation, _ ->
                 showFriendOptionsDialog(conversation)
             }
         )
 
-        binding.rvFriendsList.layoutManager = LinearLayoutManager(this)
+        binding.rvFriendsList.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFriendsList.adapter = adapter
 
         binding.etSearchFriends.addTextChangedListener(object : TextWatcher {
@@ -98,49 +101,49 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
 
         popupBinding.btnMenuNewChat.setOnClickListener {
             popupWindow.dismiss()
-            startActivity(Intent(this, SearchUserActivity::class.java))
+            findNavController().navigate(R.id.searchUserFragment)
         }
 
         popupBinding.btnMenuPendingRequests.setOnClickListener {
             popupWindow.dismiss()
-            startActivity(Intent(this, PendingRequestsActivity::class.java))
+            findNavController().navigate(R.id.pendingRequestsFragment)
         }
 
         popupWindow.showAsDropDown(anchorView, -150, 0)
     }
 
     private fun showFriendOptionsDialog(conversation: ConversationResponse) {
-        val dialog = AlertDialog.Builder(this).create()
-        val binding = DialogFriendOptionsBinding.inflate(layoutInflater)
-        dialog.setView(binding.root)
+        val dialog = AlertDialog.Builder(requireContext()).create()
+        val dialogBinding = DialogFriendOptionsBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
 
         val name = conversation.groupName ?: conversation.lastMessage?.senderName ?: "Người dùng"
 
-        binding.tvOptionPin.setOnClickListener {
+        dialogBinding.tvOptionPin.setOnClickListener {
             showToast("Tính năng đang được phát triển")
             dialog.dismiss()
         }
 
-        binding.tvOptionCreateGroup.setOnClickListener {
+        dialogBinding.tvOptionCreateGroup.setOnClickListener {
             showToast("Tính năng đang được phát triển")
             dialog.dismiss()
         }
 
-        binding.tvOptionViewProfile.setOnClickListener {
+        dialogBinding.tvOptionViewProfile.setOnClickListener {
             dialog.dismiss()
             fetchPartnerId(conversation) { partnerId ->
                 showUserInfoDialog(name, partnerId)
             }
         }
 
-        binding.tvOptionBlock.setOnClickListener {
+        dialogBinding.tvOptionBlock.setOnClickListener {
             dialog.dismiss()
             fetchPartnerId(conversation) { partnerId ->
                 showBlockConfirmDialog(partnerId, name)
             }
         }
 
-        binding.tvOptionDelete.setOnClickListener {
+        dialogBinding.tvOptionDelete.setOnClickListener {
             dialog.dismiss()
             fetchPartnerId(conversation) { partnerId ->
                 showUnfriendConfirmDialog(partnerId, name, conversation.id)
@@ -159,8 +162,8 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
             return
         }
 
-        val messageRepository = MessageRepository(this)
-        lifecycleScope.launch {
+        val messageRepository = MessageRepository(requireContext())
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = withContext(Dispatchers.IO) {
                     messageRepository.getMessages(conversation.id, page = 0, size = 20)
@@ -183,7 +186,7 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
     }
 
     private fun showUnfriendConfirmDialog(friendId: String, friendName: String, conversationId: String) {
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = DialogConfirmDeleteBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
@@ -206,7 +209,7 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
     }
 
     private fun showBlockConfirmDialog(userId: String, friendName: String) {
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = DialogConfirmDeleteBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
@@ -229,7 +232,7 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
     }
 
     private fun showUserInfoDialog(userName: String, userId: String? = null) {
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = DialogUserInfoBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
@@ -242,9 +245,9 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
         dialogBinding.tvOnlineStatus.visibility = View.GONE
 
         if (!userId.isNullOrEmpty()) {
-            val profileRepository = ProfileRepository(this)
+            val profileRepository = ProfileRepository(requireContext())
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 when (val result = profileRepository.getProfile(userId)) {
                     is Resource.Success -> {
                         val user = result.data.data
@@ -266,7 +269,7 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
                 }
             }
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 when (val result = profileRepository.getUserOnlineStatus(userId)) {
                     is Resource.Success -> {
                         val status = result.data.data
@@ -297,18 +300,18 @@ class FriendsListActivity : BaseActivity<FragmentFriendsListBinding>() {
         dialogBinding.btnAddFriend.text = "Nhắn tin"
         dialogBinding.btnAddFriend.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, com.example.myapplication.ui.home.MainActivity::class.java).apply {
-                putExtra("user_name", userName)
+            val bundle = android.os.Bundle().apply {
+                putString("user_name", userName)
                 if (!userId.isNullOrEmpty()) {
-                    putExtra("target_user_id", userId)
+                    putString("target_user_id", userId)
                 }
             }
-            startActivity(intent)
+            findNavController().navigate(R.id.chatFragment, bundle)
         }
 
         dialogBinding.btnViewProfile.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(this, ProfileActivity::class.java).apply {
+            val intent = Intent(requireContext(), ProfileActivity::class.java).apply {
                 if (!userId.isNullOrEmpty()) {
                     putExtra("target_user_id", userId)
                 }
