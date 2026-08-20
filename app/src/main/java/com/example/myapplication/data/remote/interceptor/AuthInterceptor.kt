@@ -7,7 +7,7 @@ import android.os.Looper
 import android.widget.Toast
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.network.NetworkConstants
-import com.example.myapplication.ui.auth.LoginActivity
+import com.example.myapplication.ui.auth.AuthActivity
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import okhttp3.Interceptor
@@ -70,7 +70,7 @@ class AuthInterceptor(
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(context, "Phiên đăng nhập đã hết hạn.", Toast.LENGTH_LONG).show()
                 }
-                val intent = Intent(context, LoginActivity::class.java).apply {
+                val intent = Intent(context, AuthActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
                 context.startActivity(intent)

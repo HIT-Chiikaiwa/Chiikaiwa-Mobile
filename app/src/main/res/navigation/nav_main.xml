@@ -1,6 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main">
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.myapplication.ui.profile.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile">
+        <argument
+            android:name="target_user_id"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_accountSettingsFragment"
+            app:destination="@id/accountSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.myapplication.ui.profile.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
+
+    <fragment
+        android:id="@+id/accountSettingsFragment"
+        android:name="com.example.myapplication.ui.profile.AccountSettingsFragment"
+        android:label="fragment_account_settings"
+        tools:layout="@layout/fragment_account_settings">
+        <action
+            android:id="@+id/action_accountSettingsFragment_to_registrationInfoFragment"
+            app:destination="@id/registrationInfoFragment" />
+        <action
+            android:id="@+id/action_accountSettingsFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
+        <action
+            android:id="@+id/action_accountSettingsFragment_to_notificationSettingsFragment"
+            app:destination="@id/notificationSettingsFragment" />
+        <action
+            android:id="@+id/action_accountSettingsFragment_to_blockedUsersFragment"
+            app:destination="@id/blockedUsersFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registrationInfoFragment"
+        android:name="com.example.myapplication.ui.profile.RegistrationInfoFragment"
+        android:label="fragment_registration_info"
+        tools:layout="@layout/fragment_registration_info" />
+
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.example.myapplication.ui.profile.ChangePasswordFragment"
+        android:label="fragment_change_password"
+        tools:layout="@layout/fragment_change_password" />
+
+    <fragment
+        android:id="@+id/notificationSettingsFragment"
+        android:name="com.example.myapplication.ui.profile.NotificationSettingsFragment"
+        android:label="fragment_notification_settings"
+        tools:layout="@layout/fragment_notification_settings" />
+
+    <fragment
+        android:id="@+id/blockedUsersFragment"
+        android:name="com.example.myapplication.ui.profile.BlockedUsersFragment"
+        android:label="fragment_blocked_users"
+        tools:layout="@layout/fragment_blocked_users" />
 
 </navigation>

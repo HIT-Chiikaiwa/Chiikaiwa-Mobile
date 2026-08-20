@@ -60,6 +60,7 @@
             android:name=".ui.profile.NotificationSettingsActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
+
         <activity
             android:name=".ui.profile.BlockedUsersActivity"
             android:windowSoftInputMode="adjustResize"

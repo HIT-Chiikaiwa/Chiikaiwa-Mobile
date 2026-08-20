@@ -1,13 +1,11 @@
 package com.example.myapplication.ui.profile
 
-import android.content.Intent
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.activity.viewModels
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
@@ -17,34 +15,31 @@ import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.FragmentEditProfileBinding
 import com.example.myapplication.databinding.DialogEditIntroductionBinding
 import com.example.myapplication.databinding.DialogEditPersonalInfoBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
+class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
 
-    override fun inflateBinding() = FragmentEditProfileBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentEditProfileBinding.inflate(inflater, container, false)
 
     private val viewModel: ProfileViewModel by viewModels()
     private var currentUserDto: UserDto? = null
 
-    private val pickAvatarLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
+    private val pickAvatarLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let { handleAvatarSelected(it) }
     }
 
     override fun initView() {
         binding.ivBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.imgEditAvatar.setOnClickListener {
@@ -57,7 +52,7 @@ class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
 
         binding.btnUpdateProfile.setOnClickListener {
             showToast("Đã lưu thay đổi hồ sơ")
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         val openEditInfoListener = {
@@ -70,17 +65,20 @@ class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
         }
         binding.tvIntroduction.setOnClickListener { openEditIntroListener() }
         binding.ivTogglePassword.setOnClickListener { openEditIntroListener() }
+
+        viewModel.loadProfile()
     }
 
     private fun openImagePicker() {
         pickAvatarLauncher.launch(
-            androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)
+            androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
         )
     }
 
     private fun handleAvatarSelected(uri: android.net.Uri) {
-        lifecycleScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
+                val contentResolver = requireContext().contentResolver
                 val inputStream = contentResolver.openInputStream(uri)
                 val originalBitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
@@ -100,7 +98,7 @@ class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
                     }
 
                     val resizedBitmap = android.graphics.Bitmap.createScaledBitmap(originalBitmap, scaledWidth, scaledHeight, true)
-                    val avatarFile = java.io.File(cacheDir, "avatar_compressed_${System.currentTimeMillis()}.jpg")
+                    val avatarFile = java.io.File(requireContext().cacheDir, "avatar_compressed_${System.currentTimeMillis()}.jpg")
                     val fileOutputStream = java.io.FileOutputStream(avatarFile)
                     resizedBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
                     fileOutputStream.flush()
@@ -198,7 +196,7 @@ class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
     }
 
     private fun showEditIntroductionDialog() {
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = DialogEditIntroductionBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
@@ -219,7 +217,7 @@ class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
     }
 
     private fun showEditPersonalInfoDialog() {
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = DialogEditPersonalInfoBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 
@@ -254,36 +252,36 @@ class EditProfileActivity : BaseActivity<FragmentEditProfileBinding>() {
             val phone = dialogBinding.etPhone.text.toString().trim()
             val email = currentUserDto?.email ?: ""
 
-            dialogBinding.tvErrorLastName.visibility = android.view.View.GONE
-            dialogBinding.tvErrorFirstName.visibility = android.view.View.GONE
-            dialogBinding.tvErrorDateOfBirth.visibility = android.view.View.GONE
-            dialogBinding.tvErrorUniversity.visibility = android.view.View.GONE
-            dialogBinding.tvErrorMajorName.visibility = android.view.View.GONE
+            dialogBinding.tvErrorLastName.visibility = View.GONE
+            dialogBinding.tvErrorFirstName.visibility = View.GONE
+            dialogBinding.tvErrorDateOfBirth.visibility = View.GONE
+            dialogBinding.tvErrorUniversity.visibility = View.GONE
+            dialogBinding.tvErrorMajorName.visibility = View.GONE
 
             var isValid = true
             if (lastName.isEmpty()) {
                 dialogBinding.tvErrorLastName.text = "Họ không được để trống"
-                dialogBinding.tvErrorLastName.visibility = android.view.View.VISIBLE
+                dialogBinding.tvErrorLastName.visibility = View.VISIBLE
                 isValid = false
             }
             if (firstName.isEmpty()) {
                 dialogBinding.tvErrorFirstName.text = "Tên không được để trống"
-                dialogBinding.tvErrorFirstName.visibility = android.view.View.VISIBLE
+                dialogBinding.tvErrorFirstName.visibility = View.VISIBLE
                 isValid = false
             }
             if (dob.isEmpty()) {
                 dialogBinding.tvErrorDateOfBirth.text = "Ngày sinh không được để trống"
-                dialogBinding.tvErrorDateOfBirth.visibility = android.view.View.VISIBLE
+                dialogBinding.tvErrorDateOfBirth.visibility = View.VISIBLE
                 isValid = false
             }
             if (university.isEmpty()) {
                 dialogBinding.tvErrorUniversity.text = "Trường học không được để trống"
-                dialogBinding.tvErrorUniversity.visibility = android.view.View.VISIBLE
+                dialogBinding.tvErrorUniversity.visibility = View.VISIBLE
                 isValid = false
             }
             if (majorName.isEmpty()) {
                 dialogBinding.tvErrorMajorName.text = "Ngành học không được để trống"
-                dialogBinding.tvErrorMajorName.visibility = android.view.View.VISIBLE
+                dialogBinding.tvErrorMajorName.visibility = View.VISIBLE
                 isValid = false
             }
 

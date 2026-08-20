@@ -1,21 +1,24 @@
 package com.example.myapplication.ui.profile
 
 import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentNotificationSettingsBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 
-class NotificationSettingsActivity : BaseActivity<FragmentNotificationSettingsBinding>() {
+class NotificationSettingsFragment : BaseFragment<FragmentNotificationSettingsBinding>() {
 
-    override fun inflateBinding() = FragmentNotificationSettingsBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentNotificationSettingsBinding.inflate(inflater, container, false)
 
     private val prefs by lazy {
-        getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
+        requireContext().getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
     }
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.switchSystemNotification.isChecked = prefs.getBoolean("system_notif", true)

@@ -1,28 +1,32 @@
 package com.example.myapplication.ui.profile
 
 import android.app.DatePickerDialog
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
+import com.example.myapplication.R
 import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.request.UpdatePersonalInfoRequest
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.FragmentRegistrationInfoBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import java.util.Calendar
 import java.util.Locale
 
-class RegistrationInfoActivity : BaseActivity<FragmentRegistrationInfoBinding>() {
+class RegistrationInfoFragment : BaseFragment<FragmentRegistrationInfoBinding>() {
 
-    override fun inflateBinding() = FragmentRegistrationInfoBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentRegistrationInfoBinding.inflate(inflater, container, false)
 
     private val viewModel: ProfileViewModel by viewModels()
     private var currentUserDto: UserDto? = null
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.etEmail.apply {
@@ -38,7 +42,7 @@ class RegistrationInfoActivity : BaseActivity<FragmentRegistrationInfoBinding>()
             isCursorVisible = false
         }
 
-        val savedEmail = PreferenceManager(this).getEmail()
+        val savedEmail = PreferenceManager(requireContext()).getEmail()
         if (!savedEmail.isNullOrEmpty()) {
             binding.etEmail.setText(savedEmail)
         }
@@ -54,12 +58,14 @@ class RegistrationInfoActivity : BaseActivity<FragmentRegistrationInfoBinding>()
         binding.btnSave.setOnClickListener {
             saveRegistrationInfo()
         }
+
+        viewModel.loadProfile()
     }
 
     private fun setupGenderSpinner() {
         val genders = listOf("Nam", "Nữ", "Khác")
-        val adapter = ArrayAdapter(this, com.example.myapplication.R.layout.item_spinner_selected, genders).apply {
-            setDropDownViewResource(com.example.myapplication.R.layout.item_spinner_dropdown)
+        val adapter = ArrayAdapter(requireContext(), R.layout.item_spinner_selected, genders).apply {
+            setDropDownViewResource(R.layout.item_spinner_dropdown)
         }
         binding.spinnerGender.adapter = adapter
     }
@@ -70,7 +76,7 @@ class RegistrationInfoActivity : BaseActivity<FragmentRegistrationInfoBinding>()
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        DatePickerDialog(this, { _, y, m, d ->
+        DatePickerDialog(requireContext(), { _, y, m, d ->
             val formattedDate = String.format(Locale.US, "%02d/%02d/%04d", d, m + 1, y)
             binding.etDateOfBirth.setText(formattedDate)
         }, year, month, day).show()
@@ -102,7 +108,7 @@ class RegistrationInfoActivity : BaseActivity<FragmentRegistrationInfoBinding>()
     }
 
     private fun bindUserData(user: UserDto) {
-        val savedEmail = PreferenceManager(this).getEmail()
+        val savedEmail = PreferenceManager(requireContext()).getEmail()
         val emailToDisplay = user.email.takeIf { !it.isNullOrEmpty() } ?: savedEmail ?: ""
         binding.etEmail.setText(emailToDisplay)
         binding.etId.setText(user.id)
@@ -149,7 +155,7 @@ class RegistrationInfoActivity : BaseActivity<FragmentRegistrationInfoBinding>()
         val formattedDob = convertDobToIso(rawDob)
 
         val phone = currentUserDto?.phone ?: ""
-        val savedEmail = PreferenceManager(this).getEmail()
+        val savedEmail = PreferenceManager(requireContext()).getEmail()
         val email = currentUserDto?.email.takeIf { !it.isNullOrEmpty() } ?: savedEmail ?: ""
 
         val request = UpdatePersonalInfoRequest(

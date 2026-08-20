@@ -11,15 +11,15 @@ import androidx.core.content.ContextCompat
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.request.ChangePasswordRequest
 import com.example.myapplication.data.remote.dto.response.UserDto
-import com.example.myapplication.databinding.ActivityAccountSettingsBinding
-import com.example.myapplication.ui.auth.LoginActivity
+import com.example.myapplication.databinding.FragmentAccountSettingsBinding
+import com.example.myapplication.ui.auth.AuthActivity
 import com.example.myapplication.ui.base.BaseActivity
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 
-class AccountSettingsActivity : BaseActivity<ActivityAccountSettingsBinding>() {
+class AccountSettingsActivity : BaseActivity<FragmentAccountSettingsBinding>() {
 
-    override fun inflateBinding() = ActivityAccountSettingsBinding.inflate(layoutInflater)
+    override fun inflateBinding() = FragmentAccountSettingsBinding.inflate(layoutInflater)
 
     private val viewModel: ProfileViewModel by viewModels()
     private var currentUser: UserDto? = null
@@ -41,10 +41,12 @@ class AccountSettingsActivity : BaseActivity<ActivityAccountSettingsBinding>() {
         }
 
         binding.cardChangePassword.setOnClickListener {
+            // TODO: Navigate to ChangePasswordFragment when AccountSettings is migrated to Fragment
             startActivity(Intent(this, ChangePasswordActivity::class.java))
         }
 
         binding.cardNotificationSettings.setOnClickListener {
+            // TODO: Navigate to NotificationSettingsFragment when AccountSettings is migrated to Fragment
             startActivity(Intent(this, NotificationSettingsActivity::class.java))
         }
 
@@ -82,7 +84,7 @@ class AccountSettingsActivity : BaseActivity<ActivityAccountSettingsBinding>() {
             when (event) {
                 is UiEvent.ShowToast -> showToast(event.message)
                 is UiEvent.NavigateHome -> {
-                    val intent = Intent(this, LoginActivity::class.java).apply {
+                    val intent = Intent(this, AuthActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
                     startActivity(intent)

@@ -4,44 +4,42 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RadioGroup
-import android.widget.ScrollView
-import android.widget.TextView
-import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.databinding.FragmentProfileBinding
 import com.example.myapplication.ui.auth.AuthActivity
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
+class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
-    override fun inflateBinding() = FragmentProfileBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentProfileBinding.inflate(inflater, container, false)
 
     private val viewModel: ProfileViewModel by viewModels()
     private var targetUserId: String? = null
     private var currentProfile: UserDto? = null
 
     override fun initView() {
-        targetUserId = intent.getStringExtra("target_user_id")
-            ?: intent.getStringExtra("targetUserId")
-            ?: intent.getStringExtra("userId")
-            ?: intent.getStringExtra("id")
+        // Receive target_user_id from Navigation arguments or Activity intent
+        targetUserId = arguments?.getString("target_user_id")
+            ?: requireActivity().intent.getStringExtra("target_user_id")
+            ?: requireActivity().intent.getStringExtra("targetUserId")
+            ?: requireActivity().intent.getStringExtra("userId")
+            ?: requireActivity().intent.getStringExtra("id")
+
         val isOtherUser = !targetUserId.isNullOrEmpty() && targetUserId != viewModel.getUserId()
 
         binding.ivBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.cvHonor.setOnClickListener {
@@ -60,18 +58,20 @@ class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
             binding.ivWoodBottomRight.visibility = View.VISIBLE
 
             binding.btnUpdateProfile.setOnClickListener {
-                startActivity(Intent(this, EditProfileActivity::class.java))
+                findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
             }
             binding.cvSettings.setOnClickListener {
-                startActivity(Intent(this, AccountSettingsActivity::class.java))
+                findNavController().navigate(R.id.action_profileFragment_to_accountSettingsFragment)
             }
             val openScheduleAction = View.OnClickListener {
-                startActivity(Intent(this, com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
+                startActivity(Intent(requireContext(), com.example.myapplication.ui.home.schedule.ScheduleActivity::class.java))
             }
             binding.cvAppointment.setOnClickListener(openScheduleAction)
             binding.layoutAppointmentInner.setOnClickListener(openScheduleAction)
             binding.tvAppointment.setOnClickListener(openScheduleAction)
         }
+
+        viewModel.loadProfile(targetUserId)
     }
 
     override fun onResume() {
@@ -113,11 +113,11 @@ class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
                     showToast(event.message)
                 }
                 is UiEvent.NavigateHome -> {
-                    val intent = Intent(this, AuthActivity::class.java).apply {
+                    val intent = Intent(requireContext(), AuthActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
                     startActivity(intent)
-                    finish()
+                    requireActivity().finish()
                 }
             }
         }
@@ -173,21 +173,21 @@ class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
     }
 
     private fun showSubjectManagementDialog(isOtherUser: Boolean = false) {
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
-        val binding = com.example.myapplication.databinding.DialogSubjectManagementBinding.inflate(layoutInflater)
-        dialog.setView(binding.root)
+        val dialog = AlertDialog.Builder(requireContext()).create()
+        val dialogBinding = com.example.myapplication.databinding.DialogSubjectManagementBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
 
-        binding.btnCancel.setOnClickListener {
+        dialogBinding.btnCancel.setOnClickListener {
             dialog.dismiss()
         }
 
         if (isOtherUser) {
-            binding.tvTitle.text = "Danh Sách Môn Học"
-            binding.btnAddSubject.visibility = View.GONE
+            dialogBinding.tvTitle.text = "Danh Sách Môn Học"
+            dialogBinding.btnAddSubject.visibility = View.GONE
         } else {
-            binding.tvTitle.text = "Quản Lý Môn Học"
-            binding.btnAddSubject.visibility = View.VISIBLE
-            binding.btnAddSubject.setOnClickListener {
+            dialogBinding.tvTitle.text = "Quản Lý Môn Học"
+            dialogBinding.btnAddSubject.visibility = View.VISIBLE
+            dialogBinding.btnAddSubject.setOnClickListener {
                 showAddSubjectDialog {
                     viewModel.loadSubjects()
                 }
@@ -195,11 +195,11 @@ class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
         }
 
         viewModel.subjects.observeState { subjectsList ->
-            binding.layoutStrengthSubjects.removeAllViews()
-            binding.layoutReviewSubjects.removeAllViews()
+            dialogBinding.layoutStrengthSubjects.removeAllViews()
+            dialogBinding.layoutReviewSubjects.removeAllViews()
 
             for (sub in subjectsList) {
-                val parent = if (sub.type == "STRENGTH") binding.layoutStrengthSubjects else binding.layoutReviewSubjects
+                val parent = if (sub.type == "STRENGTH") dialogBinding.layoutStrengthSubjects else dialogBinding.layoutReviewSubjects
                 val itemBinding = com.example.myapplication.databinding.ItemDialogSubjectBinding.inflate(layoutInflater, parent, false)
                 itemBinding.tvSubjectName.text = sub.name
                 if (isOtherUser) {
@@ -219,22 +219,22 @@ class ProfileActivity : BaseActivity<FragmentProfileBinding>() {
     }
 
     private fun showAddSubjectDialog(onSubjectAdded: () -> Unit) {
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(this).create()
-        val binding = com.example.myapplication.databinding.DialogAddSubjectBinding.inflate(layoutInflater)
-        dialog.setView(binding.root)
+        val dialog = AlertDialog.Builder(requireContext()).create()
+        val dialogBinding = com.example.myapplication.databinding.DialogAddSubjectBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
 
-        binding.btnCancelAdd.setOnClickListener {
+        dialogBinding.btnCancelAdd.setOnClickListener {
             dialog.dismiss()
         }
 
-        binding.btnConfirmAdd.setOnClickListener {
-            val name = binding.etSubjectName.text.toString().trim()
+        dialogBinding.btnConfirmAdd.setOnClickListener {
+            val name = dialogBinding.etSubjectName.text.toString().trim()
             if (name.isEmpty()) {
                 showToast("Vui lòng nhập tên môn học")
                 return@setOnClickListener
             }
 
-            val type = if (binding.rgSubjectType.checkedRadioButtonId == binding.rbStrength.id) "STRENGTH" else "NEED_REVIEW"
+            val type = if (dialogBinding.rgSubjectType.checkedRadioButtonId == dialogBinding.rbStrength.id) "STRENGTH" else "NEED_REVIEW"
             viewModel.addSubject(name, type)
             dialog.dismiss()
         }

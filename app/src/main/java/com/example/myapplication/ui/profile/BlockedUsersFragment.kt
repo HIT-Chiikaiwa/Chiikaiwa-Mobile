@@ -1,26 +1,29 @@
 package com.example.myapplication.ui.profile
 
+import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.viewModels
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.FragmentBlockedUsersBinding
 import com.example.myapplication.databinding.DialogConfirmDeleteBinding
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.BlockUserViewModel
 import com.example.myapplication.ui.home.chat.adapter.BlockedUsersAdapter
 
-class BlockedUsersActivity : BaseActivity<FragmentBlockedUsersBinding>() {
+class BlockedUsersFragment : BaseFragment<FragmentBlockedUsersBinding>() {
 
-    override fun inflateBinding() = FragmentBlockedUsersBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentBlockedUsersBinding.inflate(inflater, container, false)
 
     private val blockUserViewModel: BlockUserViewModel by viewModels()
     private lateinit var blockedAdapter: BlockedUsersAdapter
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         blockedAdapter = BlockedUsersAdapter(
@@ -31,7 +34,7 @@ class BlockedUsersActivity : BaseActivity<FragmentBlockedUsersBinding>() {
             }
         )
 
-        binding.rvBlockedUsers.layoutManager = LinearLayoutManager(this)
+        binding.rvBlockedUsers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBlockedUsers.adapter = blockedAdapter
 
         loadData()
@@ -53,7 +56,7 @@ class BlockedUsersActivity : BaseActivity<FragmentBlockedUsersBinding>() {
     }
 
     private fun showUnblockConfirmDialog(userId: String, name: String) {
-        val dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(requireContext()).create()
         val dialogBinding = DialogConfirmDeleteBinding.inflate(layoutInflater)
         dialog.setView(dialogBinding.root)
 

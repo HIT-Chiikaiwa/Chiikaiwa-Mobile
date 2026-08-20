@@ -1,28 +1,31 @@
 package com.example.myapplication.ui.profile
 
 import android.content.Intent
+import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.viewModels
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import com.example.myapplication.data.remote.dto.request.ChangePasswordRequest
 import com.example.myapplication.databinding.FragmentChangePasswordBinding
 import com.example.myapplication.ui.auth.AuthActivity
-import com.example.myapplication.ui.base.BaseActivity
+import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
 
-class ChangePasswordActivity : BaseActivity<FragmentChangePasswordBinding>() {
+class ChangePasswordFragment : BaseFragment<FragmentChangePasswordBinding>() {
 
-    override fun inflateBinding() = FragmentChangePasswordBinding.inflate(layoutInflater)
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentChangePasswordBinding.inflate(inflater, container, false)
 
     private val viewModel: ProfileViewModel by viewModels()
 
     override fun initView() {
         binding.btnBack.setOnClickListener {
-            finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.tvForgotPassword.setOnClickListener {
-            startActivity(Intent(this, AuthActivity::class.java))
+            startActivity(Intent(requireContext(), AuthActivity::class.java))
         }
 
         binding.btnOk.setOnClickListener {
@@ -66,7 +69,7 @@ class ChangePasswordActivity : BaseActivity<FragmentChangePasswordBinding>() {
                 is UiEvent.ShowToast -> {
                     showToast(event.message)
                     if (event.message.contains("thành công")) {
-                        finish()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     }
                 }
                 else -> {}
