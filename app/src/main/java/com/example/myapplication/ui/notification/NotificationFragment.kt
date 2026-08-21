@@ -14,7 +14,7 @@ import com.example.myapplication.data.remote.dto.response.NotificationDto
 import com.example.myapplication.databinding.FragmentNotificationBinding
 import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.ui.home.schedule.AppointmentReminderDialog
+import com.example.myapplication.ui.schedule.AppointmentReminderDialog
 import com.example.myapplication.utils.extension.observeState
 
 class NotificationFragment : BaseFragment<FragmentNotificationBinding>() {

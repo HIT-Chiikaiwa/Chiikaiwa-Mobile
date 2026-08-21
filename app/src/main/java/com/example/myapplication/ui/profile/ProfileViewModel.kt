@@ -8,7 +8,7 @@ import com.example.myapplication.data.local.PreferenceManager
 import com.example.myapplication.data.remote.dto.request.*
 import com.example.myapplication.data.remote.dto.response.UserDto
 import com.example.myapplication.data.remote.dto.response.SubjectDto
-import com.example.myapplication.data.repository.ProfileRepository
+import com.example.myapplication.data.repository.profile.ProfileRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState
@@ -20,7 +20,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     private val repository = ProfileRepository(application)
     private val preferenceManager = PreferenceManager(application)
 
-    private val bookingRepository = com.example.myapplication.data.repository.BookingRepository(application)
+    private val bookingRepository = com.example.myapplication.data.repository.schedule.BookingRepository(application)
     private val _subjects = MutableStateFlow<List<SubjectDto>>(emptyList())
     val subjects: StateFlow<List<SubjectDto>> get() = _subjects
 
@@ -229,7 +229,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         }
     }
 
-    private val authRepository = com.example.myapplication.data.repository.AuthRepository(application)
+    private val authRepository = com.example.myapplication.data.repository.auth.AuthRepository(application)
 
     fun logout() {
         val refreshToken = preferenceManager.getRefreshToken()

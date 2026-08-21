@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.remote.dto.request.RegisterRequest
-import com.example.myapplication.data.repository.AuthRepository
+import com.example.myapplication.data.repository.auth.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState

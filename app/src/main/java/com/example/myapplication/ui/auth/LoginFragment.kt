@@ -134,7 +134,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
                 UiEvent.NavigateHome -> {
                     startActivity(
-                        Intent(requireContext(), com.example.myapplication.ui.home.MainActivity::class.java)
+                        Intent(requireContext(), com.example.myapplication.ui.main.MainActivity::class.java)
                     )
                     requireActivity().finish()
                 }

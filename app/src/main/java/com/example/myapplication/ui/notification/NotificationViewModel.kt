@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.remote.dto.response.NotificationDto
-import com.example.myapplication.data.repository.NotificationRepository
+import com.example.myapplication.data.repository.notification.NotificationRepository
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.flow.MutableStateFlow

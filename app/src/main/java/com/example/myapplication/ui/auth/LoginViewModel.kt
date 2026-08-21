@@ -3,7 +3,7 @@ package com.example.myapplication.ui.auth
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.local.PreferenceManager
-import com.example.myapplication.data.repository.AuthRepository
+import com.example.myapplication.data.repository.auth.AuthRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiEvent
 import com.example.myapplication.ui.base.UiState

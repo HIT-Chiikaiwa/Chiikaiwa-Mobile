@@ -9,7 +9,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.myapplication.R
-import com.example.myapplication.ui.home.MainActivity
+import com.example.myapplication.ui.main.MainActivity
 import com.example.myapplication.utils.TimeUtils
 
 class AppointmentReminderReceiver : BroadcastReceiver() {

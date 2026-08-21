@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mapFragment"
-        android:name="com.example.myapplication.ui.home.map.MapFragment"
+        android:name="com.example.myapplication.ui.map.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map">
         <action
@@ -84,19 +84,19 @@
 
     <fragment
         android:id="@+id/notificationSettingsFragment"
-        android:name="com.example.myapplication.ui.profile.NotificationSettingsFragment"
+        android:name="com.example.myapplication.ui.notification.NotificationSettingsFragment"
         android:label="fragment_notification_settings"
         tools:layout="@layout/fragment_notification_settings" />
 
     <fragment
         android:id="@+id/blockedUsersFragment"
-        android:name="com.example.myapplication.ui.profile.BlockedUsersFragment"
+        android:name="com.example.myapplication.ui.friends.BlockedUsersFragment"
         android:label="fragment_blocked_users"
         tools:layout="@layout/fragment_blocked_users" />
 
     <fragment
         android:id="@+id/friendsListFragment"
-        android:name="com.example.myapplication.ui.home.chat.FriendsListFragment"
+        android:name="com.example.myapplication.ui.friends.FriendsListFragment"
         android:label="fragment_friends_list"
         tools:layout="@layout/fragment_friends_list">
         <action
@@ -112,7 +112,7 @@
 
     <fragment
         android:id="@+id/searchUserFragment"
-        android:name="com.example.myapplication.ui.home.chat.SearchUserFragment"
+        android:name="com.example.myapplication.ui.friends.SearchUserFragment"
         android:label="fragment_search_user"
         tools:layout="@layout/fragment_search_user">
         <action
@@ -122,13 +122,13 @@
 
     <fragment
         android:id="@+id/pendingRequestsFragment"
-        android:name="com.example.myapplication.ui.home.chat.PendingRequestsFragment"
+        android:name="com.example.myapplication.ui.friends.PendingRequestsFragment"
         android:label="fragment_pending_requests"
         tools:layout="@layout/fragment_pending_requests" />
 
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.myapplication.ui.home.chat.chatroom.ChatFragment"
+        android:name="com.example.myapplication.ui.chat.ChatFragment"
         android:label="fragment_chat"
         tools:layout="@layout/fragment_chat">
         <argument
@@ -182,7 +182,7 @@
 
     <fragment
         android:id="@+id/scheduleFragment"
-        android:name="com.example.myapplication.ui.home.schedule.ScheduleFragment"
+        android:name="com.example.myapplication.ui.schedule.ScheduleFragment"
         android:label="fragment_schedule"
         tools:layout="@layout/fragment_schedule">
         <argument
@@ -193,7 +193,7 @@
 
     <fragment
         android:id="@+id/createAppointmentFragment"
-        android:name="com.example.myapplication.ui.home.schedule.CreateAppointmentFragment"
+        android:name="com.example.myapplication.ui.schedule.CreateAppointmentFragment"
         android:label="fragment_create_appointment"
         tools:layout="@layout/fragment_create_appointment">
         <argument

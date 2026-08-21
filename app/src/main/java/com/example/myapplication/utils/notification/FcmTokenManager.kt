@@ -3,7 +3,7 @@ package com.example.myapplication.utils.notification
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.example.myapplication.data.repository.NotificationRepository
+import com.example.myapplication.data.repository.notification.NotificationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
