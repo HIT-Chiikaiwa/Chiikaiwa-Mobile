@@ -2,8 +2,6 @@ package com.example.myapplication.ui.home.chat.chatroom
 
 import android.content.Context
 import com.example.myapplication.R
-
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -145,10 +143,10 @@ class ChatFragment : Fragment() {
             }
         }
         if (idToOpen.isNotEmpty()) {
-            val intent = Intent(requireContext(), com.example.myapplication.ui.profile.ProfileActivity::class.java).apply {
-                putExtra("target_user_id", idToOpen)
+            val bundle = Bundle().apply {
+                putString("target_user_id", idToOpen)
             }
-            startActivity(intent)
+            findNavController().navigate(R.id.profileFragment, bundle)
         }
     }
 

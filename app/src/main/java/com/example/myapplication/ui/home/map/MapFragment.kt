@@ -19,8 +19,6 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentMapBinding
 import com.example.myapplication.ui.base.UiState
-import com.example.myapplication.ui.home.chat.FriendsListActivity
-import com.example.myapplication.ui.profile.ProfileActivity
 import com.example.myapplication.utils.extension.observeState
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory

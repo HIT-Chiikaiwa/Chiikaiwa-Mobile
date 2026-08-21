@@ -36,47 +36,7 @@
             android:name=".ui.auth.AuthActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
-        <activity
-            android:name=".ui.profile.ProfileActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.EditProfileActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.AccountSettingsActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.RegistrationInfoActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.ChangePasswordActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.profile.NotificationSettingsActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
 
-        <activity
-            android:name=".ui.profile.BlockedUsersActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.home.chat.FriendsListActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.home.chat.PendingRequestsActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-        <activity
-            android:name=".ui.home.chat.SearchUserActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
 
         <receiver
             android:name=".utils.notification.AppointmentReminderReceiver"

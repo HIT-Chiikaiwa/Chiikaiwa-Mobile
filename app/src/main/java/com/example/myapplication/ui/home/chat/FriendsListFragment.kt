@@ -26,7 +26,6 @@ import com.example.myapplication.databinding.LayoutFriendsMenuPopupBinding
 import com.example.myapplication.ui.base.BaseFragment
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.ui.home.chat.adapter.FriendsAdapter
-import com.example.myapplication.ui.profile.ProfileActivity
 import com.example.myapplication.utils.TimeUtils
 import com.example.myapplication.utils.resource.Resource
 import kotlinx.coroutines.Dispatchers
@@ -311,12 +310,12 @@ class FriendsListFragment : BaseFragment<FragmentFriendsListBinding>() {
 
         dialogBinding.btnViewProfile.setOnClickListener {
             dialog.dismiss()
-            val intent = Intent(requireContext(), ProfileActivity::class.java).apply {
+            val bundle = android.os.Bundle().apply {
                 if (!userId.isNullOrEmpty()) {
-                    putExtra("target_user_id", userId)
+                    putString("target_user_id", userId)
                 }
             }
-            startActivity(intent)
+            findNavController().navigate(R.id.profileFragment, bundle)
         }
 
         dialog.show()

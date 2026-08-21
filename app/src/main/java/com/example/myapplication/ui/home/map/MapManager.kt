@@ -1,7 +1,7 @@
 package com.example.myapplication.ui.home.map
 
-import android.content.Intent
 import android.graphics.Bitmap
+import androidx.navigation.fragment.findNavController
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -344,10 +344,10 @@ class MapManager(
 
             binding.btnViewProfile.setOnClickListener {
                 dialog.dismiss()
-                val intent = Intent(context, com.example.myapplication.ui.profile.ProfileActivity::class.java).apply {
-                    putExtra("target_user_id", userId)
+                val bundle = android.os.Bundle().apply {
+                    putString("target_user_id", userId)
                 }
-                context.startActivity(intent)
+                fragment.findNavController().navigate(R.id.profileFragment, bundle)
             }
         }
 
