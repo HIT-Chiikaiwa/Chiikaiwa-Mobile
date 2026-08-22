@@ -166,6 +166,7 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
 
         binding.tvSchool.text = "Trường học: ${user.university ?: "Chưa cập nhật"}"
         binding.tvMajor.text = "Ngành học: ${user.majorName ?: "Chưa cập nhật"}"
+        binding.tvLocation.text = "Địa điểm: ${user.location ?: "Chưa cập nhật"}"
 
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(this)
@@ -227,6 +228,7 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
         dialogBinding.etUniversity.setText(currentUserDto?.university ?: "")
         dialogBinding.etMajorName.setText(currentUserDto?.majorName ?: "")
         dialogBinding.etPhone.setText(currentUserDto?.phone ?: "")
+        dialogBinding.etLocation.setText(currentUserDto?.location ?: "")
 
         when (currentUserDto?.gender) {
             "MALE" -> dialogBinding.rbMale.isChecked = true
@@ -250,6 +252,7 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
             val university = dialogBinding.etUniversity.text.toString().trim()
             val majorName = dialogBinding.etMajorName.text.toString().trim()
             val phone = dialogBinding.etPhone.text.toString().trim()
+            val location = dialogBinding.etLocation.text.toString().trim()
             val email = currentUserDto?.email ?: ""
 
             dialogBinding.tvErrorLastName.visibility = View.GONE
@@ -299,7 +302,8 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding>() {
                 academicRequest = UpdateAcademicInfoRequest(
                     university = university,
                     majorName = majorName
-                )
+                ),
+                location = location
             )
 
             dialog.dismiss()

@@ -61,6 +61,12 @@ interface ApiService {
         @Body request: UpdateAcademicInfoRequest
     ): Response<BaseResponse<UserDto>>
 
+    @PUT("api/v1/profile/{userId}/location")
+    suspend fun updateProfileLocation(
+        @Path("userId") userId: String,
+        @Body request: UpdateProfileLocationRequest
+    ): Response<BaseResponse<UserDto>>
+
     @Multipart
     @POST("api/v1/profile/{userId}/avatar")
     suspend fun uploadAvatar(

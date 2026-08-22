@@ -68,6 +68,10 @@ class ProfileRepository(context: Context) : BaseRepository() {
         return safeApiCall { api.updateAcademicInfo(userId, request) }
     }
 
+    suspend fun updateProfileLocation(userId: String, request: UpdateProfileLocationRequest): Resource<BaseResponse<UserDto>> {
+        return safeApiCall { api.updateProfileLocation(userId, request) }
+    }
+
     suspend fun getUserOnlineStatus(userId: String): Resource<BaseResponse<OnlineStatusDto>> {
         return safeApiCall { api.getUserOnlineStatus(userId) }
     }

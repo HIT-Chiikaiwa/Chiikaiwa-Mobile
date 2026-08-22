@@ -242,6 +242,28 @@
             android:textColorHint="@color/hint"
             android:textSize="@dimen/_12ssp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Địa điểm:"
+            android:textColor="@color/brown"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etLocation"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:background="@drawable/bg_edittext"
+            android:hint="Nhập địa điểm"
+            android:inputType="text"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:textColor="@color/brown"
+            android:textColorHint="@color/hint"
+            android:textSize="@dimen/_12ssp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

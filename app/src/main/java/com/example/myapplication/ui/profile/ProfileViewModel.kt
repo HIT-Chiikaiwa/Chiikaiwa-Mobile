@@ -290,7 +290,24 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
         }
     }
 
-    fun updateFullProfileInfo(personalRequest: UpdatePersonalInfoRequest, academicRequest: UpdateAcademicInfoRequest) {
+    fun updateProfileLocation(location: String) {
+        val userId = getUserId() ?: return
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            when (val result = repository.updateProfileLocation(userId, UpdateProfileLocationRequest(location))) {
+                is Resource.Success -> {
+                    _uiState.value = UiState.Success(result.data.data)
+                    _event.emit(UiEvent.ShowToast("Cập nhật địa điểm thành công"))
+                }
+                is Resource.Error -> {
+                    _uiState.value = UiState.Error(result.message)
+                    _event.emit(UiEvent.ShowToast("Lỗi cập nhật địa điểm: ${result.message}"))
+                }
+            }
+        }
+    }
+
+    fun updateFullProfileInfo(personalRequest: UpdatePersonalInfoRequest, academicRequest: UpdateAcademicInfoRequest, location: String) {
         val userId = getUserId() ?: return
         viewModelScope.launch {
             _uiState.value = UiState.Loading
@@ -308,8 +325,15 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                 return@launch
             }
 
-            if (academicResult is Resource.Success) {
-                _uiState.value = UiState.Success(academicResult.data.data)
+            val locationResult = repository.updateProfileLocation(userId, UpdateProfileLocationRequest(location))
+            if (locationResult is Resource.Error) {
+                _uiState.value = UiState.Error(locationResult.message)
+                _event.emit(UiEvent.ShowToast("Lỗi cập nhật địa điểm: ${locationResult.message}"))
+                return@launch
+            }
+
+            if (locationResult is Resource.Success) {
+                _uiState.value = UiState.Success(locationResult.data.data)
                 _event.emit(UiEvent.ShowToast("Cập nhật thông tin thành công"))
             }
         }

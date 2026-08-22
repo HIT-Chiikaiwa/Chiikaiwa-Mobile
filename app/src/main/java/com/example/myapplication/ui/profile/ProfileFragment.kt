@@ -143,6 +143,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
         binding.tvSchool.text = "Trường học: ${user.university ?: "Chưa cập nhật"}"
         binding.tvMajor.text = "Ngành học: ${user.majorName ?: "Chưa cập nhật"}"
+        binding.tvLocation.text = "Địa điểm: ${user.location ?: "Chưa cập nhật"}"
 
         if (!user.avatar.isNullOrEmpty()) {
             Glide.with(this)
