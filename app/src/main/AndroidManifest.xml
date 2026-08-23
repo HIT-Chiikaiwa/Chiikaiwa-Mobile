@@ -23,7 +23,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.MyApplication">
         <activity
-            android:name=".ui.home.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>

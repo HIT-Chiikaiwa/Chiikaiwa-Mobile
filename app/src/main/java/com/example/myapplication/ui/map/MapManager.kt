@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.maplibre.geojson.Point
+import com.example.myapplication.data.remote.network.NetworkConstants
 
 class MapManager(
     private val fragment: MapFragment,
@@ -40,14 +41,7 @@ class MapManager(
     private val profileRepository by lazy { com.example.myapplication.data.repository.profile.ProfileRepository(context) }
 
     fun setup() {
-        val vietnamBounds = LatLngBounds.Builder()
-            .include(LatLng(8.0, 102.0))
-            .include(LatLng(24.0, 109.460833))
-            .build()
-        map.setLatLngBoundsForCameraTarget(vietnamBounds)
-        map.setMinZoomPreference(5.0)
-
-        map.setStyle("https://tiles.openfreemap.org/styles/liberty") { style ->
+        map.setStyle(NetworkConstants.AWS_MAP_STYLE_URL) { style ->
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_marker)?.let { bitmap ->
                 val scaledChicken = Bitmap.createScaledBitmap(bitmap, markerSize, markerSize, false)
@@ -283,7 +277,6 @@ class MapManager(
                         }
                     }
                     is com.example.myapplication.utils.resource.Resource.Error -> {
-                        // Keep hidden
                     }
                 }
             }
