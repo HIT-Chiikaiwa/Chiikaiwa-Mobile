@@ -49,7 +49,7 @@ class MapManager(
             }
 
             BitmapFactory.decodeResource(context.resources, R.drawable.ic_launcher_foreground)?.let { bitmap ->
-                val defaultUserMarker = createMarkerBitmapFromLayout(bitmap)
+                val defaultUserMarker = createMarkerBitmapDirectly(bitmap)
                 style.addImage("my_marker", defaultUserMarker)
             }
 
@@ -82,7 +82,7 @@ class MapManager(
                     val imageId = "avatar_$userId"
                     if (style.getImage(imageId) == null) {
                         val avatarMarker = avatarBitmapCache.getOrPut(userId) {
-                            createMarkerBitmapFromLayout(bitmap)
+                            createMarkerBitmapDirectly(bitmap)
                         }
                         style.addImage(imageId, avatarMarker)
                         needsUpdate = true
@@ -151,41 +151,44 @@ class MapManager(
         source.setGeoJson(FeatureCollection.fromFeatures(listOf(Feature.fromGeometry(Point.fromLngLat(longitude, latitude)))))
     }
 
-    private fun createMarkerBitmapFromLayout(srcBitmap: Bitmap): Bitmap {
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_avatar, null)
-        val ivAvatar = view.findViewById<android.widget.ImageView>(R.id.ivAvatar)
-        
-        val roundedBitmap = getRoundedCornerBitmap(srcBitmap, 24f)
-        ivAvatar.setImageBitmap(roundedBitmap)
-
-        view.measure(
-            View.MeasureSpec.makeMeasureSpec(markerSize, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(markerSize, View.MeasureSpec.EXACTLY)
-        )
-        view.layout(0, 0, markerSize, markerSize)
-
+    private fun createMarkerBitmapDirectly(srcBitmap: Bitmap): Bitmap {
         val output = Bitmap.createBitmap(markerSize, markerSize, Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(output)
-        view.draw(canvas)
-        return output
-    }
 
-    private fun getRoundedCornerBitmap(bitmap: Bitmap, pixels: Float): Bitmap {
-        val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-        val canvas = android.graphics.Canvas(output)
-        val color = -0xbdbdbe
-        val paint = android.graphics.Paint()
-        val rect = android.graphics.Rect(0, 0, bitmap.width, bitmap.height)
-        val rectF = android.graphics.RectF(rect)
-        val roundPx = pixels
+        val bgPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.parseColor("#FCE740")
+            style = android.graphics.Paint.Style.FILL
+        }
+        val bgRect = android.graphics.RectF(0f, 0f, markerSize.toFloat(), markerSize.toFloat())
+        val bgRadius = context.resources.getDimension(com.intuit.sdp.R.dimen._8sdp)
+        canvas.drawRoundRect(bgRect, bgRadius, bgRadius, bgPaint)
 
-        paint.isAntiAlias = true
-        canvas.drawARGB(0, 0, 0, 0)
-        paint.color = color
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
+        val padding = context.resources.getDimension(com.intuit.sdp.R.dimen._3sdp)
+        val innerRect = android.graphics.RectF(padding, padding, markerSize.toFloat() - padding, markerSize.toFloat() - padding)
+        val innerRadius = context.resources.getDimension(com.intuit.sdp.R.dimen._6sdp)
 
-        paint.xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(bitmap, rect, rect, paint)
+        val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+
+        val avatarShader = android.graphics.BitmapShader(
+            srcBitmap,
+            android.graphics.Shader.TileMode.CLAMP,
+            android.graphics.Shader.TileMode.CLAMP
+        )
+
+        val matrix = android.graphics.Matrix()
+        val scaleX = innerRect.width() / srcBitmap.width
+        val scaleY = innerRect.height() / srcBitmap.height
+        val scale = Math.max(scaleX, scaleY)
+
+        val dx = innerRect.left + (innerRect.width() - srcBitmap.width * scale) / 2f
+        val dy = innerRect.top + (innerRect.height() - srcBitmap.height * scale) / 2f
+
+        matrix.setScale(scale, scale)
+        matrix.postTranslate(dx, dy)
+        avatarShader.setLocalMatrix(matrix)
+
+        paint.shader = avatarShader
+        canvas.drawRoundRect(innerRect, innerRadius, innerRadius, paint)
 
         return output
     }

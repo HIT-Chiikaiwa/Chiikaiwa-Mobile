@@ -11,7 +11,7 @@ import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
 
 class ConversationRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun getConversations(
         page: Int = 0,

@@ -10,7 +10,7 @@ import com.example.myapplication.utils.resource.Resource
 import okhttp3.MultipartBody
 
 class MessageRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun getMessages(
         conversationId: String,

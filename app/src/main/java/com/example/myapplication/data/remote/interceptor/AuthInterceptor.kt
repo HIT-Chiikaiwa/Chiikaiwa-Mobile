@@ -66,6 +66,7 @@ class AuthInterceptor(
                     }
                 }
 
+                com.example.myapplication.data.remote.websocket.WebSocketManager.disconnect()
                 preferenceManager.logout()
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(context, "Phiên đăng nhập đã hết hạn.", Toast.LENGTH_LONG).show()

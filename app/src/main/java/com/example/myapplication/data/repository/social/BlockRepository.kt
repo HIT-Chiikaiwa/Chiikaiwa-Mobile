@@ -7,7 +7,7 @@ import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
 
 class BlockRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun blockUser(userId: String): Resource<BaseResponse<CommonResponse>> {
         return safeApiCall { api.blockUser(userId) }

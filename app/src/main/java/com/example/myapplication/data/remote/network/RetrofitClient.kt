@@ -12,7 +12,16 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    fun create(context: Context): ApiService {
+    @Volatile
+    private var apiService: ApiService? = null
+
+    fun getApiService(context: Context): ApiService {
+        return apiService ?: synchronized(this) {
+            apiService ?: create(context.applicationContext).also { apiService = it }
+        }
+    }
+
+    private fun create(context: Context): ApiService {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }

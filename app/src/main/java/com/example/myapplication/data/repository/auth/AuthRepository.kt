@@ -12,7 +12,7 @@ import com.example.myapplication.utils.resource.Resource
 import com.example.myapplication.data.remote.api.ApiService
 
 class AuthRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun login(email: String, password: String): Resource<LoginResponse> {
         return safeApiCall {

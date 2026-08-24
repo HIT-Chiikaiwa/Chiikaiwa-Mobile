@@ -16,7 +16,7 @@ import okhttp3.MultipartBody
 import com.example.myapplication.data.remote.api.ApiService
 
 class ProfileRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun getCurrentUser(): Resource<BaseResponse<UserDto>> {
         return safeApiCall { api.getCurrentUser() }

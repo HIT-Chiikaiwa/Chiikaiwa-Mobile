@@ -7,7 +7,7 @@ import com.example.myapplication.data.remote.network.RetrofitClient
 import com.example.myapplication.utils.resource.Resource
 
 class FriendRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun searchUsers(keyword: String): Resource<BaseResponse<List<UserSearchDto>>> {
         return safeApiCall { api.searchUsers(keyword) }

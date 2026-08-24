@@ -15,7 +15,7 @@ import com.example.myapplication.utils.resource.Resource
 import com.example.myapplication.data.remote.dto.request.ScheduleInviteRequest
 
 class BookingRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun createBookingInConversation(
         conversationId: String,

@@ -232,6 +232,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     private val authRepository = com.example.myapplication.data.repository.auth.AuthRepository(application)
 
     fun logout() {
+        com.example.myapplication.data.remote.websocket.WebSocketManager.disconnect()
         val refreshToken = preferenceManager.getRefreshToken()
         viewModelScope.launch {
             if (!refreshToken.isNullOrEmpty()) {

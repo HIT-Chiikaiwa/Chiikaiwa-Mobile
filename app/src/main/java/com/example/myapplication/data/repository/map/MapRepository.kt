@@ -9,7 +9,7 @@ import com.example.myapplication.utils.resource.Resource
 import com.example.myapplication.data.remote.api.ApiService
 
 class MapRepository(context: Context) : BaseRepository() {
-    private val api = RetrofitClient.create(context)
+    private val api = RetrofitClient.getApiService(context)
 
     suspend fun updateLocation(lat: Double, lng: Double): Resource<BaseResponse<com.example.myapplication.data.remote.dto.response.CommonResponse>> {
         return safeApiCall { api.updateLocation(com.example.myapplication.data.remote.dto.request.UpdateLocationRequest(lat, lng)) }

@@ -61,9 +61,9 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
                 is Resource.Success -> {
                     val remoteUsers = result.data?.data ?: emptyList()
                     val filtered = withContext(Dispatchers.Default) {
-                        val distanceResults = FloatArray(1)
                         remoteUsers.mapNotNull { user ->
                             try {
+                                val distanceResults = FloatArray(1)
                                 Location.distanceBetween(lat, lng, user.latitude, user.longitude, distanceResults)
                                 val dist = distanceResults[0] / 1000.0
                                 if (dist <= radiusKm) user.copy(distanceKm = dist) else null
@@ -108,29 +108,32 @@ class MapViewModel(application: Application) : BaseViewModel<List<NearbyUserResp
         if (newUsersToFetch.isEmpty()) return
 
         viewModelScope.launch(Dispatchers.IO) {
-            val newlyLoaded = mutableMapOf<String, Bitmap>()
-            for (user in newUsersToFetch) {
-                try {
-                    val url = user.avatar ?: continue
-                    val bitmap = if (url.startsWith("http://") || url.startsWith("https://")) {
-                        com.bumptech.glide.Glide.with(context)
-                            .asBitmap()
-                            .load(url)
-                            .submit()
-                            .get()
-                    } else {
-                        val resId = context.resources.getIdentifier(url, "drawable", context.packageName)
-                        if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
+            val newlyLoaded = ConcurrentHashMap<String, Bitmap>()
+            val jobs = newUsersToFetch.map { user ->
+                launch {
+                    try {
+                        val url = user.avatar ?: return@launch
+                        val bitmap = if (url.startsWith("http://") || url.startsWith("https://")) {
+                            com.bumptech.glide.Glide.with(context)
+                                .asBitmap()
+                                .load(url)
+                                .submit()
+                                .get()
+                        } else {
+                            val resId = context.resources.getIdentifier(url, "drawable", context.packageName)
+                            if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
+                        }
+                        if (bitmap != null) {
+                            newlyLoaded[user.userId] = bitmap
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    } finally {
+                        fetchingUserIds.remove(user.userId)
                     }
-                    if (bitmap != null) {
-                        newlyLoaded[user.userId] = bitmap
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    fetchingUserIds.remove(user.userId)
                 }
             }
+            jobs.forEach { it.join() }
 
             if (newlyLoaded.isNotEmpty()) {
                 withContext(Dispatchers.Main) {
