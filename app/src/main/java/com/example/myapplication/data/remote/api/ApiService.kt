@@ -171,6 +171,23 @@ interface ApiService {
         @Path("msgId") msgId: String
     ): Response<BaseResponse<Any>>
 
+    @POST("api/v1/chat/messages/{msgId}/reply")
+    suspend fun replyToMessage(
+        @Path("msgId") msgId: String,
+        @Query("content") content: String
+    ): Response<BaseResponse<MessageResponse>>
+
+    @POST("api/v1/chat/messages/{msgId}/reactions")
+    suspend fun addReaction(
+        @Path("msgId") msgId: String,
+        @Query("emoji") emoji: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
+    @DELETE("api/v1/chat/messages/{msgId}/reactions")
+    suspend fun removeReaction(
+        @Path("msgId") msgId: String
+    ): Response<BaseResponse<ActionStatusDto>>
+
     @Multipart
     @POST("api/v1/chat/conversations/{id}/upload")
     suspend fun uploadImage(

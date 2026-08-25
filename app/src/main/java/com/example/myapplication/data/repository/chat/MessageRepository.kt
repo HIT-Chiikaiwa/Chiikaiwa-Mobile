@@ -2,6 +2,7 @@ package com.example.myapplication.data.repository.chat
 import com.example.myapplication.data.repository.BaseRepository
 
 import android.content.Context
+import com.example.myapplication.data.remote.dto.response.ActionStatusDto
 import com.example.myapplication.data.remote.dto.response.BaseResponse
 import com.example.myapplication.data.remote.dto.response.MessageResponse
 import com.example.myapplication.data.remote.dto.response.PageResponse
@@ -44,5 +45,25 @@ class MessageRepository(context: Context) : BaseRepository() {
 
     suspend fun deleteMessage(messageId: String): Resource<BaseResponse<Any>> = safeApiCall {
         api.deleteMessage(messageId)
+    }
+
+    suspend fun replyToMessage(
+        messageId: String,
+        content: String
+    ): Resource<BaseResponse<MessageResponse>> = safeApiCall {
+        api.replyToMessage(messageId, content)
+    }
+
+    suspend fun addReaction(
+        messageId: String,
+        emoji: String
+    ): Resource<BaseResponse<ActionStatusDto>> = safeApiCall {
+        api.addReaction(messageId, emoji)
+    }
+
+    suspend fun removeReaction(
+        messageId: String
+    ): Resource<BaseResponse<ActionStatusDto>> = safeApiCall {
+        api.removeReaction(messageId)
     }
 }
