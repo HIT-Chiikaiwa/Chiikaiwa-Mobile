@@ -58,6 +58,44 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
             content.trimEnd(',', ';', ' ', '"', '\'')
         } else content
 
+        val replyToObj = if (data.has("replyToMessage") && data.get("replyToMessage")?.isJsonObject == true) {
+            data.getAsJsonObject("replyToMessage")
+        } else null
+
+        val replyTo = replyToObj?.let {
+            com.example.myapplication.data.model.ReplyMessage(
+                id = it.get("id").asStringOrNull(),
+                senderName = it.get("senderName").asStringOrNull(),
+                content = it.get("content").asStringOrNull(),
+                messageType = it.get("messageType").asStringOrNull()
+            )
+        }
+
+        val reactionsList = mutableListOf<com.example.myapplication.data.model.Reaction>()
+        if (data.has("reactions") && data.get("reactions")?.isJsonArray == true) {
+            val arr = data.getAsJsonArray("reactions")
+            for (elem in arr) {
+                if (elem.isJsonObject) {
+                    val obj = elem.asJsonObject
+                    val emoji = obj.get("emoji").asStringOrNull()
+                    val count = obj.get("count")?.takeIf { !it.isJsonNull }?.asInt ?: 0
+                    val userIds = mutableListOf<String>()
+                    if (obj.has("userIds") && obj.get("userIds")?.isJsonArray == true) {
+                        obj.getAsJsonArray("userIds").forEach { el ->
+                            el.asStringOrNull()?.let { userIds.add(it) }
+                        }
+                    }
+                    val userNames = mutableListOf<String>()
+                    if (obj.has("userNames") && obj.get("userNames")?.isJsonArray == true) {
+                        obj.getAsJsonArray("userNames").forEach { el ->
+                            el.asStringOrNull()?.let { userNames.add(it) }
+                        }
+                    }
+                    reactionsList.add(com.example.myapplication.data.model.Reaction(emoji = emoji, count = count, userIds = userIds, userNames = userNames))
+                }
+            }
+        }
+
         return Message(
             id = msgId,
             conversationId = convId,
@@ -67,7 +105,9 @@ class ChatMessageParser(private val gson: Gson = Gson()) {
             status = MessageStatus.SENT,
             createdAt = if (rawCreatedDate.isNotEmpty()) rawCreatedDate else "Vừa xong",
             updatedAt = "",
-            isRecalled = false
+            isRecalled = false,
+            replyToMessage = replyTo,
+            reactions = reactionsList
         )
     }
 

@@ -10,5 +10,21 @@ data class Message(
     val createdAt: String = "",
     val updatedAt: String = "",
     val isRecalled: Boolean = false,
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
+    val replyToMessage: ReplyMessage? = null,
+    val reactions: List<Reaction> = emptyList()
+)
+
+data class ReplyMessage(
+    val id: String?,
+    val senderName: String?,
+    val content: String?,
+    val messageType: String?
+)
+
+data class Reaction(
+    val emoji: String?,
+    val count: Int?,
+    val userIds: List<String> = emptyList(),
+    val userNames: List<String> = emptyList()
 )

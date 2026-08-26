@@ -12,7 +12,9 @@ class IncomingTextViewHolder(
     private val binding: ItemChatIncomingBinding,
     private val onMessageLongClick: (View, Message) -> Unit,
     private val partnerName: String = "",
-    private val onAvatarClick: ((String) -> Unit)? = null
+    private val onAvatarClick: ((String) -> Unit)? = null,
+    private val onReactionClick: ((Message, String) -> Unit)? = null,
+    private val currentUserId: String = ""
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: Message) {
@@ -46,9 +48,75 @@ class IncomingTextViewHolder(
             }
         }
 
-        binding.root.setOnLongClickListener {
-            onMessageLongClick(binding.tvMessageContent, message)
+        if (message.replyToMessage != null && !message.isRecalled) {
+            binding.layoutReplyInBubble.visibility = View.VISIBLE
+            binding.tvReplySender.text = message.replyToMessage.senderName ?: "Người dùng"
+            binding.tvReplyContent.text = message.replyToMessage.content ?: ""
+        } else {
+            binding.layoutReplyInBubble.visibility = View.GONE
+        }
+
+        bindReactions(binding.layoutReactions, message.reactions, message)
+
+        binding.layoutMessageBubble.setOnLongClickListener {
+            onMessageLongClick(binding.layoutMessageBubble, message)
             true
+        }
+    }
+
+    private fun bindReactions(
+        layoutReactions: android.widget.LinearLayout,
+        reactions: List<com.example.myapplication.data.model.Reaction>,
+        message: Message
+    ) {
+        layoutReactions.removeAllViews()
+        val context = layoutReactions.context
+        if (reactions.isEmpty()) {
+            layoutReactions.visibility = View.GONE
+            return
+        }
+        layoutReactions.visibility = View.VISIBLE
+
+        for (reaction in reactions) {
+            if (reaction.count == null || reaction.count <= 0) continue
+
+            val hasUserReacted = reaction.userIds.contains(currentUserId)
+
+            val textView = android.widget.TextView(context).apply {
+                text = "${reaction.emoji} ${reaction.count}"
+                textSize = 10f 
+                setTextColor(context.getColor(R.color.brown))
+
+                val drawable = android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = 20f
+                    if (hasUserReacted) {
+                        setColor(0x308D6E63) 
+                        setStroke(1, 0xFF8D6E63.toInt()) 
+                    } else {
+                        setColor(0x10000000)
+                        setStroke(1, 0x20000000)
+                    }
+                }
+                background = drawable
+                val padHorizontal = (8 * context.resources.displayMetrics.density).toInt()
+                val padVertical = (4 * context.resources.displayMetrics.density).toInt()
+                setPadding(padHorizontal, padVertical, padHorizontal, padVertical)
+                
+                val params = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, (6 * context.resources.displayMetrics.density).toInt(), 0)
+                }
+                layoutParams = params
+                
+                setOnClickListener {
+                    reaction.emoji?.let { emoji ->
+                        onReactionClick?.invoke(message, emoji)
+                    }
+                }
+            }
+            layoutReactions.addView(textView)
         }
     }
 }

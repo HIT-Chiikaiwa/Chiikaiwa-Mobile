@@ -15,7 +15,9 @@ class ReactionPopup(
     private val context: Context,
     private val currentUserId: String,
     private val onRecallClick: (Message) -> Unit,
-    private val onDeleteClick: (Message) -> Unit
+    private val onDeleteClick: (Message) -> Unit,
+    private val onReplyClick: (Message) -> Unit,
+    private val onReactionClick: (Message, String) -> Unit
 ) {
 
     fun show(anchorView: View, message: Message) {
@@ -31,17 +33,34 @@ class ReactionPopup(
             elevation = 20f
         }
 
+        val emojiClickHelper = { emoji: String ->
+            onReactionClick(message, emoji)
+            popupWindow.dismiss()
+        }
+        binding.tvEmojiLike.setOnClickListener { emojiClickHelper("👍") }
+        binding.tvEmojiHeart.setOnClickListener { emojiClickHelper("❤️") }
+        binding.tvEmojiLaugh.setOnClickListener { emojiClickHelper("😂") }
+        binding.tvEmojiWow.setOnClickListener { emojiClickHelper("😮") }
+        binding.tvEmojiSad.setOnClickListener { emojiClickHelper("😢") }
+        binding.tvEmojiPray.setOnClickListener { emojiClickHelper("🙏") }
+
+        binding.tvReply.setOnClickListener {
+            onReplyClick(message)
+            popupWindow.dismiss()
+        }
+
         val isMyMessage = message.sender.id == currentUserId
         if (isMyMessage && !message.isRecalled) {
             binding.tvRecall.visibility = View.VISIBLE
             binding.divider.visibility = View.VISIBLE
-            binding.tvRecall.setOnClickListener {
-                onRecallClick(message)
-                popupWindow.dismiss()
-            }
         } else {
             binding.tvRecall.visibility = View.GONE
             binding.divider.visibility = View.GONE
+        }
+
+        binding.tvRecall.setOnClickListener {
+            onRecallClick(message)
+            popupWindow.dismiss()
         }
 
         binding.tvDelete.setOnClickListener {

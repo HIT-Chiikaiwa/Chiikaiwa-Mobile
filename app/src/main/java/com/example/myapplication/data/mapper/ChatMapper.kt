@@ -35,6 +35,24 @@ object ChatMapper {
             avatar = dto.senderAvatar
         )
 
+        val replyTo = dto.replyToMessage?.let {
+            ReplyMessage(
+                id = it.id,
+                senderName = it.senderName,
+                content = it.content,
+                messageType = it.messageType
+            )
+        }
+
+        val reactionsList = dto.reactions?.map {
+            Reaction(
+                emoji = it.emoji,
+                count = it.count,
+                userIds = it.userIds ?: emptyList(),
+                userNames = it.userNames ?: emptyList()
+            )
+        } ?: emptyList()
+
         return Message(
             id = dto.id,
             conversationId = dto.conversationId ?: "",
@@ -44,7 +62,9 @@ object ChatMapper {
             status = MessageStatus.SENT,
             createdAt = dto.createdDate ?: "",
             updatedAt = dto.createdDate ?: "",
-            isRecalled = dto.isRecalled
+            isRecalled = dto.isRecalled,
+            replyToMessage = replyTo,
+            reactions = reactionsList
         )
     }
 }

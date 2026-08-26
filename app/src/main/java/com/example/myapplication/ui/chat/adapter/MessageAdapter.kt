@@ -25,7 +25,8 @@ class MessageAdapter(
     private val partnerName: String = "",
     private val onMessageLongClick: (View, Message) -> Unit,
     private val onBookingAction: ((String, String) -> Unit)? = null,
-    private val onAvatarClick: ((String) -> Unit)? = null
+    private val onAvatarClick: ((String) -> Unit)? = null,
+    private val onReactionClick: ((Message, String) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val messages = mutableListOf<Message>()
@@ -67,11 +68,11 @@ class MessageAdapter(
         return when (viewType) {
             TYPE_OUTGOING_TEXT -> {
                 val binding = ItemChatOutgoingBinding.inflate(inflater, parent, false)
-                OutgoingTextViewHolder(binding, onMessageLongClick, partnerName)
+                OutgoingTextViewHolder(binding, onMessageLongClick, partnerName, onReactionClick, currentUserId)
             }
             TYPE_INCOMING_TEXT -> {
                 val binding = ItemChatIncomingBinding.inflate(inflater, parent, false)
-                IncomingTextViewHolder(binding, onMessageLongClick, partnerName, onAvatarClick)
+                IncomingTextViewHolder(binding, onMessageLongClick, partnerName, onAvatarClick, onReactionClick, currentUserId)
             }
             TYPE_OUTGOING_IMAGE -> {
                 val binding = ItemChatImageOutgoingBinding.inflate(inflater, parent, false)
@@ -91,7 +92,7 @@ class MessageAdapter(
             }
             else -> {
                 val binding = ItemChatIncomingBinding.inflate(inflater, parent, false)
-                IncomingTextViewHolder(binding, onMessageLongClick, partnerName, onAvatarClick)
+                IncomingTextViewHolder(binding, onMessageLongClick, partnerName, onAvatarClick, onReactionClick, currentUserId)
             }
         }
     }

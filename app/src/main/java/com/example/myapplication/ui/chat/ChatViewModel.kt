@@ -50,6 +50,9 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
     private val _isChatDisabled = MutableStateFlow(false)
     val isChatDisabled: StateFlow<Boolean> = _isChatDisabled.asStateFlow()
 
+    private val _replyingToMessage = MutableStateFlow<Message?>(null)
+    val replyingToMessage: StateFlow<Message?> = _replyingToMessage.asStateFlow()
+
     val currentUserId: String = preferenceManager.getUserId() ?: ""
     private var activeConversationId: String = ""
     private var currentTargetUserId: String = ""
@@ -387,6 +390,68 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         updatedAt = "",
         isRecalled = false
     )
+
+    fun setReplyingTo(message: Message?) {
+        _replyingToMessage.value = message
+    }
+
+    fun sendTextMessage(content: String) {
+        val replyMsg = _replyingToMessage.value
+        if (replyMsg != null) {
+            replyToMessage(replyMsg.id, content)
+        } else {
+            sendRealtimeMessage(currentTargetUserId, content)
+        }
+    }
+
+    fun replyToMessage(messageId: String, content: String) {
+        if (_isChatDisabled.value) {
+            viewModelScope.launch {
+                _event.emit(UiEvent.ShowToast("Không thể trả lời vì hai người không còn là bạn bè"))
+            }
+            return
+        }
+        if (content.isBlank()) return
+        val trimmed = content.trim()
+
+        viewModelScope.launch {
+            when (val result = messageRepository.replyToMessage(messageId, trimmed)) {
+                is Resource.Success -> {
+                    _replyingToMessage.value = null
+                    val newMsg = ChatMapper.toDomain(result.data.data)
+                    addOrReplaceMessage(newMsg)
+                    updateState()
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast("Gửi trả lời thất bại: ${result.message}"))
+                }
+            }
+        }
+    }
+
+    fun toggleReaction(messageId: String, emoji: String) {
+        viewModelScope.launch {
+            val message = _messages.find { it.id == messageId }
+            val alreadyReacted = message?.reactions?.any { r ->
+                r.emoji == emoji && r.userIds.contains(currentUserId)
+            } ?: false
+
+            val result = if (alreadyReacted) {
+                messageRepository.removeReaction(messageId)
+            } else {
+                messageRepository.addReaction(messageId, emoji)
+            }
+
+            when (result) {
+                is Resource.Success -> {
+                    fetchMessages(activeConversationId)
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast("Thao tác cảm xúc thất bại: ${result.message}"))
+                }
+            }
+        }
+    }
 
     fun updateBookingMessageRating(bookingId: String, score: Int) {
         if (bookingManager.updateBookingMessageRating(_messages, bookingId, score)) {

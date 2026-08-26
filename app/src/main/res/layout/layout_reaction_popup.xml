@@ -8,6 +8,111 @@
     android:orientation="vertical"
     android:padding="@dimen/_6sdp">
 
+    <LinearLayout
+        android:id="@+id/layoutEmojiRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/_4sdp"
+        android:paddingHorizontal="@dimen/_8sdp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvEmojiLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="👍"
+            android:textSize="@dimen/_20ssp"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tvEmojiHeart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="❤️"
+            android:textSize="@dimen/_20ssp"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tvEmojiLaugh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="😂"
+            android:textSize="@dimen/_20ssp"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tvEmojiWow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="😮"
+            android:textSize="@dimen/_20ssp"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tvEmojiSad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="😢"
+            android:textSize="@dimen/_20ssp"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tvEmojiPray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🙏"
+            android:textSize="@dimen/_20ssp"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/emojiDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/_2sdp"
+        android:background="@color/context_menu_divider" />
+
+    <TextView
+        android:id="@+id/tvReply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_8sdp"
+        android:text="Trả lời"
+        android:textColor="@color/brown"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <View
+        android:id="@+id/replyDividerPopup"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/_2sdp"
+        android:background="@color/context_menu_divider" />
+
     <TextView
         android:id="@+id/tvRecall"
         android:layout_width="match_parent"
@@ -18,7 +123,10 @@
         android:text="Thu hồi tin nhắn"
         android:textColor="@color/brown"
         android:textSize="@dimen/_14ssp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true" />
 
     <View
         android:id="@+id/divider"
@@ -37,6 +145,9 @@
         android:text="Xóa phía tôi"
         android:textColor="@color/brown"
         android:textSize="@dimen/_14ssp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true" />
 
 </LinearLayout>

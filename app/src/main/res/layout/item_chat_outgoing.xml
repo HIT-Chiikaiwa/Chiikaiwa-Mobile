@@ -32,21 +32,87 @@
         </androidx.cardview.widget.CardView>
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/tvMessageContent"
+    <LinearLayout
+        android:id="@+id/layoutMessageBubble"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_30sdp"
         android:layout_marginEnd="@dimen/_8sdp"
         android:background="@drawable/bg_date_tag"
+        android:orientation="vertical"
         android:padding="@dimen/_12sdp"
-        android:textColor="@color/white"
-        android:textSize="@dimen/_12ssp"
         app:layout_constraintEnd_toStartOf="@id/layoutAvatar"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Xin chào." />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/layoutReplyInBubble"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#25FFFFFF"
+            android:padding="@dimen/_6sdp"
+            android:layout_marginBottom="@dimen/_4sdp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <View
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@color/white" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/_6sdp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvReplySender"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/_10ssp"
+                    tools:text="Nam Phong" />
+
+                <TextView
+                    android:id="@+id/tvReplyContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#E0E0E0"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="@dimen/_9ssp"
+                    tools:text="Hello, how are you?" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvMessageContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12ssp"
+            tools:text="Xin chào." />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutReactions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/layoutAvatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutMessageBubble"
+        tools:visibility="visible">
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvTime"
@@ -57,7 +123,7 @@
         android:textColor="@color/hint"
         android:textSize="@dimen/_9ssp"
         app:layout_constraintEnd_toStartOf="@id/layoutAvatar"
-        app:layout_constraintTop_toBottomOf="@id/tvMessageContent"
+        app:layout_constraintTop_toBottomOf="@id/layoutReactions"
         tools:text="Vừa xong" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

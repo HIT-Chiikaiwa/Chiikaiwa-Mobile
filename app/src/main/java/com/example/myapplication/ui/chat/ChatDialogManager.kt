@@ -63,7 +63,9 @@ object ChatDialogManager {
             context = context,
             currentUserId = currentUserId,
             onRecallClick = { msg -> viewModel.recallMessage(msg.id) },
-            onDeleteClick = { msg -> viewModel.deleteMessage(msg.id) }
+            onDeleteClick = { msg -> viewModel.deleteMessage(msg.id) },
+            onReplyClick = { msg -> viewModel.setReplyingTo(msg) },
+            onReactionClick = { msg, emoji -> viewModel.toggleReaction(msg.id, emoji) }
         )
         popup.show(anchorView, message)
     }

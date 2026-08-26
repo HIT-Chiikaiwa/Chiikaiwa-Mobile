@@ -170,6 +170,9 @@ class ChatFragment : Fragment() {
             },
             onAvatarClick = { senderId ->
                 openPartnerProfile(senderId)
+            },
+            onReactionClick = { message, emoji ->
+                viewModel.toggleReaction(message.id, emoji)
             }
         )
         val layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -220,6 +223,10 @@ class ChatFragment : Fragment() {
         binding.btnFolder.setOnClickListener {
             Toast.makeText(requireContext(), "Tính năng đang được phát triển", Toast.LENGTH_SHORT).show()
         }
+
+        binding.btnCancelReply.setOnClickListener {
+            viewModel.setReplyingTo(null)
+        }
     }
 
     private fun handleImageSelected(uri: Uri) {
@@ -269,8 +276,7 @@ class ChatFragment : Fragment() {
     private fun sendMessage() {
         val text = binding.etMessage.text.toString().trim()
         if (text.isNotEmpty()) {
-            val destinationId = if (targetUserId.isNotEmpty()) targetUserId else conversationId
-            viewModel.sendRealtimeMessage(destinationId, text)
+            viewModel.sendTextMessage(text)
             binding.etMessage.setText("")
             scrollHelper.scrollToBottom(delayMs = 50)
         }
@@ -309,6 +315,25 @@ class ChatFragment : Fragment() {
                     viewModel.isChatDisabled.collect { isDisabled ->
                         if (isDisabled) {
                             disableMessagingInput()
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.replyingToMessage.collect { message ->
+                        if (message != null) {
+                            binding.layoutReplyPreview.visibility = View.VISIBLE
+                            binding.replyDivider.visibility = View.VISIBLE
+                            binding.tvReplySenderName.text = "Đang trả lời ${message.sender.fullName}"
+                            val displayContent = if (message.isRecalled) {
+                                "Tin nhắn đã được thu hồi"
+                            } else {
+                                message.content
+                            }
+                            binding.tvReplyMessageContent.text = displayContent
+                        } else {
+                            binding.layoutReplyPreview.visibility = View.GONE
+                            binding.replyDivider.visibility = View.GONE
                         }
                     }
                 }
