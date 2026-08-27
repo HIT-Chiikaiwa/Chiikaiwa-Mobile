@@ -128,7 +128,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                 is Resource.Success -> {
                     val user = result.data.data
                     _uiState.value = UiState.Success(user)
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Cập nhật trạng thái Buddy thành công")) }
+                    _event.emit(UiEvent.ShowToast("Cập nhật trạng thái Buddy thành công"))
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
@@ -144,8 +144,8 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
             when (val result = repository.deleteAccount(userId)) {
                 is Resource.Success -> {
                     preferenceManager.logout()
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Xoá tài khoản thành công")) }
-                    viewModelScope.launch { _event.emit(UiEvent.NavigateHome) }
+                    _event.emit(UiEvent.ShowToast("Xoá tài khoản thành công"))
+                    _event.emit(UiEvent.NavigateHome)
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error(result.message)
@@ -162,7 +162,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                     _subjects.value = result.data.data ?: emptyList()
                 }
                 is Resource.Error -> {
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Không thể tải danh sách môn học: ${result.message}")) }
+                    _event.emit(UiEvent.ShowToast("Không thể tải danh sách môn học: ${result.message}"))
                 }
             }
         }
@@ -171,20 +171,20 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
     fun addSubject(name: String, type: String) {
         val userId = getUserId() ?: return
         if (name.isBlank()) {
-            viewModelScope.launch { _event.emit(UiEvent.ShowToast("Tên môn học không được để trống")) }
+            viewModelScope.launch { _event.emit(UiEvent.ShowToast("Tên môn học không được để trống")) }
             return
         }
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             when (val result = repository.addSubject(userId, AddSubjectRequest(name, type))) {
                 is Resource.Success -> {
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Thêm môn học thành công")) }
+                    _event.emit(UiEvent.ShowToast("Thêm môn học thành công"))
                     loadSubjects()
                     loadProfile()
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Idle
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Lỗi: ${result.message}")) }
+                    _event.emit(UiEvent.ShowToast("Lỗi: ${result.message}"))
                 }
             }
         }
@@ -196,13 +196,13 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
             _uiState.value = UiState.Loading
             when (val result = repository.deleteSubject(userId, subjectId)) {
                 is Resource.Success -> {
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Xoá môn học thành công")) }
+                    _event.emit(UiEvent.ShowToast("Xoá môn học thành công"))
                     loadSubjects()
                     loadProfile()
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Idle
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Lỗi: ${result.message}")) }
+                    _event.emit(UiEvent.ShowToast("Lỗi: ${result.message}"))
                 }
             }
         }
@@ -220,7 +220,7 @@ class ProfileViewModel(application: Application) : BaseViewModel<UserDto>(applic
                     } else {
                         _uiState.value = UiState.Idle
                     }
-                    viewModelScope.launch { _event.emit(UiEvent.ShowToast("Đổi mật khẩu thành công")) }
+                    _event.emit(UiEvent.ShowToast("Đổi mật khẩu thành công"))
                 }
                 is Resource.Error -> {
                     _uiState.value = UiState.Error("Đổi mật khẩu thất bại: ${result.message}")

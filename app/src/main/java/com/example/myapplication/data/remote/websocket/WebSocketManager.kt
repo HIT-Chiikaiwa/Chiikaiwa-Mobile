@@ -1,5 +1,7 @@
 package com.example.myapplication.data.remote.websocket
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -8,6 +10,7 @@ object WebSocketManager : SocketListener {
     private val stompManager = StompManager()
     private val _messageFlow = MutableSharedFlow<Pair<String, String>>(extraBufferCapacity = 64)
     val messageFlow: SharedFlow<Pair<String, String>> = _messageFlow
+    private val gson = Gson()
 
     private var activeUserId: String = ""
     private var activeConversationId: String = ""
@@ -49,18 +52,29 @@ object WebSocketManager : SocketListener {
     }
 
     fun sendMessage(conversationId: String, content: String, type: String = "TEXT", senderId: String = activeUserId) {
-        val jsonPayload = """{"conversationId":"$conversationId","senderId":"$senderId","content":"$content","type":"$type","messageType":"$type"}"""
-        stompManager.send("/app/chat.send", jsonPayload)
+        val payload = JsonObject().apply {
+            addProperty("conversationId", conversationId)
+            addProperty("senderId", senderId)
+            addProperty("content", content)
+            addProperty("type", type)
+            addProperty("messageType", type)
+        }
+        stompManager.send("/app/chat.send", gson.toJson(payload))
     }
 
     fun sendReadReceipt(conversationId: String) {
-        val jsonPayload = """{"conversationId":"$conversationId"}"""
-        stompManager.send("/app/chat.read", jsonPayload)
+        val payload = JsonObject().apply {
+            addProperty("conversationId", conversationId)
+        }
+        stompManager.send("/app/chat.read", gson.toJson(payload))
     }
 
     fun sendTypingSignal(conversationId: String, isTyping: Boolean) {
-        val jsonPayload = """{"conversationId":"$conversationId","isTyping":$isTyping}"""
-        stompManager.send("/app/chat.typing", jsonPayload)
+        val payload = JsonObject().apply {
+            addProperty("conversationId", conversationId)
+            addProperty("isTyping", isTyping)
+        }
+        stompManager.send("/app/chat.typing", gson.toJson(payload))
     }
 
     override fun onConnected() {
@@ -77,4 +91,4 @@ object WebSocketManager : SocketListener {
     override fun onMessageReceived(destination: String, body: String) {
         _messageFlow.tryEmit(Pair(destination, body))
     }
-}
+}

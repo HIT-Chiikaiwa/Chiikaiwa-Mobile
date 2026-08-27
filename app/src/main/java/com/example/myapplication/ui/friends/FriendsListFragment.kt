@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.friends
 
-import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater

@@ -22,14 +22,19 @@ object RetrofitClient {
     }
 
     private fun create(context: Context): ApiService {
+        val isDebug = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (isDebug) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
 
         val client = OkHttpClient.Builder()
-            .connectTimeout(120, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
-            .writeTimeout(120, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(logging)
             .addInterceptor(AuthInterceptor(PreferenceManager(context), context))
             .build()
@@ -41,4 +46,4 @@ object RetrofitClient {
             .build()
             .create(ApiService::class.java)
     }
-}
+}

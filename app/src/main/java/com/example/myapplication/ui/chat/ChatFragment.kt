@@ -205,10 +205,10 @@ class ChatFragment : Fragment() {
         binding.btnCreateSchedule.setOnClickListener {
             findNavController().navigate(
                 R.id.action_chatFragment_to_createAppointmentFragment,
-                androidx.core.os.bundleOf(
-                    "conversation_id" to conversationId,
-                    "target_user_name" to userName
-                )
+                Bundle().apply {
+                    putString("conversation_id", conversationId)
+                    putString("target_user_name", userName)
+                }
             )
         }
 
@@ -239,16 +239,20 @@ class ChatFragment : Fragment() {
                 }
                 if (bitmap != null) {
                     val maxDimension = 1280
-                    val scaledBitmap = if (bitmap.width > maxDimension || bitmap.height > maxDimension) {
+                    val needsScaling = bitmap.width > maxDimension || bitmap.height > maxDimension
+                    val scaledBitmap = if (needsScaling) {
                         val ratio = Math.min(maxDimension.toFloat() / bitmap.width, maxDimension.toFloat() / bitmap.height)
                         val width = Math.round(ratio * bitmap.width)
                         val height = Math.round(ratio * bitmap.height)
-                        android.graphics.Bitmap.createScaledBitmap(bitmap, width, height, true)
+                        val scaled = android.graphics.Bitmap.createScaledBitmap(bitmap, width, height, true)
+                        bitmap.recycle()
+                        scaled
                     } else bitmap
 
                     tempFile.outputStream().use { output ->
                         scaledBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, output)
                     }
+                    scaledBitmap.recycle()
                 } else {
                     context.contentResolver.openInputStream(uri)?.use { input ->
                         tempFile.outputStream().use { output ->
@@ -265,6 +269,8 @@ class ChatFragment : Fragment() {
                     viewModel.sendImageMessage(part, tempFile.absolutePath)
                     scrollHelper.scrollToBottom(delayMs = 100)
                 }
+
+                tempFile.delete()
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Lỗi chọn ảnh: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()

@@ -13,7 +13,6 @@ import com.example.myapplication.utils.resource.Resource
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.MultipartBody
-import com.example.myapplication.data.remote.api.ApiService
 
 class ProfileRepository(context: Context) : BaseRepository() {
     private val api = RetrofitClient.getApiService(context)

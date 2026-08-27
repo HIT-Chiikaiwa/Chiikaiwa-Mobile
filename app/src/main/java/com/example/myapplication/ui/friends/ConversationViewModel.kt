@@ -11,16 +11,22 @@ import com.example.myapplication.data.repository.chat.MessageRepository
 import com.example.myapplication.ui.base.BaseViewModel
 import com.example.myapplication.ui.base.UiState
 import com.example.myapplication.utils.resource.Resource
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ConversationViewModel(application: Application) : BaseViewModel<List<ConversationResponse>>(application) {
 
     private val conversationRepository = ConversationRepository(application)
     private val blockRepository = BlockRepository(application)
+    private val messageRepository = MessageRepository(application)
     private val preferenceManager = PreferenceManager(application)
     private val socketService = WebSocketManager
 
     private val partnerIdCache = mutableMapOf<String, String>()
+    @Volatile
+    private var isResolving = false
+    private var searchJob: Job? = null
 
     init {
         initWebSocket()
@@ -97,19 +103,24 @@ class ConversationViewModel(application: Application) : BaseViewModel<List<Conve
             return
         }
 
+        if (isResolving) return
+        isResolving = true
+
         viewModelScope.launch {
-            val messageRepository = MessageRepository(getApplication())
-            val result = messageRepository.getMessages(conv.id, page = 0, size = 20)
-            if (result is Resource.Success) {
-                val messages = result.data.data.content
-                val partnerId = messages.firstOrNull { it.senderId != currentUserId }?.senderId
-                if (!partnerId.isNullOrEmpty()) {
-                    partnerIdCache[conv.id] = partnerId
-                    if (blockedIds.contains(partnerId)) {
-                        // Re-fetch to apply updated filter, but guard against infinite recursion
-                        fetchConversations()
+            try {
+                val result = messageRepository.getMessages(conv.id, page = 0, size = 20)
+                if (result is Resource.Success) {
+                    val messages = result.data.data.content
+                    val partnerId = messages.firstOrNull { it.senderId != currentUserId }?.senderId
+                    if (!partnerId.isNullOrEmpty()) {
+                        partnerIdCache[conv.id] = partnerId
+                        if (blockedIds.contains(partnerId)) {
+                            fetchConversations()
+                        }
                     }
                 }
+            } finally {
+                isResolving = false
             }
         }
     }
@@ -135,11 +146,13 @@ class ConversationViewModel(application: Application) : BaseViewModel<List<Conve
     }
 
     fun searchConversations(keyword: String) {
+        searchJob?.cancel()
         if (keyword.isBlank()) {
             fetchConversations()
             return
         }
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
+            delay(300)
             when (val result = conversationRepository.searchConversations(keyword)) {
                 is Resource.Success -> {
                     val list = result.data?.data?.content ?: emptyList()
@@ -152,3 +165,4 @@ class ConversationViewModel(application: Application) : BaseViewModel<List<Conve
         }
     }
 }
+

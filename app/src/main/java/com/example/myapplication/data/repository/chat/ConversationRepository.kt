@@ -2,7 +2,6 @@ package com.example.myapplication.data.repository.chat
 import com.example.myapplication.data.repository.BaseRepository
 
 import android.content.Context
-import com.example.myapplication.data.remote.dto.request.CreateGroupRequest
 import com.example.myapplication.data.remote.dto.request.DirectChatRequest
 import com.example.myapplication.data.remote.dto.response.BaseResponse
 import com.example.myapplication.data.remote.dto.response.ConversationResponse

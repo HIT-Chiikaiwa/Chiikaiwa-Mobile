@@ -52,7 +52,7 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
     }
 
     protected open fun initSystemBarsPadding() {
-        androidx.core.view .ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val statusBarTop = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars()).top
             view.setPadding(
                 view.paddingLeft,
