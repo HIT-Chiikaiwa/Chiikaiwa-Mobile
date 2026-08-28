@@ -52,7 +52,8 @@ object ChatDialogManager {
         currentUserId: String,
         viewModel: ChatViewModel,
         bookingViewModel: BookingViewModel,
-        conversationId: String
+        conversationId: String,
+        onForwardClick: (Message) -> Unit
     ) {
         if (anchorView.id == com.example.myapplication.R.id.btnViewDetail) {
             showBookingDetailDialog(context, message, bookingViewModel, viewModel, conversationId)
@@ -65,6 +66,7 @@ object ChatDialogManager {
             onRecallClick = { msg -> viewModel.recallMessage(msg.id) },
             onDeleteClick = { msg -> viewModel.deleteMessage(msg.id) },
             onReplyClick = { msg -> viewModel.setReplyingTo(msg) },
+            onForwardClick = onForwardClick,
             onReactionClick = { msg, emoji -> viewModel.toggleReaction(msg.id, emoji) }
         )
         popup.show(anchorView, message)

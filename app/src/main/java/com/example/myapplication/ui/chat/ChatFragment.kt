@@ -2,6 +2,8 @@ package com.example.myapplication.ui.chat
 
 import android.content.Context
 import com.example.myapplication.R
+import com.example.myapplication.data.model.Message
+import com.example.myapplication.ui.friends.ConversationViewModel
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -162,7 +164,8 @@ class ChatFragment : Fragment() {
                     currentUserId = viewModel.currentUserId,
                     viewModel = viewModel,
                     bookingViewModel = bookingViewModel,
-                    conversationId = conversationId
+                    conversationId = conversationId,
+                    onForwardClick = { msg -> showForwardDialog(msg) }
                 )
             },
             onBookingAction = { bookingId, action ->
@@ -417,6 +420,106 @@ class ChatFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED)
+    }
+
+    private fun showForwardDialog(message: Message) {
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext()).create()
+        val dialogBinding = com.example.myapplication.databinding.DialogForwardSelectBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        val forwardAdapter = ForwardConversationsAdapter(viewModel.currentUserId) { selectedConv ->
+            viewModel.forwardMessage(message.id, selectedConv.id)
+            dialog.dismiss()
+        }
+
+        dialogBinding.rvConversations.layoutManager = LinearLayoutManager(requireContext())
+        dialogBinding.rvConversations.adapter = forwardAdapter
+
+        val conversationViewModel = ViewModelProvider(this)[ConversationViewModel::class.java]
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                conversationViewModel.uiState.collect { state ->
+                    if (state is UiState.Success) {
+                        forwardAdapter.submitList(state.data)
+                    }
+                }
+            }
+        }
+
+        dialogBinding.etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                conversationViewModel.searchConversations(s?.toString() ?: "")
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    }
+
+    private class ForwardConversationsAdapter(
+        private val currentUserId: String,
+        private val onItemClick: (com.example.myapplication.data.remote.dto.response.ConversationResponse) -> Unit
+    ) : androidx.recyclerview.widget.RecyclerView.Adapter<ForwardConversationsAdapter.ViewHolder>() {
+
+        private var items = emptyList<com.example.myapplication.data.remote.dto.response.ConversationResponse>()
+
+        fun submitList(newItems: List<com.example.myapplication.data.remote.dto.response.ConversationResponse>) {
+            items = newItems
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
+            val binding = com.example.myapplication.databinding.ItemFriendBinding.inflate(
+                android.view.LayoutInflater.from(parent.context), parent, false
+            )
+            return ViewHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.bind(items[position])
+        }
+
+        override fun getItemCount(): Int = items.size
+
+        inner class ViewHolder(private val binding: com.example.myapplication.databinding.ItemFriendBinding) :
+            androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+
+            fun bind(item: com.example.myapplication.data.remote.dto.response.ConversationResponse) {
+                val isUserUnavailable = item.memberCount == 1 || item.hasLeft
+                val name = when {
+                    isUserUnavailable -> "Người dùng không tồn tại"
+                    !item.groupName.isNullOrEmpty() -> item.groupName
+                    item.lastMessage != null && item.lastMessage.senderId != currentUserId && !item.lastMessage.senderName.isNullOrEmpty() -> item.lastMessage.senderName
+                    else -> "Người dùng"
+                }
+                binding.tvFriendName.text = name
+                binding.tvLastMessage.visibility = android.view.View.GONE
+                binding.tvTime.visibility = android.view.View.GONE
+                binding.btnMore.visibility = android.view.View.GONE
+
+                val avatarUrl = if (isUserUnavailable) null else (item.groupAvatar ?: if (item.lastMessage?.senderId != currentUserId) item.lastMessage?.senderAvatar else null)
+                if (!avatarUrl.isNullOrEmpty()) {
+                    com.bumptech.glide.Glide.with(binding.root.context)
+                        .load(avatarUrl)
+                        .placeholder(com.example.myapplication.R.drawable.ic_launcher_foreground)
+                        .error(com.example.myapplication.R.drawable.ic_launcher_foreground)
+                        .into(binding.ivFriendAvatar)
+                } else {
+                    binding.ivFriendAvatar.setImageResource(com.example.myapplication.R.drawable.ic_launcher_foreground)
+                }
+
+                binding.root.setOnClickListener {
+                    onItemClick(item)
+                }
+            }
+        }
     }
 
     companion object {

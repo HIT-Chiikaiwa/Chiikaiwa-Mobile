@@ -177,6 +177,12 @@ interface ApiService {
         @Query("content") content: String
     ): Response<BaseResponse<MessageResponse>>
 
+    @POST("api/v1/chat/messages/{msgId}/forward")
+    suspend fun forwardMessage(
+        @Path("msgId") msgId: String,
+        @Body request: ForwardRequest
+    ): Response<BaseResponse<MessageResponse>>
+
     @POST("api/v1/chat/messages/{msgId}/reactions")
     suspend fun addReaction(
         @Path("msgId") msgId: String,

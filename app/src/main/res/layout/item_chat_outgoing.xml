@@ -46,6 +46,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/tvForwardedHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_4sdp"
+            android:textColor="#D7CCC8"
+            android:textSize="@dimen/_9ssp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="↪ Chuyển tiếp từ Nam Phong" />
+
         <LinearLayout
             android:id="@+id/layoutReplyInBubble"
             android:layout_width="match_parent"

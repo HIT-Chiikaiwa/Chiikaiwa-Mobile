@@ -429,6 +429,22 @@ class ChatViewModel(application: Application) : BaseViewModel<List<Message>>(app
         }
     }
 
+    fun forwardMessage(messageId: String, targetConversationId: String) {
+        viewModelScope.launch {
+            when (val result = messageRepository.forwardMessage(messageId, targetConversationId)) {
+                is Resource.Success -> {
+                    _event.emit(UiEvent.ShowToast("Đã chuyển tiếp tin nhắn"))
+                    if (targetConversationId == activeConversationId) {
+                        fetchMessages(activeConversationId)
+                    }
+                }
+                is Resource.Error -> {
+                    _event.emit(UiEvent.ShowToast("Chuyển tiếp thất bại: ${result.message}"))
+                }
+            }
+        }
+    }
+
     fun toggleReaction(messageId: String, emoji: String) {
         viewModelScope.launch {
             val message = _messages.find { it.id == messageId }

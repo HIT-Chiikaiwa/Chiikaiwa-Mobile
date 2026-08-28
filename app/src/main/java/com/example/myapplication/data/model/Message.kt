@@ -12,6 +12,7 @@ data class Message(
     val isRecalled: Boolean = false,
     val isDeleted: Boolean = false,
     val replyToMessage: ReplyMessage? = null,
+    val forwardedFrom: ReplyMessage? = null,
     val reactions: List<Reaction> = emptyList()
 )
 

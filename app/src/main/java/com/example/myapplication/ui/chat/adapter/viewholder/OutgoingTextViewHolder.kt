@@ -49,6 +49,13 @@ class OutgoingTextViewHolder(
             binding.layoutReplyInBubble.visibility = View.GONE
         }
 
+        if (message.forwardedFrom != null && !message.isRecalled) {
+            binding.tvForwardedHeader.visibility = View.VISIBLE
+            binding.tvForwardedHeader.text = "↪ Chuyển tiếp từ ${message.forwardedFrom.senderName ?: "Người dùng"}"
+        } else {
+            binding.tvForwardedHeader.visibility = View.GONE
+        }
+
         bindReactions(binding.layoutReactions, message.reactions, message)
 
         binding.layoutMessageBubble.setOnLongClickListener {

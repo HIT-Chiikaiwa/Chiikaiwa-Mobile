@@ -17,6 +17,7 @@ class ReactionPopup(
     private val onRecallClick: (Message) -> Unit,
     private val onDeleteClick: (Message) -> Unit,
     private val onReplyClick: (Message) -> Unit,
+    private val onForwardClick: (Message) -> Unit,
     private val onReactionClick: (Message, String) -> Unit
 ) {
 
@@ -46,6 +47,19 @@ class ReactionPopup(
 
         binding.tvReply.setOnClickListener {
             onReplyClick(message)
+            popupWindow.dismiss()
+        }
+
+        if (message.isRecalled) {
+            binding.tvForward.visibility = View.GONE
+            binding.forwardDividerPopup.visibility = View.GONE
+        } else {
+            binding.tvForward.visibility = View.VISIBLE
+            binding.forwardDividerPopup.visibility = View.VISIBLE
+        }
+
+        binding.tvForward.setOnClickListener {
+            onForwardClick(message)
             popupWindow.dismiss()
         }
 

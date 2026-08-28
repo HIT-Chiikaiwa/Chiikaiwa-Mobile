@@ -114,6 +114,28 @@
         android:background="@color/context_menu_divider" />
 
     <TextView
+        android:id="@+id/tvForward"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/_12sdp"
+        android:paddingVertical="@dimen/_8sdp"
+        android:text="Chuyển tiếp"
+        android:textColor="@color/brown"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <View
+        android:id="@+id/forwardDividerPopup"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="@dimen/_2sdp"
+        android:background="@color/context_menu_divider" />
+
+    <TextView
         android:id="@+id/tvRecall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

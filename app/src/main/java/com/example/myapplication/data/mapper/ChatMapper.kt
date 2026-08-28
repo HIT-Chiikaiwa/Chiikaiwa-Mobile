@@ -43,6 +43,15 @@ object ChatMapper {
             )
         }
 
+        val forwarded = dto.forwardedFrom?.let {
+            ReplyMessage(
+                id = it.id,
+                senderName = it.senderName,
+                content = it.content,
+                messageType = it.messageType
+            )
+        }
+
         val reactionsList = dto.reactions?.map {
             Reaction(
                 emoji = it.emoji,
@@ -63,6 +72,7 @@ object ChatMapper {
             updatedAt = dto.createdDate ?: "",
             isRecalled = dto.isRecalled,
             replyToMessage = replyTo,
+            forwardedFrom = forwarded,
             reactions = reactionsList
         )
     }

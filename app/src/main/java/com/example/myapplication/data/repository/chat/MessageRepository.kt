@@ -54,6 +54,13 @@ class MessageRepository(context: Context) : BaseRepository() {
         api.replyToMessage(messageId, content)
     }
 
+    suspend fun forwardMessage(
+        messageId: String,
+        targetConversationId: String
+    ): Resource<BaseResponse<MessageResponse>> = safeApiCall {
+        api.forwardMessage(messageId, com.example.myapplication.data.remote.dto.request.ForwardRequest(targetConversationId))
+    }
+
     suspend fun addReaction(
         messageId: String,
         emoji: String
